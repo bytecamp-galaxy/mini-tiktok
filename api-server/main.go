@@ -5,11 +5,18 @@ package main
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	"mini-tiktok-v2/api-server/biz/mu"
+	"mini-tiktok-v2/pkg/dal"
 )
 
-func main() {
-	h := server.Default(server.WithHostPorts("localhost:8080"), server.WithTransport(netpoll.NewTransporter))
+func Init() {
+	dal.Init()
+	mu.Init()
+}
 
+func main() {
+	Init()
+	h := server.Default(server.WithHostPorts("localhost:8080"), server.WithTransport(netpoll.NewTransporter))
 	register(h)
 	h.Spin()
 }

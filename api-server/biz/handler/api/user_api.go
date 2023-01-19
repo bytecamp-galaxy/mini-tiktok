@@ -5,6 +5,7 @@ package api
 import (
 	"context"
 	"github.com/cloudwego/kitex/client"
+	"mini-tiktok-v2/api-server/biz/mu"
 	"mini-tiktok-v2/user-server/kitex_gen/user"
 	"mini-tiktok-v2/user-server/kitex_gen/user/userservice"
 
@@ -20,8 +21,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var req api.UserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
+		panic(nil)
 	}
 
 	userClient, err := userservice.NewClient("user", client.WithHostPorts("0.0.0.0:8888"))
@@ -39,11 +39,56 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		panic(err)
 	}
 
+	token, _, err := mu.JwtMiddleware.TokenGenerator(req.Username)
+	if err != nil {
+		panic(err)
+	}
+
 	resp := &api.UserRegisterResponse{
 		StatusCode: respRpc.StatusCode,
 		StatusMsg:  respRpc.StatusMsg,
 		UserId:     respRpc.UserId,
-		Token:      respRpc.Token,
+		Token:      token,
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UserLogin .
+// @router /douyin/user/login/ [POST]
+func UserLogin(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.UserLoginRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		panic(nil)
+	}
+
+	userClient, err := userservice.NewClient("user", client.WithHostPorts("0.0.0.0:8888"))
+	if err != nil {
+		panic(nil)
+	}
+
+	reqRpc := &user.UserLoginRequest{
+		Username: req.Username,
+		Password: req.Password,
+	}
+
+	respRpc, err := userClient.UserLogin(ctx, reqRpc)
+	if err != nil {
+		panic(err)
+	}
+
+	token, _, err := mu.JwtMiddleware.TokenGenerator(req.Username)
+	if err != nil {
+		panic(err)
+	}
+
+	resp := &api.UserRLoginResponse{
+		StatusCode: respRpc.StatusCode,
+		StatusMsg:  respRpc.StatusMsg,
+		UserId:     respRpc.UserId,
+		Token:      token,
 	}
 
 	c.JSON(consts.StatusOK, resp)
