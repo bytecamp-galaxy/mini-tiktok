@@ -5,8 +5,8 @@ package api
 import (
 	"context"
 	"github.com/cloudwego/kitex/client"
-	"mini-tiktok-v2/api-server/kitex_gen/user"
-	"mini-tiktok-v2/api-server/kitex_gen/user/userservice"
+	"mini-tiktok-v2/user-server/kitex_gen/user"
+	"mini-tiktok-v2/user-server/kitex_gen/user/userservice"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"

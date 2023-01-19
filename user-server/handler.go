@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"mini-tiktok-v2/pkg/dal/model"
+	"mini-tiktok-v2/pkg/dal/query"
 	user "mini-tiktok-v2/user-server/kitex_gen/user"
 )
 
@@ -11,7 +12,12 @@ type UserServiceImpl struct{}
 
 // UserRegister implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
-	fmt.Println(req.Username, req.Password)
+	if err := query.User.WithContext(ctx).Create(&model.User{
+		UserName: req.Username,
+		Password: req.Password,
+	}); err != nil {
+		panic(err)
+	}
 	resp = &user.UserRegisterResponse{
 		StatusCode: 0,
 		StatusMsg:  "success",
