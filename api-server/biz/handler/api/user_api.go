@@ -5,8 +5,9 @@ package api
 import (
 	"context"
 	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/registry-eureka/resolver"
 	"google.golang.org/protobuf/proto"
-	"mini-tiktok-v2/api-server/biz/mu"
+	"mini-tiktok-v2/api-server/biz/middleware"
 	"mini-tiktok-v2/user-server/kitex_gen/user"
 	"mini-tiktok-v2/user-server/kitex_gen/user/userservice"
 
@@ -25,22 +26,20 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		panic(nil)
 	}
 
-	userClient, err := userservice.NewClient("user", client.WithHostPorts("0.0.0.0:8888"))
-	if err != nil {
-		panic(nil)
-	}
+	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	cli := userservice.MustNewClient("tiktok.user.service", client.WithResolver(r))
 
 	reqRpc := &user.UserRegisterRequest{
 		Username: req.Username,
 		Password: req.Password,
 	}
 
-	respRpc, err := userClient.UserRegister(ctx, reqRpc)
+	respRpc, err := cli.UserRegister(ctx, reqRpc)
 	if err != nil {
 		panic(err)
 	}
 
-	token, _, err := mu.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	token, _, err := middleware.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		panic(err)
 	}
@@ -65,22 +64,20 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		panic(nil)
 	}
 
-	userClient, err := userservice.NewClient("user", client.WithHostPorts("0.0.0.0:8888"))
-	if err != nil {
-		panic(nil)
-	}
+	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	cli := userservice.MustNewClient("tiktok.user.service", client.WithResolver(r))
 
 	reqRpc := &user.UserLoginRequest{
 		Username: req.Username,
 		Password: req.Password,
 	}
 
-	respRpc, err := userClient.UserLogin(ctx, reqRpc)
+	respRpc, err := cli.UserLogin(ctx, reqRpc)
 	if err != nil {
 		panic(err)
 	}
 
-	token, _, err := mu.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	token, _, err := middleware.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		panic(err)
 	}
@@ -105,7 +102,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		panic(err)
 	}
 
-	id, ok := c.Get(mu.IdentityKey)
+	id, ok := c.Get(middleware.IdentityKey)
 	if !ok {
 		panic(err)
 	}

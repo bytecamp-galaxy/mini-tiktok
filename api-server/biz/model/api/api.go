@@ -10,7 +10,7 @@ import (
 
 type UserRegisterRequest struct {
 	Username string `thrift:"Username,1,required" json:"Username,required" query:"username,required" vd:"(len($) > 0 && len($) < 32); msg:'Illegal format'"`
-	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 0 && len($) < 32); msg:'Illegal format'"`
+	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 0 && len($) < 64); msg:'Illegal format'"`
 }
 
 func NewUserRegisterRequest() *UserRegisterRequest {
@@ -516,7 +516,7 @@ func (p *UserRegisterResponse) String() string {
 
 type UserLoginRequest struct {
 	Username string `thrift:"Username,1,required" json:"Username,required" query:"username,required" vd:"(len($) > 0 && len($) < 32); msg:'Illegal format'"`
-	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 0 && len($) < 32); msg:'Illegal format'"`
+	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 0 && len($) < 64); msg:'Illegal format'"`
 }
 
 func NewUserLoginRequest() *UserLoginRequest {

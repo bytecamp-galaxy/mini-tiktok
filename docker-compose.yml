@@ -2,11 +2,16 @@ version: '3'
 
 services:
   mysql:
-    image: 'mysql:latest'
+    image: mysql:latest
     ports:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=gorm
       - MYSQL_USER=gorm
       - MYSQL_PASSWORD=gorm
-      - MYSQL_RANDOM_ROOT_PASSWORD="yes"
+      - MYSQL_RANDOM_ROOT_PASSWORD="yes"  # https://dev.mysql.com/doc/refman/5.7/en/docker-mysql-more-topics.html#docker_var_mysql_random_root_password
+
+  eureka:
+    image: xdockerh/eureka-server:latest
+    ports:
+      - "8761:8761"

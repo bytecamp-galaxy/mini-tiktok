@@ -2,7 +2,7 @@ namespace go api
 
 struct UserRegisterRequest {
     1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
-    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
+    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 64); msg:'Illegal format'");
 }
 
 struct UserRegisterResponse {
@@ -14,7 +14,7 @@ struct UserRegisterResponse {
 
 struct UserLoginRequest {
     1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
-    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
+    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 64); msg:'Illegal format'");
 }
 
 struct UserLoginResponse {
