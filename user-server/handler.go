@@ -13,9 +13,14 @@ type UserServiceImpl struct{}
 
 // UserRegister implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
+	hash, err := utils.HashPassword(req.Password)
+	if err != nil {
+		panic(err)
+	}
+
 	err = query.User.WithContext(ctx).Create(&model.User{
 		UserName: req.Username,
-		Password: utils.MD5(req.Password),
+		Password: hash,
 	})
 	if err != nil {
 		panic(err)
@@ -47,7 +52,7 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 		panic(err)
 	}
 
-	if data.Password != utils.MD5(req.Password) {
+	if !utils.CheckPasswordHash(req.Password, data.Password) {
 		panic("incorrect password")
 	}
 
