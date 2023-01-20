@@ -3,8 +3,8 @@
 package Api
 
 import (
-	"github.com/cloudwego/hertz/pkg/app/server"
 	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/handler/api"
+	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 /*

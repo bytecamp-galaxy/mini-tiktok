@@ -15,7 +15,7 @@ var (
 func Init() {
 	var err error
 	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
-		Realm:   "mini-tiktok-v2",
+		Realm:   "mini-tiktok",
 		Key:     []byte("114514"),
 		Timeout: time.Hour,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {

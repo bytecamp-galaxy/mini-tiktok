@@ -23,7 +23,7 @@ func Init() {
 		panic(err)
 	}
 
-	if err := DB.AutoMigrate(&model.User{}); err != nil {
+	if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
 		panic(err)
 	}
 
