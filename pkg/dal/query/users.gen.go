@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"mini-tiktok-v2/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 )
 
 func newUser(db *gorm.DB, opts ...gen.DOOption) user {

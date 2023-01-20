@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
-	router "mini-tiktok-v2/api-server/biz/router"
+	router "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/router"
 )
 
 // register registers all routers.

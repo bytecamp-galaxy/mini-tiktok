@@ -4,17 +4,17 @@ package api
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/middleware"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
+	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
+	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/client"
 	"github.com/kitex-contrib/registry-eureka/resolver"
 	"google.golang.org/protobuf/proto"
-	"mini-tiktok-v2/api-server/biz/middleware"
-	"mini-tiktok-v2/pkg/utils"
-	"mini-tiktok-v2/user-server/kitex_gen/user"
-	"mini-tiktok-v2/user-server/kitex_gen/user/userservice"
 
+	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	api "mini-tiktok-v2/api-server/biz/model/api"
 )
 
 // UserRegister .
@@ -24,12 +24,12 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var req api.UserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		panic(nil)
+		panic(err)
 	}
 
 	err = utils.ValidatePassword(req.Password)
 	if err != nil {
-		panic(nil)
+		panic(err)
 	}
 
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
@@ -67,7 +67,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	var req api.UserLoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		panic(nil)
+		panic(err)
 	}
 
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})

@@ -5,13 +5,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/middleware"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
-	"mini-tiktok-v2/api-server/biz/middleware"
-	"mini-tiktok-v2/api-server/biz/registry/eureka"
-	"mini-tiktok-v2/pkg/dal"
 	"time"
 )
 

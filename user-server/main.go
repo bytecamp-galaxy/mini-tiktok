@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
+	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/registry-eureka/registry"
-	"mini-tiktok-v2/pkg/dal"
-	user "mini-tiktok-v2/user-server/kitex_gen/user/userservice"
 	"net"
 	"time"
 )

@@ -6,7 +6,7 @@ import (
 	"context"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
-	user "mini-tiktok-v2/user-server/kitex_gen/user"
+	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 )
 
 func serviceInfo() *kitex.ServiceInfo {

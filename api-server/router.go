@@ -3,9 +3,9 @@
 package main
 
 import (
+	handler "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/handler"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/pprof"
-	handler "mini-tiktok-v2/api-server/biz/handler"
 )
 
 // customizeRegister registers customize routers.

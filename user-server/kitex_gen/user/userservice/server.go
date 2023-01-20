@@ -3,7 +3,7 @@ package userservice
 
 import (
 	server "github.com/cloudwego/kitex/server"
-	user "mini-tiktok-v2/user-server/kitex_gen/user"
+	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 )
 
 // NewServer creates a server.Server with the given handler and options.

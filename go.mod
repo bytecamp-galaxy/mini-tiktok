@@ -1,4 +1,4 @@
-module mini-tiktok-v2
+module github.com/bytecamp-galaxy/mini-tiktok
 
 go 1.19
 

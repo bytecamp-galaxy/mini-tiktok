@@ -1,10 +1,10 @@
 package mysql
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"mini-tiktok-v2/pkg/dal/model"
 )
 
 // https://github.com/go-sql-driver/mysql#dsn-data-source-name

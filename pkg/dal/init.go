@@ -1,8 +1,8 @@
 package dal
 
 import (
-	"mini-tiktok-v2/pkg/dal/mysql"
-	"mini-tiktok-v2/pkg/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 )
 
 func Init() {

@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"mini-tiktok-v2/pkg/dal/model"
-	"mini-tiktok-v2/pkg/dal/query"
-	"mini-tiktok-v2/pkg/utils"
-	user "mini-tiktok-v2/user-server/kitex_gen/user"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
+	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 )
 
 // UserServiceImpl implements the last service interface defined in the IDL.

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
 	"gorm.io/gen"
-	"mini-tiktok-v2/pkg/dal/model"
-	"mini-tiktok-v2/pkg/dal/mysql"
 )
 
 func main() {

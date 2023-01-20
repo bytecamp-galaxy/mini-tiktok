@@ -3,8 +3,8 @@
 package Api
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/middleware"
 	"github.com/cloudwego/hertz/pkg/app"
-	"mini-tiktok-v2/api-server/biz/middleware"
 )
 
 func rootMw() []app.HandlerFunc {
