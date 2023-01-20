@@ -12,6 +12,7 @@ require (
 	github.com/hertz-contrib/pprof v0.1.0
 	github.com/hudl/fargo v1.4.0
 	github.com/kitex-contrib/registry-eureka v0.0.1
+	github.com/wagslane/go-password-validator v0.3.0
 	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/mysql v1.4.5

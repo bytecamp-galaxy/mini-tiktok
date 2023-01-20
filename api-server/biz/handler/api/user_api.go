@@ -8,6 +8,7 @@ import (
 	"github.com/kitex-contrib/registry-eureka/resolver"
 	"google.golang.org/protobuf/proto"
 	"mini-tiktok-v2/api-server/biz/middleware"
+	"mini-tiktok-v2/pkg/utils"
 	"mini-tiktok-v2/user-server/kitex_gen/user"
 	"mini-tiktok-v2/user-server/kitex_gen/user/userservice"
 
@@ -22,6 +23,11 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserRegisterRequest
 	err = c.BindAndValidate(&req)
+	if err != nil {
+		panic(nil)
+	}
+
+	err = utils.ValidatePassword(req.Password)
 	if err != nil {
 		panic(nil)
 	}
@@ -108,7 +114,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	if id != req.UserId {
-		panic(err)
+		panic("incorrect id")
 	}
 
 	resp := new(api.UserResponse)

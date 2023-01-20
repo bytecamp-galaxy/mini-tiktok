@@ -26,7 +26,7 @@ func main() {
 	r := eureka.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 40*time.Second)
 	h := server.Default(server.WithHostPorts(addr),
 		server.WithTransport(netpoll.NewTransporter),
-		server.WithExitWaitTime(3*time.Second),
+		server.WithExitWaitTime(5*time.Second),
 		server.WithRegistry(r, &registry.Info{
 			ServiceName: "tiktok.api.service",
 			Addr:        utils.NewNetAddr("tcp", addr),
