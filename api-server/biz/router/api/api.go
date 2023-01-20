@@ -28,6 +28,7 @@ func Register(r *server.Hertz) {
 		}
 		{
 			_user := _douyin.Group("/user", _userMw()...)
+			_user.GET("/", append(_userqueryMw(), api.UserQuery)...)
 			{
 				_login := _user.Group("/login", _loginMw()...)
 				_login.POST("/", append(_userloginMw(), api.UserLogin)...)

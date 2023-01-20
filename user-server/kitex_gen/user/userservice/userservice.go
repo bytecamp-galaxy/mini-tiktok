@@ -21,6 +21,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	methods := map[string]kitex.MethodInfo{
 		"userRegister": kitex.NewMethodInfo(userRegisterHandler, newUserServiceUserRegisterArgs, newUserServiceUserRegisterResult, false),
 		"userLogin":    kitex.NewMethodInfo(userLoginHandler, newUserServiceUserLoginArgs, newUserServiceUserLoginResult, false),
+		"userQuery":    kitex.NewMethodInfo(userQueryHandler, newUserServiceUserQueryArgs, newUserServiceUserQueryResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "user",
@@ -72,6 +73,24 @@ func newUserServiceUserLoginResult() interface{} {
 	return user.NewUserServiceUserLoginResult()
 }
 
+func userQueryHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceUserQueryArgs)
+	realResult := result.(*user.UserServiceUserQueryResult)
+	success, err := handler.(user.UserService).UserQuery(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceUserQueryArgs() interface{} {
+	return user.NewUserServiceUserQueryArgs()
+}
+
+func newUserServiceUserQueryResult() interface{} {
+	return user.NewUserServiceUserQueryResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -97,6 +116,16 @@ func (p *kClient) UserLogin(ctx context.Context, req *user.UserLoginRequest) (r 
 	_args.Req = req
 	var _result user.UserServiceUserLoginResult
 	if err = p.c.Call(ctx, "userLogin", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UserQuery(ctx context.Context, req *user.UserRequest) (r *user.UserResponse, err error) {
+	var _args user.UserServiceUserQueryArgs
+	_args.Req = req
+	var _result user.UserServiceUserQueryResult
+	if err = p.c.Call(ctx, "userQuery", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

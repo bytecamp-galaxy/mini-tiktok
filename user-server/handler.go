@@ -33,7 +33,6 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 		StatusCode: 0,
 		StatusMsg:  "success",
 		UserId:     int64(data.ID),
-		Token:      "",
 	}
 	return resp, nil
 }
@@ -56,7 +55,12 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 		StatusCode: 0,
 		StatusMsg:  "success",
 		UserId:     int64(data.ID),
-		Token:      "",
 	}
 	return resp, nil
+}
+
+// UserQuery implements the UserServiceImpl interface.
+func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
+	// TODO: Your code here...
+	return
 }

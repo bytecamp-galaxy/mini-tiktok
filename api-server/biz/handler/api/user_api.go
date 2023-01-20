@@ -5,6 +5,7 @@ package api
 import (
 	"context"
 	"github.com/cloudwego/kitex/client"
+	"google.golang.org/protobuf/proto"
 	"mini-tiktok-v2/api-server/biz/mu"
 	"mini-tiktok-v2/user-server/kitex_gen/user"
 	"mini-tiktok-v2/user-server/kitex_gen/user/userservice"
@@ -39,14 +40,14 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		panic(err)
 	}
 
-	token, _, err := mu.JwtMiddleware.TokenGenerator(req.Username)
+	token, _, err := mu.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		panic(err)
 	}
 
 	resp := &api.UserRegisterResponse{
 		StatusCode: respRpc.StatusCode,
-		StatusMsg:  respRpc.StatusMsg,
+		StatusMsg:  proto.String(respRpc.StatusMsg),
 		UserId:     respRpc.UserId,
 		Token:      token,
 	}
@@ -79,17 +80,41 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		panic(err)
 	}
 
-	token, _, err := mu.JwtMiddleware.TokenGenerator(req.Username)
+	token, _, err := mu.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		panic(err)
 	}
 
-	resp := &api.UserRLoginResponse{
+	resp := &api.UserLoginResponse{
 		StatusCode: respRpc.StatusCode,
-		StatusMsg:  respRpc.StatusMsg,
+		StatusMsg:  proto.String(respRpc.StatusMsg),
 		UserId:     respRpc.UserId,
 		Token:      token,
 	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UserQuery .
+// @router /douyin/user/ [GET]
+func UserQuery(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.UserRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		panic(err)
+	}
+
+	id, ok := c.Get(mu.IdentityKey)
+	if !ok {
+		panic(err)
+	}
+
+	if id != req.UserId {
+		panic(err)
+	}
+
+	resp := new(api.UserResponse)
 
 	c.JSON(consts.StatusOK, resp)
 }
