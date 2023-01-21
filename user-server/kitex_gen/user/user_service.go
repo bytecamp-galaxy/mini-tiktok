@@ -1019,39 +1019,30 @@ func (p *UserLoginResponse) Field3DeepEqual(src int64) bool {
 	return true
 }
 
-type UserRequest struct {
-	UserId int64  `thrift:"UserId,1" frugal:"1,default,i64" json:"UserId"`
-	Token  string `thrift:"Token,2" frugal:"2,default,string" json:"Token"`
+type UserQueryRequest struct {
+	UserId int64 `thrift:"UserId,1" frugal:"1,default,i64" json:"UserId"`
 }
 
-func NewUserRequest() *UserRequest {
-	return &UserRequest{}
+func NewUserQueryRequest() *UserQueryRequest {
+	return &UserQueryRequest{}
 }
 
-func (p *UserRequest) InitDefault() {
-	*p = UserRequest{}
+func (p *UserQueryRequest) InitDefault() {
+	*p = UserQueryRequest{}
 }
 
-func (p *UserRequest) GetUserId() (v int64) {
+func (p *UserQueryRequest) GetUserId() (v int64) {
 	return p.UserId
 }
-
-func (p *UserRequest) GetToken() (v string) {
-	return p.Token
-}
-func (p *UserRequest) SetUserId(val int64) {
+func (p *UserQueryRequest) SetUserId(val int64) {
 	p.UserId = val
 }
-func (p *UserRequest) SetToken(val string) {
-	p.Token = val
-}
 
-var fieldIDToName_UserRequest = map[int16]string{
+var fieldIDToName_UserQueryRequest = map[int16]string{
 	1: "UserId",
-	2: "Token",
 }
 
-func (p *UserRequest) Read(iprot thrift.TProtocol) (err error) {
+func (p *UserQueryRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1080,16 +1071,6 @@ func (p *UserRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
-		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -1110,7 +1091,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UserRequest[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UserQueryRequest[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1120,7 +1101,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UserRequest) ReadField1(iprot thrift.TProtocol) error {
+func (p *UserQueryRequest) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
@@ -1129,27 +1110,14 @@ func (p *UserRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserRequest) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.Token = v
-	}
-	return nil
-}
-
-func (p *UserRequest) Write(oprot thrift.TProtocol) (err error) {
+func (p *UserQueryRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UserRequest"); err != nil {
+	if err = oprot.WriteStructBegin("UserQueryRequest"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -1171,7 +1139,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *UserRequest) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *UserQueryRequest) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("UserId", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1188,31 +1156,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *UserRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("Token", thrift.STRING, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Token); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *UserRequest) String() string {
+func (p *UserQueryRequest) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UserRequest(%+v)", *p)
+	return fmt.Sprintf("UserQueryRequest(%+v)", *p)
 }
 
-func (p *UserRequest) DeepEqual(ano *UserRequest) bool {
+func (p *UserQueryRequest) DeepEqual(ano *UserQueryRequest) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1221,78 +1172,68 @@ func (p *UserRequest) DeepEqual(ano *UserRequest) bool {
 	if !p.Field1DeepEqual(ano.UserId) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Token) {
-		return false
-	}
 	return true
 }
 
-func (p *UserRequest) Field1DeepEqual(src int64) bool {
+func (p *UserQueryRequest) Field1DeepEqual(src int64) bool {
 
 	if p.UserId != src {
 		return false
 	}
 	return true
 }
-func (p *UserRequest) Field2DeepEqual(src string) bool {
 
-	if strings.Compare(p.Token, src) != 0 {
-		return false
-	}
-	return true
-}
-
-type UserResponse struct {
+type UserQueryResponse struct {
 	StatusCode int32  `thrift:"StatusCode,1" frugal:"1,default,i32" json:"StatusCode"`
 	StatusMsg  string `thrift:"StatusMsg,2" frugal:"2,default,string" json:"StatusMsg"`
 	User       *User  `thrift:"User,3" frugal:"3,default,User" json:"User"`
 }
 
-func NewUserResponse() *UserResponse {
-	return &UserResponse{}
+func NewUserQueryResponse() *UserQueryResponse {
+	return &UserQueryResponse{}
 }
 
-func (p *UserResponse) InitDefault() {
-	*p = UserResponse{}
+func (p *UserQueryResponse) InitDefault() {
+	*p = UserQueryResponse{}
 }
 
-func (p *UserResponse) GetStatusCode() (v int32) {
+func (p *UserQueryResponse) GetStatusCode() (v int32) {
 	return p.StatusCode
 }
 
-func (p *UserResponse) GetStatusMsg() (v string) {
+func (p *UserQueryResponse) GetStatusMsg() (v string) {
 	return p.StatusMsg
 }
 
-var UserResponse_User_DEFAULT *User
+var UserQueryResponse_User_DEFAULT *User
 
-func (p *UserResponse) GetUser() (v *User) {
+func (p *UserQueryResponse) GetUser() (v *User) {
 	if !p.IsSetUser() {
-		return UserResponse_User_DEFAULT
+		return UserQueryResponse_User_DEFAULT
 	}
 	return p.User
 }
-func (p *UserResponse) SetStatusCode(val int32) {
+func (p *UserQueryResponse) SetStatusCode(val int32) {
 	p.StatusCode = val
 }
-func (p *UserResponse) SetStatusMsg(val string) {
+func (p *UserQueryResponse) SetStatusMsg(val string) {
 	p.StatusMsg = val
 }
-func (p *UserResponse) SetUser(val *User) {
+func (p *UserQueryResponse) SetUser(val *User) {
 	p.User = val
 }
 
-var fieldIDToName_UserResponse = map[int16]string{
+var fieldIDToName_UserQueryResponse = map[int16]string{
 	1: "StatusCode",
 	2: "StatusMsg",
 	3: "User",
 }
 
-func (p *UserResponse) IsSetUser() bool {
+func (p *UserQueryResponse) IsSetUser() bool {
 	return p.User != nil
 }
 
-func (p *UserResponse) Read(iprot thrift.TProtocol) (err error) {
+func (p *UserQueryResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1361,7 +1302,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UserResponse[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UserQueryResponse[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1371,7 +1312,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UserResponse) ReadField1(iprot thrift.TProtocol) error {
+func (p *UserQueryResponse) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -1380,7 +1321,7 @@ func (p *UserResponse) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserResponse) ReadField2(iprot thrift.TProtocol) error {
+func (p *UserQueryResponse) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -1389,7 +1330,7 @@ func (p *UserResponse) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserResponse) ReadField3(iprot thrift.TProtocol) error {
+func (p *UserQueryResponse) ReadField3(iprot thrift.TProtocol) error {
 	p.User = NewUser()
 	if err := p.User.Read(iprot); err != nil {
 		return err
@@ -1397,9 +1338,9 @@ func (p *UserResponse) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UserResponse) Write(oprot thrift.TProtocol) (err error) {
+func (p *UserQueryResponse) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UserResponse"); err != nil {
+	if err = oprot.WriteStructBegin("UserQueryResponse"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1434,7 +1375,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *UserResponse) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *UserQueryResponse) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("StatusCode", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1451,7 +1392,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *UserResponse) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *UserQueryResponse) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("StatusMsg", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1468,7 +1409,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *UserResponse) writeField3(oprot thrift.TProtocol) (err error) {
+func (p *UserQueryResponse) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("User", thrift.STRUCT, 3); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1485,14 +1426,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
-func (p *UserResponse) String() string {
+func (p *UserQueryResponse) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UserResponse(%+v)", *p)
+	return fmt.Sprintf("UserQueryResponse(%+v)", *p)
 }
 
-func (p *UserResponse) DeepEqual(ano *UserResponse) bool {
+func (p *UserQueryResponse) DeepEqual(ano *UserQueryResponse) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1510,21 +1451,21 @@ func (p *UserResponse) DeepEqual(ano *UserResponse) bool {
 	return true
 }
 
-func (p *UserResponse) Field1DeepEqual(src int32) bool {
+func (p *UserQueryResponse) Field1DeepEqual(src int32) bool {
 
 	if p.StatusCode != src {
 		return false
 	}
 	return true
 }
-func (p *UserResponse) Field2DeepEqual(src string) bool {
+func (p *UserQueryResponse) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.StatusMsg, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *UserResponse) Field3DeepEqual(src *User) bool {
+func (p *UserQueryResponse) Field3DeepEqual(src *User) bool {
 
 	if !p.User.DeepEqual(src) {
 		return false
@@ -1937,7 +1878,7 @@ type UserService interface {
 
 	UserLogin(ctx context.Context, req *UserLoginRequest) (r *UserLoginResponse, err error)
 
-	UserQuery(ctx context.Context, req *UserRequest) (r *UserResponse, err error)
+	UserQuery(ctx context.Context, req *UserQueryRequest) (r *UserQueryResponse, err error)
 }
 
 type UserServiceClient struct {
@@ -1984,7 +1925,7 @@ func (p *UserServiceClient) UserLogin(ctx context.Context, req *UserLoginRequest
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *UserServiceClient) UserQuery(ctx context.Context, req *UserRequest) (r *UserResponse, err error) {
+func (p *UserServiceClient) UserQuery(ctx context.Context, req *UserQueryRequest) (r *UserQueryResponse, err error) {
 	var _args UserServiceUserQueryArgs
 	_args.Req = req
 	var _result UserServiceUserQueryResult
@@ -2152,7 +2093,7 @@ func (p *userServiceProcessorUserQuery) Process(ctx context.Context, seqId int32
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := UserServiceUserQueryResult{}
-	var retval *UserResponse
+	var retval *UserQueryResponse
 	if retval, err2 = p.handler.UserQuery(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing userQuery: "+err2.Error())
 		oprot.WriteMessageBegin("userQuery", thrift.EXCEPTION, seqId)
@@ -2874,7 +2815,7 @@ func (p *UserServiceUserLoginResult) Field0DeepEqual(src *UserLoginResponse) boo
 }
 
 type UserServiceUserQueryArgs struct {
-	Req *UserRequest `thrift:"req,1" frugal:"1,default,UserRequest" json:"req"`
+	Req *UserQueryRequest `thrift:"req,1" frugal:"1,default,UserQueryRequest" json:"req"`
 }
 
 func NewUserServiceUserQueryArgs() *UserServiceUserQueryArgs {
@@ -2885,15 +2826,15 @@ func (p *UserServiceUserQueryArgs) InitDefault() {
 	*p = UserServiceUserQueryArgs{}
 }
 
-var UserServiceUserQueryArgs_Req_DEFAULT *UserRequest
+var UserServiceUserQueryArgs_Req_DEFAULT *UserQueryRequest
 
-func (p *UserServiceUserQueryArgs) GetReq() (v *UserRequest) {
+func (p *UserServiceUserQueryArgs) GetReq() (v *UserQueryRequest) {
 	if !p.IsSetReq() {
 		return UserServiceUserQueryArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *UserServiceUserQueryArgs) SetReq(val *UserRequest) {
+func (p *UserServiceUserQueryArgs) SetReq(val *UserQueryRequest) {
 	p.Req = val
 }
 
@@ -2965,7 +2906,7 @@ ReadStructEndError:
 }
 
 func (p *UserServiceUserQueryArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewUserRequest()
+	p.Req = NewUserQueryRequest()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
@@ -3037,7 +2978,7 @@ func (p *UserServiceUserQueryArgs) DeepEqual(ano *UserServiceUserQueryArgs) bool
 	return true
 }
 
-func (p *UserServiceUserQueryArgs) Field1DeepEqual(src *UserRequest) bool {
+func (p *UserServiceUserQueryArgs) Field1DeepEqual(src *UserQueryRequest) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -3046,7 +2987,7 @@ func (p *UserServiceUserQueryArgs) Field1DeepEqual(src *UserRequest) bool {
 }
 
 type UserServiceUserQueryResult struct {
-	Success *UserResponse `thrift:"success,0,optional" frugal:"0,optional,UserResponse" json:"success,omitempty"`
+	Success *UserQueryResponse `thrift:"success,0,optional" frugal:"0,optional,UserQueryResponse" json:"success,omitempty"`
 }
 
 func NewUserServiceUserQueryResult() *UserServiceUserQueryResult {
@@ -3057,16 +2998,16 @@ func (p *UserServiceUserQueryResult) InitDefault() {
 	*p = UserServiceUserQueryResult{}
 }
 
-var UserServiceUserQueryResult_Success_DEFAULT *UserResponse
+var UserServiceUserQueryResult_Success_DEFAULT *UserQueryResponse
 
-func (p *UserServiceUserQueryResult) GetSuccess() (v *UserResponse) {
+func (p *UserServiceUserQueryResult) GetSuccess() (v *UserQueryResponse) {
 	if !p.IsSetSuccess() {
 		return UserServiceUserQueryResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *UserServiceUserQueryResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UserResponse)
+	p.Success = x.(*UserQueryResponse)
 }
 
 var fieldIDToName_UserServiceUserQueryResult = map[int16]string{
@@ -3137,7 +3078,7 @@ ReadStructEndError:
 }
 
 func (p *UserServiceUserQueryResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewUserResponse()
+	p.Success = NewUserQueryResponse()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
@@ -3211,7 +3152,7 @@ func (p *UserServiceUserQueryResult) DeepEqual(ano *UserServiceUserQueryResult) 
 	return true
 }
 
-func (p *UserServiceUserQueryResult) Field0DeepEqual(src *UserResponse) bool {
+func (p *UserServiceUserQueryResult) Field0DeepEqual(src *UserQueryResponse) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false

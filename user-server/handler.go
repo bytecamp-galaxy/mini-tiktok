@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
@@ -13,31 +14,36 @@ type UserServiceImpl struct{}
 
 // UserRegister implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
+	// hash password
 	hash, err := utils.HashPassword(req.Password)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
+	// create user in db
 	err = query.User.WithContext(ctx).Create(&model.User{
-		UserName: req.Username,
+		Username: req.Username,
 		Password: hash,
 	})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
+	// query user id in db
+	// TODO: simplify
 	q := query.Q
 	t := q.User
 
-	data, err := query.User.WithContext(ctx).Where(t.UserName.Eq(req.Username)).Take()
+	data, err := query.User.WithContext(ctx).Where(t.Username.Eq(req.Username)).Take()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
+	// response to user server
 	resp = &user.UserRegisterResponse{
 		StatusCode: 0,
 		StatusMsg:  "success",
-		UserId:     int64(data.ID),
+		UserId:     data.ID,
 	}
 	return resp, nil
 }
@@ -47,25 +53,46 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 	q := query.Q
 	t := q.User
 
-	data, err := query.User.WithContext(ctx).Where(t.UserName.Eq(req.Username)).Take()
+	// query user in db
+	data, err := query.User.WithContext(ctx).Where(t.Username.Eq(req.Username)).Take()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
+	// check password
 	if !utils.CheckPasswordHash(req.Password, data.Password) {
-		panic("incorrect password")
+		return nil, errors.New("incorrect password")
 	}
 
 	resp = &user.UserLoginResponse{
 		StatusCode: 0,
 		StatusMsg:  "success",
-		UserId:     int64(data.ID),
+		UserId:     data.ID,
 	}
 	return resp, nil
 }
 
 // UserQuery implements the UserServiceImpl interface.
-func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
-	// TODO: Your code here...
-	return
+func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequest) (resp *user.UserQueryResponse, err error) {
+	q := query.Q
+	t := q.User
+
+	// query user in db
+	data, err := query.User.WithContext(ctx).Where(t.ID.Eq(req.UserId)).Take()
+	if err != nil {
+		return nil, err
+	}
+
+	resp = &user.UserQueryResponse{
+		StatusCode: 0,
+		StatusMsg:  "success",
+		User: &user.User{
+			Id:            data.ID,
+			Name:          data.Username,
+			FollowCount:   data.FollowerCount,
+			FollowerCount: data.FollowingCount,
+			IsFollow:      false, // TODO
+		},
+	}
+	return resp, nil
 }

@@ -3,7 +3,7 @@
 package Api
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/middleware"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -59,5 +59,5 @@ func _userloginMw() []app.HandlerFunc {
 
 func _userqueryMw() []app.HandlerFunc {
 	// your code...
-	return []app.HandlerFunc{middleware.JwtMiddleware.MiddlewareFunc()}
+	return []app.HandlerFunc{mw.JwtMiddleware.MiddlewareFunc()}
 }

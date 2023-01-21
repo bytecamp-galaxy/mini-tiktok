@@ -22,12 +22,11 @@ struct UserLoginResponse {
     3: i64 UserId;
 }
 
-struct UserRequest {
+struct UserQueryRequest {
     1: i64 UserId;
-    2: string Token;
 }
 
-struct UserResponse {
+struct UserQueryResponse {
     1: i32 StatusCode;
     2: string StatusMsg;
     3: User User;
@@ -44,5 +43,5 @@ struct User {
 service UserService {
     UserRegisterResponse userRegister(1: UserRegisterRequest req);
     UserLoginResponse userLogin(1: UserLoginRequest req);
-    UserResponse userQuery(1: UserRequest req);
+    UserQueryResponse userQuery(1: UserQueryRequest req);
 }

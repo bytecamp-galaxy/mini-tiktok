@@ -121,7 +121,7 @@ func (p *kClient) UserLogin(ctx context.Context, req *user.UserLoginRequest) (r 
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UserQuery(ctx context.Context, req *user.UserRequest) (r *user.UserResponse, err error) {
+func (p *kClient) UserQuery(ctx context.Context, req *user.UserQueryRequest) (r *user.UserQueryResponse, err error) {
 	var _args user.UserServiceUserQueryArgs
 	_args.Req = req
 	var _result user.UserServiceUserQueryResult

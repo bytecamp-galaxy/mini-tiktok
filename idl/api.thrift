@@ -1,8 +1,8 @@
 namespace go api
 
 struct UserRegisterRequest {
-    1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
-    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
+    1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32)");
+    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32)");
 }
 
 struct UserRegisterResponse {
@@ -13,8 +13,8 @@ struct UserRegisterResponse {
 }
 
 struct UserLoginRequest {
-    1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
-    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32); msg:'Illegal format'");
+    1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32)");
+    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32)");
 }
 
 struct UserLoginResponse {
@@ -24,12 +24,12 @@ struct UserLoginResponse {
     4: required string Token (api.body="token");
 }
 
-struct UserRequest {
+struct UserQueryRequest {
     1: required i64 UserId (api.query="user_id");
     2: required string Token (api.query="token");
 }
 
-struct UserResponse {
+struct UserQueryResponse {
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
     3: required User User (api.body="user");
@@ -46,7 +46,7 @@ struct User {
 service UserApi {
     UserRegisterResponse userRegister(1: UserRegisterRequest req) (api.post="/douyin/user/register/");
     UserLoginResponse userLogin(1: UserLoginRequest req) (api.post="/douyin/user/login/");
-    UserResponse userQuery(1: UserRequest req) (api.get="/douyin/user/");
+    UserQueryResponse userQuery(1: UserQueryRequest req) (api.get="/douyin/user/");
 }
 
 struct PublishActionRequest {

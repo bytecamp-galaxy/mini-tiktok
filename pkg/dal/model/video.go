@@ -1,15 +1,14 @@
 package model
 
-import "gorm.io/gorm"
-
 // Video belongs to User
 type Video struct {
-	gorm.Model
-	Author        User   `gorm:"foreignKey:AuthorID;" json:"author"`
-	AuthorID      int    `gorm:"index:idx_author_id;" json:"author_id"`
+	ID            int64  `gorm:"primaryKey;" json:"id"`
+	CreatedAt     int64  `gorm:"index:idx_created_at;autoCreateTime;" json:"created_at"` // 使用时间戳秒数填充创建时间
+	Author        User   `gorm:"foreignKey:AuthorID;references:ID;" json:"author"`
+	AuthorID      int64  `gorm:"index:idx_author_id;" json:"author_id"`
 	PlayUrl       string `gorm:"type:varchar(255);not null;" json:"play_url"`
 	CoverUrl      string `gorm:"type:varchar(255);" json:"cover_url"`
-	FavoriteCount int    `gorm:"default:0;" json:"favorite_count"`
-	CommentCount  int    `gorm:"default:0;" json:"comment_count"`
+	FavoriteCount int64  `gorm:"default:0;" json:"favorite_count"`
+	CommentCount  int64  `gorm:"default:0;" json:"comment_count"`
 	Title         string `gorm:"type:varchar(63);not null;" json:"title"`
 }

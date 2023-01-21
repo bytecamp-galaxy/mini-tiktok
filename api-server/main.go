@@ -5,7 +5,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/middleware"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -17,7 +17,7 @@ import (
 
 func Init() {
 	dal.Init()
-	middleware.Init()
+	mw.Init()
 }
 
 func main() {

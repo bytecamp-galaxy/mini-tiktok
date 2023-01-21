@@ -27,12 +27,9 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 
 	tableName := _comment.commentDo.TableName()
 	_comment.ALL = field.NewAsterisk(tableName)
-	_comment.ID = field.NewUint(tableName, "id")
-	_comment.CreatedAt = field.NewTime(tableName, "created_at")
-	_comment.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_comment.DeletedAt = field.NewField(tableName, "deleted_at")
-	_comment.VideoID = field.NewInt(tableName, "video_id")
-	_comment.UserID = field.NewInt(tableName, "user_id")
+	_comment.ID = field.NewInt64(tableName, "id")
+	_comment.VideoID = field.NewInt64(tableName, "video_id")
+	_comment.UserID = field.NewInt64(tableName, "user_id")
 	_comment.Content = field.NewString(tableName, "content")
 	_comment.Video = commentBelongsToVideo{
 		db: db.Session(&gorm.Session{}),
@@ -67,15 +64,12 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 type comment struct {
 	commentDo
 
-	ALL       field.Asterisk
-	ID        field.Uint
-	CreatedAt field.Time
-	UpdatedAt field.Time
-	DeletedAt field.Field
-	VideoID   field.Int
-	UserID    field.Int
-	Content   field.String
-	Video     commentBelongsToVideo
+	ALL     field.Asterisk
+	ID      field.Int64
+	VideoID field.Int64
+	UserID  field.Int64
+	Content field.String
+	Video   commentBelongsToVideo
 
 	User commentBelongsToUser
 
@@ -94,12 +88,9 @@ func (c comment) As(alias string) *comment {
 
 func (c *comment) updateTableName(table string) *comment {
 	c.ALL = field.NewAsterisk(table)
-	c.ID = field.NewUint(table, "id")
-	c.CreatedAt = field.NewTime(table, "created_at")
-	c.UpdatedAt = field.NewTime(table, "updated_at")
-	c.DeletedAt = field.NewField(table, "deleted_at")
-	c.VideoID = field.NewInt(table, "video_id")
-	c.UserID = field.NewInt(table, "user_id")
+	c.ID = field.NewInt64(table, "id")
+	c.VideoID = field.NewInt64(table, "video_id")
+	c.UserID = field.NewInt64(table, "user_id")
 	c.Content = field.NewString(table, "content")
 
 	c.fillFieldMap()
@@ -117,11 +108,8 @@ func (c *comment) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *comment) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 9)
+	c.fieldMap = make(map[string]field.Expr, 6)
 	c.fieldMap["id"] = c.ID
-	c.fieldMap["created_at"] = c.CreatedAt
-	c.fieldMap["updated_at"] = c.UpdatedAt
-	c.fieldMap["deleted_at"] = c.DeletedAt
 	c.fieldMap["video_id"] = c.VideoID
 	c.fieldMap["user_id"] = c.UserID
 	c.fieldMap["content"] = c.Content

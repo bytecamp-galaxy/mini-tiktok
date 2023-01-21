@@ -27,15 +27,13 @@ func newVideo(db *gorm.DB, opts ...gen.DOOption) video {
 
 	tableName := _video.videoDo.TableName()
 	_video.ALL = field.NewAsterisk(tableName)
-	_video.ID = field.NewUint(tableName, "id")
-	_video.CreatedAt = field.NewTime(tableName, "created_at")
-	_video.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_video.DeletedAt = field.NewField(tableName, "deleted_at")
-	_video.AuthorID = field.NewInt(tableName, "author_id")
+	_video.ID = field.NewInt64(tableName, "id")
+	_video.CreatedAt = field.NewInt64(tableName, "created_at")
+	_video.AuthorID = field.NewInt64(tableName, "author_id")
 	_video.PlayUrl = field.NewString(tableName, "play_url")
 	_video.CoverUrl = field.NewString(tableName, "cover_url")
-	_video.FavoriteCount = field.NewInt(tableName, "favorite_count")
-	_video.CommentCount = field.NewInt(tableName, "comment_count")
+	_video.FavoriteCount = field.NewInt64(tableName, "favorite_count")
+	_video.CommentCount = field.NewInt64(tableName, "comment_count")
 	_video.Title = field.NewString(tableName, "title")
 	_video.Author = videoBelongsToAuthor{
 		db: db.Session(&gorm.Session{}),
@@ -65,15 +63,13 @@ type video struct {
 	videoDo
 
 	ALL           field.Asterisk
-	ID            field.Uint
-	CreatedAt     field.Time
-	UpdatedAt     field.Time
-	DeletedAt     field.Field
-	AuthorID      field.Int
+	ID            field.Int64
+	CreatedAt     field.Int64
+	AuthorID      field.Int64
 	PlayUrl       field.String
 	CoverUrl      field.String
-	FavoriteCount field.Int
-	CommentCount  field.Int
+	FavoriteCount field.Int64
+	CommentCount  field.Int64
 	Title         field.String
 	Author        videoBelongsToAuthor
 
@@ -92,15 +88,13 @@ func (v video) As(alias string) *video {
 
 func (v *video) updateTableName(table string) *video {
 	v.ALL = field.NewAsterisk(table)
-	v.ID = field.NewUint(table, "id")
-	v.CreatedAt = field.NewTime(table, "created_at")
-	v.UpdatedAt = field.NewTime(table, "updated_at")
-	v.DeletedAt = field.NewField(table, "deleted_at")
-	v.AuthorID = field.NewInt(table, "author_id")
+	v.ID = field.NewInt64(table, "id")
+	v.CreatedAt = field.NewInt64(table, "created_at")
+	v.AuthorID = field.NewInt64(table, "author_id")
 	v.PlayUrl = field.NewString(table, "play_url")
 	v.CoverUrl = field.NewString(table, "cover_url")
-	v.FavoriteCount = field.NewInt(table, "favorite_count")
-	v.CommentCount = field.NewInt(table, "comment_count")
+	v.FavoriteCount = field.NewInt64(table, "favorite_count")
+	v.CommentCount = field.NewInt64(table, "comment_count")
 	v.Title = field.NewString(table, "title")
 
 	v.fillFieldMap()
@@ -118,11 +112,9 @@ func (v *video) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (v *video) fillFieldMap() {
-	v.fieldMap = make(map[string]field.Expr, 11)
+	v.fieldMap = make(map[string]field.Expr, 9)
 	v.fieldMap["id"] = v.ID
 	v.fieldMap["created_at"] = v.CreatedAt
-	v.fieldMap["updated_at"] = v.UpdatedAt
-	v.fieldMap["deleted_at"] = v.DeletedAt
 	v.fieldMap["author_id"] = v.AuthorID
 	v.fieldMap["play_url"] = v.PlayUrl
 	v.fieldMap["cover_url"] = v.CoverUrl

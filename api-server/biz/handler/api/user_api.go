@@ -4,15 +4,14 @@ package api
 
 import (
 	"context"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/middleware"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/client"
 	"github.com/kitex-contrib/registry-eureka/resolver"
-	"google.golang.org/protobuf/proto"
 
-	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -22,19 +21,39 @@ import (
 func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserRegisterRequest
+
+	// bind and validate request
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusBadRequest, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
+	// validate password
 	err = utils.ValidatePassword(req.Password)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusBadRequest, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
+	// set up connection with user server
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli := userservice.MustNewClient("tiktok.user.service", client.WithResolver(r))
+	cli, err := userservice.NewClient("tiktok.user.service", client.WithResolver(r))
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
 
+	// call rpc service
 	reqRpc := &user.UserRegisterRequest{
 		Username: req.Username,
 		Password: req.Password,
@@ -42,17 +61,36 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 
 	respRpc, err := cli.UserRegister(ctx, reqRpc)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
-	token, _, err := middleware.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	// handle status code
+	if respRpc.StatusCode != 0 {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: respRpc.StatusCode,
+			StatusMsg:  utils.String(respRpc.StatusMsg),
+		})
+		return
+	}
+
+	// generate token
+	token, _, err := mw.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
+	// response to client
 	resp := &api.UserRegisterResponse{
 		StatusCode: respRpc.StatusCode,
-		StatusMsg:  proto.String(respRpc.StatusMsg),
+		StatusMsg:  utils.String(respRpc.StatusMsg),
 		UserId:     respRpc.UserId,
 		Token:      token,
 	}
@@ -65,14 +103,29 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 func UserLogin(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserLoginRequest
+
+	// bind and validate request
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusBadRequest, &api.UserLoginResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
+	// set up connection with user server
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli := userservice.MustNewClient("tiktok.user.service", client.WithResolver(r))
+	cli, err := userservice.NewClient("tiktok.user.service", client.WithResolver(r))
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
 
+	// call rpc service
 	reqRpc := &user.UserLoginRequest{
 		Username: req.Username,
 		Password: req.Password,
@@ -80,17 +133,36 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 
 	respRpc, err := cli.UserLogin(ctx, reqRpc)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
-	token, _, err := middleware.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	// handle status code
+	if respRpc.StatusCode != 0 {
+		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
+			StatusCode: respRpc.StatusCode,
+			StatusMsg:  utils.String(respRpc.StatusMsg),
+		})
+		return
+	}
+
+	// generate token
+	token, _, err := mw.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
+	// response to client
 	resp := &api.UserLoginResponse{
 		StatusCode: respRpc.StatusCode,
-		StatusMsg:  proto.String(respRpc.StatusMsg),
+		StatusMsg:  utils.String(respRpc.StatusMsg),
 		UserId:     respRpc.UserId,
 		Token:      token,
 	}
@@ -102,22 +174,83 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 // @router /douyin/user/ [GET]
 func UserQuery(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req api.UserRequest
+	var req api.UserQueryRequest
+
+	// bind and validate request
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		panic(err)
+		c.JSON(consts.StatusBadRequest, &api.UserQueryResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
 	}
 
-	id, ok := c.Get(middleware.IdentityKey)
+	// fetch user id from token
+	id, ok := c.Get(mw.IdentityKey)
 	if !ok {
-		panic(err)
+		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String("broken invariant"),
+		})
+		return
 	}
 
+	// check user id
 	if id != req.UserId {
-		panic("incorrect id")
+		c.JSON(consts.StatusUnauthorized, &api.UserQueryResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String("incorrect id"),
+		})
+		return
 	}
 
-	resp := new(api.UserResponse)
+	// set up connection with user server
+	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	cli, err := userservice.NewClient("tiktok.user.service", client.WithResolver(r))
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	// call rpc service
+	reqRpc := &user.UserQueryRequest{
+		UserId: req.UserId,
+	}
+
+	respRpc, err := cli.UserQuery(ctx, reqRpc)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	// handle status code
+	if respRpc.StatusCode != 0 {
+		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
+			StatusCode: respRpc.StatusCode,
+			StatusMsg:  utils.String(respRpc.StatusMsg),
+		})
+		return
+	}
+
+	// response to client
+	resp := &api.UserQueryResponse{
+		StatusCode: respRpc.StatusCode,
+		StatusMsg:  utils.String(respRpc.StatusMsg),
+		User: &api.User{
+			Id:            respRpc.User.Id,
+			Name:          respRpc.User.Name,
+			FollowCount:   utils.Int64(respRpc.User.FollowerCount),
+			FollowerCount: utils.Int64(respRpc.User.FollowerCount),
+			IsFollow:      false, // TODO
+		},
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

@@ -27,12 +27,9 @@ func newRelation(db *gorm.DB, opts ...gen.DOOption) relation {
 
 	tableName := _relation.relationDo.TableName()
 	_relation.ALL = field.NewAsterisk(tableName)
-	_relation.ID = field.NewUint(tableName, "id")
-	_relation.CreatedAt = field.NewTime(tableName, "created_at")
-	_relation.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_relation.DeletedAt = field.NewField(tableName, "deleted_at")
-	_relation.UserID = field.NewInt(tableName, "user_id")
-	_relation.ToUserID = field.NewInt(tableName, "to_user_id")
+	_relation.ID = field.NewInt64(tableName, "id")
+	_relation.UserID = field.NewInt64(tableName, "user_id")
+	_relation.ToUserID = field.NewInt64(tableName, "to_user_id")
 	_relation.User = relationBelongsToUser{
 		db: db.Session(&gorm.Session{}),
 
@@ -66,14 +63,11 @@ func newRelation(db *gorm.DB, opts ...gen.DOOption) relation {
 type relation struct {
 	relationDo
 
-	ALL       field.Asterisk
-	ID        field.Uint
-	CreatedAt field.Time
-	UpdatedAt field.Time
-	DeletedAt field.Field
-	UserID    field.Int
-	ToUserID  field.Int
-	User      relationBelongsToUser
+	ALL      field.Asterisk
+	ID       field.Int64
+	UserID   field.Int64
+	ToUserID field.Int64
+	User     relationBelongsToUser
 
 	ToUser relationBelongsToToUser
 
@@ -92,12 +86,9 @@ func (r relation) As(alias string) *relation {
 
 func (r *relation) updateTableName(table string) *relation {
 	r.ALL = field.NewAsterisk(table)
-	r.ID = field.NewUint(table, "id")
-	r.CreatedAt = field.NewTime(table, "created_at")
-	r.UpdatedAt = field.NewTime(table, "updated_at")
-	r.DeletedAt = field.NewField(table, "deleted_at")
-	r.UserID = field.NewInt(table, "user_id")
-	r.ToUserID = field.NewInt(table, "to_user_id")
+	r.ID = field.NewInt64(table, "id")
+	r.UserID = field.NewInt64(table, "user_id")
+	r.ToUserID = field.NewInt64(table, "to_user_id")
 
 	r.fillFieldMap()
 
@@ -114,11 +105,8 @@ func (r *relation) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (r *relation) fillFieldMap() {
-	r.fieldMap = make(map[string]field.Expr, 8)
+	r.fieldMap = make(map[string]field.Expr, 5)
 	r.fieldMap["id"] = r.ID
-	r.fieldMap["created_at"] = r.CreatedAt
-	r.fieldMap["updated_at"] = r.UpdatedAt
-	r.fieldMap["deleted_at"] = r.DeletedAt
 	r.fieldMap["user_id"] = r.UserID
 	r.fieldMap["to_user_id"] = r.ToUserID
 
