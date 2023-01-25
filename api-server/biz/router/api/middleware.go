@@ -3,13 +3,44 @@
 package Api
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
+	"context"
+	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/gzip"
+	"time"
 )
 
 func rootMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		// access log
+		func(c context.Context, ctx *app.RequestContext) {
+			start := time.Now()
+			ctx.Next(c)
+			end := time.Now()
+			latency := end.Sub(start).Microseconds
+			hlog.Infof("status=%d cost=%d method=%s full_path=%s client_ip=%s host=%s",
+				ctx.Response.StatusCode(), latency,
+				ctx.Request.Header.Method(), ctx.Request.URI().PathOriginal(), ctx.ClientIP(), ctx.Request.Host())
+		},
+		// use recovery mw
+		recovery.Recovery(recovery.WithRecoveryHandler(
+			func(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
+				hlog.SystemLogger().CtxErrorf(ctx, "[Recovery] err=%v\nstack=%s", err, stack)
+				c.JSON(consts.StatusInternalServerError, utils.H{
+					"status_code":    1,
+					"status_message": fmt.Sprintf("[Recovery] err=%v\nstack=%s", err, stack),
+				})
+			},
+		)),
+		// use gzip mw
+		gzip.Gzip(gzip.DefaultCompression),
+	}
 }
 
 func _douyinMw() []app.HandlerFunc {
@@ -59,5 +90,5 @@ func _userloginMw() []app.HandlerFunc {
 
 func _userqueryMw() []app.HandlerFunc {
 	// your code...
-	return []app.HandlerFunc{mw.JwtMiddleware.MiddlewareFunc()}
+	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
 }

@@ -5,23 +5,27 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	hertzzap "github.com/hertz-contrib/logger/zap"
 	"time"
 )
 
 func Init() {
 	dal.Init()
-	mw.Init()
+	jwt.Init()
 }
 
 func main() {
 	Init()
+
+	// init server
 	addr := "localhost:8080"
 	r := eureka.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 40*time.Second)
 	h := server.Default(server.WithHostPorts(addr),
@@ -38,6 +42,25 @@ func main() {
 		<-ctx.Done()
 		fmt.Println("after ctx.Done()")
 	})
+
+	// register
 	register(h)
+
+	// init log
+	//f, err := os.OpenFile("./output.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer func(f *os.File) {
+	//	err := f.Close()
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//}(f)
+	//hlog.SetOutput(f)
+	hlog.SetLogger(hertzzap.NewLogger())
+	hlog.SetLevel(hlog.LevelDebug)
+
+	// run server
 	h.Spin()
 }

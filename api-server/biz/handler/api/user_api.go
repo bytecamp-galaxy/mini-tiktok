@@ -4,11 +4,14 @@ package api
 
 import (
 	"context"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/klog"
+	kitexzap "github.com/kitex-contrib/obs-opentelemetry/logging/zap"
 	"github.com/kitex-contrib/registry-eureka/resolver"
 
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
@@ -44,7 +47,10 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 
 	// set up connection with user server
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := userservice.NewClient("tiktok.user.service", client.WithResolver(r))
+	cli, err := userservice.NewClient("tiktok.user.service",
+		client.WithMiddleware(mw.CommonMiddleware),
+		client.WithInstanceMW(mw.ClientMiddleware),
+		client.WithResolver(r))
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -52,6 +58,8 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
+	klog.SetLogger(kitexzap.NewLogger())
+	klog.SetLevel(klog.LevelDebug)
 
 	// call rpc service
 	reqRpc := &user.UserRegisterRequest{
@@ -78,7 +86,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// generate token
-	token, _, err := mw.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	token, _, err := jwt.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -116,7 +124,10 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 
 	// set up connection with user server
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := userservice.NewClient("tiktok.user.service", client.WithResolver(r))
+	cli, err := userservice.NewClient("tiktok.user.service",
+		client.WithMiddleware(mw.CommonMiddleware),
+		client.WithInstanceMW(mw.ClientMiddleware),
+		client.WithResolver(r))
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
 			StatusCode: 1,
@@ -124,6 +135,8 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
+	klog.SetLogger(kitexzap.NewLogger())
+	klog.SetLevel(klog.LevelDebug)
 
 	// call rpc service
 	reqRpc := &user.UserLoginRequest{
@@ -150,7 +163,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// generate token
-	token, _, err := mw.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	token, _, err := jwt.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
 			StatusCode: 1,
@@ -187,7 +200,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// fetch user id from token
-	id, ok := c.Get(mw.IdentityKey)
+	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
 		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
 			StatusCode: 1,
@@ -207,7 +220,10 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 
 	// set up connection with user server
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := userservice.NewClient("tiktok.user.service", client.WithResolver(r))
+	cli, err := userservice.NewClient("tiktok.user.service",
+		client.WithMiddleware(mw.CommonMiddleware),
+		client.WithInstanceMW(mw.ClientMiddleware),
+		client.WithResolver(r))
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
 			StatusCode: 1,
@@ -215,6 +231,8 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
+	klog.SetLogger(kitexzap.NewLogger())
+	klog.SetLevel(klog.LevelDebug)
 
 	// call rpc service
 	reqRpc := &user.UserQueryRequest{
