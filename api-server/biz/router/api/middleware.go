@@ -92,3 +92,13 @@ func _userqueryMw() []app.HandlerFunc {
 	// your code...
 	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
 }
+
+func _feedMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getfeedMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
