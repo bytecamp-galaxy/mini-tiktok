@@ -7,13 +7,14 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
 	hertzzap "github.com/hertz-contrib/logger/zap"
+	"net"
 	"time"
 )
 
@@ -26,16 +27,24 @@ func main() {
 	Init()
 
 	// init server
-	addr := "localhost:8080"
-	r := eureka.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 40*time.Second)
-	h := server.Default(server.WithHostPorts(addr),
+	v := conf.Init().V
+
+	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
+	interval := v.GetInt64("eureka.api-heartbeat-interval")
+	r := eureka.NewEurekaRegistry([]string{eurekaAddr}, time.Duration(interval)*time.Second)
+
+	serverAddr := fmt.Sprintf("%s:%d", v.GetString("api-server.host"), v.GetInt("api-server.port"))
+	addr, err := net.ResolveTCPAddr("tcp", serverAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	h := server.Default(server.WithHostPorts(serverAddr),
 		server.WithTransport(netpoll.NewTransporter),
 		server.WithExitWaitTime(5*time.Second),
 		server.WithRegistry(r, &registry.Info{
-			ServiceName: "tiktok.api.service",
-			Addr:        utils.NewNetAddr("tcp", addr),
-			Weight:      10,
-			Tags:        nil,
+			ServiceName: v.GetString("api-server.name"),
+			Addr:        addr,
 		}))
 	h.OnShutdown = append(h.OnShutdown, func(ctx context.Context) {
 		fmt.Println("before ctx.Done()")
@@ -47,17 +56,6 @@ func main() {
 	register(h)
 
 	// init log
-	//f, err := os.OpenFile("./output.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer func(f *os.File) {
-	//	err := f.Close()
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//}(f)
-	//hlog.SetOutput(f)
 	hlog.SetLogger(hertzzap.NewLogger())
 	hlog.SetLevel(hlog.LevelDebug)
 

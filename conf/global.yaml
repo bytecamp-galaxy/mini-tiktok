@@ -1,0 +1,25 @@
+eureka:
+  host: "127.0.0.1"
+  port: 8761
+  rpc-heartbeat-interval: 10
+  api-heartbeat-interval: 60
+
+api-server:
+  name: "tiktok.api.service"
+  host: "127.0.0.1"
+  port: 8080
+
+user-server:
+  name: "tiktok.user.service"
+  host: "127.0.0.1"
+  port: 8888
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "gorm"
+  password: "gorm"
+  dbname: "gorm"
+  charset: "utf8"
+  parseTime: "True"
+  loc: "Local"

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
@@ -17,32 +19,28 @@ func main() {
 	dal.Init()
 
 	// init server
-	r := registry.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 3*time.Second)
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:8888")
+	v := conf.Init().V
+
+	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
+	interval := v.GetInt64("eureka.rpc-heartbeat-interval")
+	r := registry.NewEurekaRegistry([]string{eurekaAddr}, time.Duration(interval)*time.Second)
+
+	serverAddr := fmt.Sprintf("%s:%d", v.GetString("user-server.host"), v.GetInt("user-server.port"))
+	addr, err := net.ResolveTCPAddr("tcp", serverAddr)
 	if err != nil {
 		panic(err)
 	}
+
 	svr := user.NewServer(new(UserServiceImpl),
 		server.WithMiddleware(mw.CommonMiddleware),
 		server.WithMiddleware(mw.ServerMiddleware),
 		server.WithRegistry(r),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-			ServiceName: "tiktok.user.service",
+			ServiceName: v.GetString("user-server.name"),
 		}),
 		server.WithServiceAddr(addr))
 
 	// init log
-	//f, err := os.OpenFile("./output.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer func(f *os.File) {
-	//	err := f.Close()
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//}(f)
-	//hlog.SetOutput(f)
 	klog.SetLogger(kitexzap.NewLogger())
 	klog.SetLevel(klog.LevelDebug)
 

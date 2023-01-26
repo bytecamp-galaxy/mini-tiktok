@@ -4,7 +4,9 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
@@ -46,8 +48,10 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := userservice.NewClient("tiktok.user.service",
+	v := conf.Init().V
+	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
+	r := resolver.NewEurekaResolver([]string{eurekaAddr})
+	cli, err := userservice.NewClient(v.GetString("user-server.name"),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
 		client.WithResolver(r))
@@ -123,8 +127,10 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := userservice.NewClient("tiktok.user.service",
+	v := conf.Init().V
+	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
+	r := resolver.NewEurekaResolver([]string{eurekaAddr})
+	cli, err := userservice.NewClient(v.GetString("user-server.name"),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
 		client.WithResolver(r))
@@ -219,8 +225,10 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := userservice.NewClient("tiktok.user.service",
+	v := conf.Init().V
+	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
+	r := resolver.NewEurekaResolver([]string{eurekaAddr})
+	cli, err := userservice.NewClient(v.GetString("user-server.name"),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
 		client.WithResolver(r))
