@@ -4,9 +4,10 @@ include "user_service.thrift"
 
 struct CommentActionRequest {
     1: required i64 VideoId;
-    2: required i32 ActionType;
-    3: optional string CommentText;
-    4: optional i64 CommentId;
+    2: required i64 UserId;
+    3: required i32 ActionType;
+    4: optional string CommentText;
+    5: optional i64 CommentId;
 }
 
 struct CommentActionResponse {

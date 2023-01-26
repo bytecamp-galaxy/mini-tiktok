@@ -11,9 +11,10 @@ import (
 
 type CommentActionRequest struct {
 	VideoId     int64   `thrift:"VideoId,1,required" frugal:"1,required,i64" json:"VideoId"`
-	ActionType  int32   `thrift:"ActionType,2,required" frugal:"2,required,i32" json:"ActionType"`
-	CommentText *string `thrift:"CommentText,3,optional" frugal:"3,optional,string" json:"CommentText,omitempty"`
-	CommentId   *int64  `thrift:"CommentId,4,optional" frugal:"4,optional,i64" json:"CommentId,omitempty"`
+	UserId      int64   `thrift:"UserId,2,required" frugal:"2,required,i64" json:"UserId"`
+	ActionType  int32   `thrift:"ActionType,3,required" frugal:"3,required,i32" json:"ActionType"`
+	CommentText *string `thrift:"CommentText,4,optional" frugal:"4,optional,string" json:"CommentText,omitempty"`
+	CommentId   *int64  `thrift:"CommentId,5,optional" frugal:"5,optional,i64" json:"CommentId,omitempty"`
 }
 
 func NewCommentActionRequest() *CommentActionRequest {
@@ -26,6 +27,10 @@ func (p *CommentActionRequest) InitDefault() {
 
 func (p *CommentActionRequest) GetVideoId() (v int64) {
 	return p.VideoId
+}
+
+func (p *CommentActionRequest) GetUserId() (v int64) {
+	return p.UserId
 }
 
 func (p *CommentActionRequest) GetActionType() (v int32) {
@@ -52,6 +57,9 @@ func (p *CommentActionRequest) GetCommentId() (v int64) {
 func (p *CommentActionRequest) SetVideoId(val int64) {
 	p.VideoId = val
 }
+func (p *CommentActionRequest) SetUserId(val int64) {
+	p.UserId = val
+}
 func (p *CommentActionRequest) SetActionType(val int32) {
 	p.ActionType = val
 }
@@ -64,9 +72,10 @@ func (p *CommentActionRequest) SetCommentId(val *int64) {
 
 var fieldIDToName_CommentActionRequest = map[int16]string{
 	1: "VideoId",
-	2: "ActionType",
-	3: "CommentText",
-	4: "CommentId",
+	2: "UserId",
+	3: "ActionType",
+	4: "CommentText",
+	5: "CommentId",
 }
 
 func (p *CommentActionRequest) IsSetCommentText() bool {
@@ -82,6 +91,7 @@ func (p *CommentActionRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetVideoId bool = false
+	var issetUserId bool = false
 	var issetActionType bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -110,8 +120,19 @@ func (p *CommentActionRequest) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUserId = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetActionType = true
@@ -120,9 +141,9 @@ func (p *CommentActionRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
-		case 3:
+		case 4:
 			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField3(iprot); err != nil {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -130,9 +151,9 @@ func (p *CommentActionRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
-		case 4:
+		case 5:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField4(iprot); err != nil {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -159,8 +180,13 @@ func (p *CommentActionRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetActionType {
+	if !issetUserId {
 		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetActionType {
+		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -191,6 +217,15 @@ func (p *CommentActionRequest) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *CommentActionRequest) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.UserId = v
+	}
+	return nil
+}
+
+func (p *CommentActionRequest) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -199,7 +234,7 @@ func (p *CommentActionRequest) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *CommentActionRequest) ReadField3(iprot thrift.TProtocol) error {
+func (p *CommentActionRequest) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -208,7 +243,7 @@ func (p *CommentActionRequest) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *CommentActionRequest) ReadField4(iprot thrift.TProtocol) error {
+func (p *CommentActionRequest) ReadField5(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
@@ -237,6 +272,10 @@ func (p *CommentActionRequest) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 
@@ -276,10 +315,10 @@ WriteFieldEndError:
 }
 
 func (p *CommentActionRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("ActionType", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("UserId", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.ActionType); err != nil {
+	if err := oprot.WriteI64(p.UserId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -293,8 +332,25 @@ WriteFieldEndError:
 }
 
 func (p *CommentActionRequest) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("ActionType", thrift.I32, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.ActionType); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *CommentActionRequest) writeField4(oprot thrift.TProtocol) (err error) {
 	if p.IsSetCommentText() {
-		if err = oprot.WriteFieldBegin("CommentText", thrift.STRING, 3); err != nil {
+		if err = oprot.WriteFieldBegin("CommentText", thrift.STRING, 4); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.CommentText); err != nil {
@@ -306,14 +362,14 @@ func (p *CommentActionRequest) writeField3(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
-func (p *CommentActionRequest) writeField4(oprot thrift.TProtocol) (err error) {
+func (p *CommentActionRequest) writeField5(oprot thrift.TProtocol) (err error) {
 	if p.IsSetCommentId() {
-		if err = oprot.WriteFieldBegin("CommentId", thrift.I64, 4); err != nil {
+		if err = oprot.WriteFieldBegin("CommentId", thrift.I64, 5); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteI64(*p.CommentId); err != nil {
@@ -325,9 +381,9 @@ func (p *CommentActionRequest) writeField4(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
 func (p *CommentActionRequest) String() string {
@@ -346,13 +402,16 @@ func (p *CommentActionRequest) DeepEqual(ano *CommentActionRequest) bool {
 	if !p.Field1DeepEqual(ano.VideoId) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.ActionType) {
+	if !p.Field2DeepEqual(ano.UserId) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.CommentText) {
+	if !p.Field3DeepEqual(ano.ActionType) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.CommentId) {
+	if !p.Field4DeepEqual(ano.CommentText) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.CommentId) {
 		return false
 	}
 	return true
@@ -365,14 +424,21 @@ func (p *CommentActionRequest) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *CommentActionRequest) Field2DeepEqual(src int32) bool {
+func (p *CommentActionRequest) Field2DeepEqual(src int64) bool {
+
+	if p.UserId != src {
+		return false
+	}
+	return true
+}
+func (p *CommentActionRequest) Field3DeepEqual(src int32) bool {
 
 	if p.ActionType != src {
 		return false
 	}
 	return true
 }
-func (p *CommentActionRequest) Field3DeepEqual(src *string) bool {
+func (p *CommentActionRequest) Field4DeepEqual(src *string) bool {
 
 	if p.CommentText == src {
 		return true
@@ -384,7 +450,7 @@ func (p *CommentActionRequest) Field3DeepEqual(src *string) bool {
 	}
 	return true
 }
-func (p *CommentActionRequest) Field4DeepEqual(src *int64) bool {
+func (p *CommentActionRequest) Field5DeepEqual(src *int64) bool {
 
 	if p.CommentId == src {
 		return true

@@ -6,6 +6,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
+	"time"
 )
 
 // CommentServiceImpl implements the last service interface defined in the IDL.
@@ -16,15 +17,63 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 	q := query.Use(mysql.DB)
 
 	err = q.Transaction(func(tx *query.Query) error {
-		if _, err := tx.User.WithContext(ctx).Where(tx.User.ID.Eq(100)).Delete(); err != nil {
-			return err
-		}
-		if _, err := tx.Article.WithContext(ctx).Create(&model.User{Name: "modi"}); err != nil {
-			return err
+		switch req.ActionType {
+		case 1:
+			{
+				c := model.Comment{
+					VideoID: req.VideoId,
+					UserID:  req.UserId,
+					Content: *req.CommentText,
+				}
+				err = tx.Comment.WithContext(ctx).Create(&c)
+				if err != nil {
+					return err
+				}
+				v := tx.Video
+				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
+				if err != nil {
+					return err
+				}
+
+				resp = &user.CommentActionResponse{
+					StatusCode: 0,
+					Comment: &user.Comment{
+						Id:         c.ID,
+						User:       nil,
+						Conent:     c.Content,
+						CreateDate: time.Unix(c.CreatedAt, 0).String(),
+					},
+				}
+			}
+		case 2:
+			{
+				c := tx.Comment
+				_, err = c.WithContext(ctx).Where(c.ID.Eq(*req.CommentId)).Delete()
+				if err != nil {
+					return err
+				}
+
+				v := tx.Video
+				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
+				if err != nil {
+					return err
+				}
+
+				resp = &user.CommentActionResponse{
+					StatusCode: 0,
+				}
+			}
+		default:
+			panic("Request argument violates convention")
 		}
 		return nil
 	})
-	return
+
+	if err != nil {
+		resp.StatusCode = -1 // TODO(heiyan): return meaningful error code.
+		return resp, err
+	}
+	return resp, err
 }
 
 // CommentList implements the CommentServiceImpl interface.
