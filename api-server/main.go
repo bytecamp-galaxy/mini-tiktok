@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
@@ -27,7 +28,7 @@ func main() {
 
 	// init server
 	addr := "localhost:8080"
-	r := eureka.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 40*time.Second)
+	r := eureka.NewEurekaRegistry([]string{constants.EurekaServerUrl}, 40*time.Second)
 	h := server.Default(server.WithHostPorts(addr),
 		server.WithTransport(netpoll.NewTransporter),
 		server.WithExitWaitTime(5*time.Second),

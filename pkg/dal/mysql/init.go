@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -8,8 +9,9 @@ import (
 )
 
 // https://github.com/go-sql-driver/mysql#dsn-data-source-name
-// var dsn = constants.MySQLDefaultDSN;
-var dsn = "gorm:gorm@tcp(localhost:3306)/gorm?charset=utf8&parseTime=True&loc=Local"
+var dsn = constants.MySQLDefaultDSN
+
+//var dsn = "gorm:gorm@tcp(localhost:3306)/gorm?charset=utf8&parseTime=True&loc=Local"
 
 var DB *gorm.DB
 

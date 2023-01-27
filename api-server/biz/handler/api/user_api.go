@@ -5,6 +5,7 @@ package api
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
@@ -46,7 +47,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
 	cli, err := userservice.NewClient("tiktok.user.service",
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
@@ -123,7 +124,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
 	cli, err := userservice.NewClient("tiktok.user.service",
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
@@ -219,7 +220,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
 	cli, err := userservice.NewClient("tiktok.user.service",
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),

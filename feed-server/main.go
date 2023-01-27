@@ -2,6 +2,7 @@ package main
 
 import (
 	feed "github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed/feedservice"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -17,7 +18,7 @@ func main() {
 	dal.Init()
 
 	// init server
-	r := registry.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 3*time.Second)
+	r := registry.NewEurekaRegistry([]string{constants.EurekaServerUrl}, 3*time.Second)
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:8888")
 	if err != nil {
 		panic(err)

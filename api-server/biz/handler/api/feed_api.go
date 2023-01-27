@@ -7,6 +7,7 @@ import (
 	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed/feedservice"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -46,7 +47,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	//}
 
 	// set up connection with feed server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
+	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
 	cli, err := feedservice.NewClient("tiktok.feed.service",
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
