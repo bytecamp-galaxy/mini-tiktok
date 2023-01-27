@@ -30,7 +30,7 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 	}
 
 	// query user id in db
-	// TODO: simplify
+	// TODO(vgalaxy): simplify
 	q := query.Q
 	t := q.User
 
@@ -89,7 +89,7 @@ func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequ
 			Name:          data.Username,
 			FollowCount:   data.FollowerCount,
 			FollowerCount: data.FollowingCount,
-			IsFollow:      false, // TODO
+			IsFollow:      false, // TODO(vgalaxy)
 		},
 	}
 	return resp, nil

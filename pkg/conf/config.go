@@ -14,7 +14,7 @@ func Init() Config {
 
 	v.SetConfigName("global")
 	v.SetConfigType("yaml")
-	v.AddConfigPath("conf")
+	v.AddConfigPath("configs")
 
 	if err := v.ReadInConfig(); err != nil {
 		panic(err)

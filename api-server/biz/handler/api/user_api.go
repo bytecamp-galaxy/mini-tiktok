@@ -4,19 +4,13 @@ package api
 
 import (
 	"context"
-	"fmt"
-	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
-	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
 )
 
 // UserRegister .
@@ -46,9 +40,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	v := conf.Init().V
-	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
-	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
+	cli, err := rpc.InitUserClient()
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -56,21 +48,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-
-	cli, err := userservice.NewClient(v.GetString("user-server.name"),
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
-	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
-
-	// init kitex client log
-	log.InitKLogger()
 
 	// call rpc service
 	reqRpc := &user.UserRegisterRequest{
@@ -78,7 +55,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		Password: req.Password,
 	}
 
-	respRpc, err := cli.UserRegister(ctx, reqRpc)
+	respRpc, err := (*cli).UserRegister(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -134,9 +111,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	v := conf.Init().V
-	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
-	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
+	cli, err := rpc.InitUserClient()
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -145,28 +120,13 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	cli, err := userservice.NewClient(v.GetString("user-server.name"),
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
-	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
-
-	// init kitex client log
-	log.InitKLogger()
-
 	// call rpc service
 	reqRpc := &user.UserLoginRequest{
 		Username: req.Username,
 		Password: req.Password,
 	}
 
-	respRpc, err := cli.UserLogin(ctx, reqRpc)
+	respRpc, err := (*cli).UserLogin(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
 			StatusCode: 1,
@@ -241,9 +201,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	v := conf.Init().V
-	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
-	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
+	cli, err := rpc.InitUserClient()
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -252,27 +210,12 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	cli, err := userservice.NewClient(v.GetString("user-server.name"),
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
-	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
-
-	// init kitex client log
-	log.InitKLogger()
-
 	// call rpc service
 	reqRpc := &user.UserQueryRequest{
 		UserId: req.UserId,
 	}
 
-	respRpc, err := cli.UserQuery(ctx, reqRpc)
+	respRpc, err := (*cli).UserQuery(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
 			StatusCode: 1,
@@ -299,7 +242,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 			Name:          respRpc.User.Name,
 			FollowCount:   utils.Int64(respRpc.User.FollowerCount),
 			FollowerCount: utils.Int64(respRpc.User.FollowerCount),
-			IsFollow:      false, // TODO
+			IsFollow:      false, // TODO(vgalaxy)
 		},
 	}
 

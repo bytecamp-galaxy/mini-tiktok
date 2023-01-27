@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -11,6 +12,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	"github.com/hertz-contrib/obs-opentelemetry/provider"
+	"github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/hertz-contrib/registry/etcd"
 	"net"
 	"time"
@@ -41,13 +44,24 @@ func main() {
 		panic(err)
 	}
 
-	h := server.Default(server.WithHostPorts(serverAddr),
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithInsecure(),
+	)
+	defer p.Shutdown(context.Background())
+
+	tracer, cfg := tracing.NewServerTracer()
+	h := server.Default(
+		server.WithHostPorts(serverAddr),
 		server.WithTransport(netpoll.NewTransporter),
 		server.WithExitWaitTime(time.Duration(v.GetInt("api-server.exit-wait-time"))*time.Second),
 		server.WithRegistry(r, &registry.Info{
 			ServiceName: v.GetString("api-server.name"),
 			Addr:        addr,
-		}))
+		}),
+		tracer)
+	h.Use(tracing.ServerMiddleware(cfg))
 
 	// register
 	register(h)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -8,8 +9,11 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
+	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	"github.com/hertz-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"net"
 )
 
@@ -35,14 +39,24 @@ func main() {
 		panic(err)
 	}
 
-	svr := user.NewServer(new(UserServiceImpl),
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(v.GetString("user-server.name")),
+		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithInsecure(),
+	)
+	defer p.Shutdown(context.Background())
+
+	svr := user.NewServer(
+		new(UserServiceImpl),
+		server.WithServiceAddr(addr),
+		server.WithRegistry(r),
+		server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 100}),
 		server.WithMiddleware(mw.CommonMiddleware),
 		server.WithMiddleware(mw.ServerMiddleware),
-		server.WithRegistry(r),
-		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-			ServiceName: v.GetString("user-server.name"),
-		}),
-		server.WithServiceAddr(addr))
+		server.WithMuxTransport(),
+		server.WithSuite(tracing.NewServerSuite()),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: v.GetString("user-server.name")}),
+	)
 
 	// run server
 	err = svr.Run()
