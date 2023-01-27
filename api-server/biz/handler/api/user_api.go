@@ -6,19 +6,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/klog"
-	kitexzap "github.com/kitex-contrib/obs-opentelemetry/logging/zap"
-	"github.com/kitex-contrib/registry-eureka/resolver"
-
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	"github.com/kitex-contrib/registry-eureka/resolver"
 )
 
 // UserRegister .
@@ -62,8 +60,9 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
+
+	// init kitex client log
+	log.InitKLogger()
 
 	// call rpc service
 	reqRpc := &user.UserRegisterRequest{
@@ -141,8 +140,9 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
+
+	// init kitex client log
+	log.InitKLogger()
 
 	// call rpc service
 	reqRpc := &user.UserLoginRequest{
@@ -239,8 +239,9 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
+
+	// init kitex client log
+	log.InitKLogger()
 
 	// call rpc service
 	reqRpc := &user.UserQueryRequest{

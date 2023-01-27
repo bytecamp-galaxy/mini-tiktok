@@ -3,34 +3,34 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
+	"github.com/bytecamp-galaxy/registry/eureka"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
-	hertzzap "github.com/hertz-contrib/logger/zap"
 	"net"
 	"time"
 )
 
-func Init() {
-	dal.Init()
-	jwt.Init()
-}
-
 func main() {
-	Init()
+	// init db
+	dal.Init()
+
+	// init jwt
+	jwt.Init()
+
+	// init log
+	log.InitHLogger()
 
 	// init server
 	v := conf.Init().V
 
 	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
-	interval := v.GetInt64("eureka.api-heartbeat-interval")
+	interval := v.GetInt("eureka.api-heartbeat-interval")
 	r := eureka.NewEurekaRegistry([]string{eurekaAddr}, time.Duration(interval)*time.Second)
 
 	serverAddr := fmt.Sprintf("%s:%d", v.GetString("api-server.host"), v.GetInt("api-server.port"))
@@ -41,23 +41,14 @@ func main() {
 
 	h := server.Default(server.WithHostPorts(serverAddr),
 		server.WithTransport(netpoll.NewTransporter),
-		server.WithExitWaitTime(5*time.Second),
+		server.WithExitWaitTime(time.Duration(v.GetInt("api-server.exit-wait-time"))*time.Second),
 		server.WithRegistry(r, &registry.Info{
 			ServiceName: v.GetString("api-server.name"),
 			Addr:        addr,
 		}))
-	h.OnShutdown = append(h.OnShutdown, func(ctx context.Context) {
-		fmt.Println("before ctx.Done()")
-		<-ctx.Done()
-		fmt.Println("after ctx.Done()")
-	})
 
 	// register
 	register(h)
-
-	// init log
-	hlog.SetLogger(hertzzap.NewLogger())
-	hlog.SetLevel(hlog.LevelDebug)
 
 	// run server
 	h.Spin()

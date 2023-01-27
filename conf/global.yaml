@@ -8,6 +8,7 @@ api-server:
   name: "tiktok.api.service"
   host: "127.0.0.1"
   port: 8080
+  exit-wait-time: 5
 
 user-server:
   name: "tiktok.user.service"

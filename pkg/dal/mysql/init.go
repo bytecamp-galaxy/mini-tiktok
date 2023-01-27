@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -30,7 +30,7 @@ func Init() {
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
-		Logger:                 logger.Default.LogMode(logger.Info),
+		Logger:                 log.InitDBLogger(),
 	})
 	if err != nil {
 		panic(err)
