@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"context"
 	"fmt"
 	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -29,12 +28,11 @@ func InitUserClient() (*userservice.Client, error) {
 		return nil, err
 	}
 
-	p := provider.NewOpenTelemetryProvider(
+	provider.NewOpenTelemetryProvider(
 		provider.WithServiceName(v.GetString("api-server.name")),
 		provider.WithExportEndpoint("localhost:4317"),
 		provider.WithInsecure(),
 	)
-	defer p.Shutdown(context.Background())
 
 	c, err := userservice.NewClient(
 		v.GetString("user-server.name"),

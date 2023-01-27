@@ -7,6 +7,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/plugin/opentelemetry/tracing"
 )
 
 var DB *gorm.DB
@@ -37,6 +38,10 @@ func Init() {
 	}
 
 	if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
+		panic(err)
+	}
+
+	if err := DB.Use(tracing.NewPlugin()); err != nil {
 		panic(err)
 	}
 
