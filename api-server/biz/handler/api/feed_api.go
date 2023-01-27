@@ -45,7 +45,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	//	return
 	//}
 
-	// set up connection with user server
+	// set up connection with feed server
 	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
 	cli, err := feedservice.NewClient("tiktok.feed.service",
 		client.WithMiddleware(mw.CommonMiddleware),
