@@ -5,6 +5,7 @@ package api
 import (
 	"context"
 	"fmt"
+	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -16,7 +17,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
-	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
 // UserRegister .

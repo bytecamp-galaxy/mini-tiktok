@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
@@ -9,10 +10,7 @@ import (
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
-	etcd "github.com/kitex-contrib/registry-etcd"
-	_ "github.com/kitex-contrib/registry-eureka/registry"
 	"net"
-	_ "time"
 )
 
 func main() {
