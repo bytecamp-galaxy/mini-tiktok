@@ -1,0 +1,1 @@
+kitex --module github.com/bytecamp-galaxy/mini-tiktok --service favorite ../idl/favorite_service.thrift
