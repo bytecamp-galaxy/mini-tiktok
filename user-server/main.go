@@ -9,9 +9,10 @@ import (
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
-	"github.com/kitex-contrib/registry-eureka/registry"
+	etcd "github.com/kitex-contrib/registry-etcd"
+	_ "github.com/kitex-contrib/registry-eureka/registry"
 	"net"
-	"time"
+	_ "time"
 )
 
 func main() {
@@ -24,9 +25,11 @@ func main() {
 	// init server
 	v := conf.Init().V
 
-	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
-	interval := v.GetInt("eureka.rpc-heartbeat-interval")
-	r := registry.NewEurekaRegistry([]string{eurekaAddr}, time.Duration(interval)*time.Second)
+	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
+	r, err := etcd.NewEtcdRegistry([]string{etcdAddr})
+	if err != nil {
+		panic(err)
+	}
 
 	serverAddr := fmt.Sprintf("%s:%d", v.GetString("user-server.host"), v.GetInt("user-server.port"))
 	addr, err := net.ResolveTCPAddr("tcp", serverAddr)

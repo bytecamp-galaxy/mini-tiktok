@@ -1,8 +1,6 @@
-eureka:
+etcd:
   host: "127.0.0.1"
-  port: 8761
-  rpc-heartbeat-interval: 10
-  api-heartbeat-interval: 60
+  port: 2379
 
 api-server:
   name: "tiktok.api.service"

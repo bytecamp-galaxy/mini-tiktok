@@ -16,7 +16,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/registry-eureka/resolver"
+	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
 // UserRegister .
@@ -47,8 +47,16 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 
 	// set up connection with user server
 	v := conf.Init().V
-	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
-	r := resolver.NewEurekaResolver([]string{eurekaAddr})
+	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
+	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
 	cli, err := userservice.NewClient(v.GetString("user-server.name"),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
@@ -127,8 +135,16 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 
 	// set up connection with user server
 	v := conf.Init().V
-	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
-	r := resolver.NewEurekaResolver([]string{eurekaAddr})
+	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
+	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
 	cli, err := userservice.NewClient(v.GetString("user-server.name"),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
@@ -226,8 +242,16 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 
 	// set up connection with user server
 	v := conf.Init().V
-	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
-	r := resolver.NewEurekaResolver([]string{eurekaAddr})
+	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
+	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
 	cli, err := userservice.NewClient(v.GetString("user-server.name"),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),

@@ -8,10 +8,10 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
-	"github.com/bytecamp-galaxy/registry/eureka"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	"github.com/hertz-contrib/registry/etcd"
 	"net"
 	"time"
 )
@@ -29,9 +29,11 @@ func main() {
 	// init server
 	v := conf.Init().V
 
-	eurekaAddr := fmt.Sprintf("http://%s:%d/eureka", v.GetString("eureka.host"), v.GetInt("eureka.port"))
-	interval := v.GetInt("eureka.api-heartbeat-interval")
-	r := eureka.NewEurekaRegistry([]string{eurekaAddr}, time.Duration(interval)*time.Second)
+	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
+	r, err := etcd.NewEtcdRegistry([]string{etcdAddr})
+	if err != nil {
+		panic(err)
+	}
 
 	serverAddr := fmt.Sprintf("%s:%d", v.GetString("api-server.host"), v.GetInt("api-server.port"))
 	addr, err := net.ResolveTCPAddr("tcp", serverAddr)
