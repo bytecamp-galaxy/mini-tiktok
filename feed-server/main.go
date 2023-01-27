@@ -19,7 +19,7 @@ func main() {
 
 	// init server
 	r := registry.NewEurekaRegistry([]string{constants.EurekaServerUrl}, 3*time.Second)
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:8888")
+	addr, err := net.ResolveTCPAddr("tcp", "localhost:8887")
 	if err != nil {
 		panic(err)
 	}
