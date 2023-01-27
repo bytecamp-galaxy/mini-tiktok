@@ -240,13 +240,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	respRpc, err := cli.UserQuery(ctx, reqRpc)
-	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
 
 	// handle status code
 	if respRpc.StatusCode != 0 {
