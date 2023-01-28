@@ -82,7 +82,7 @@ func newServiceClient(c client.Client) *kClient {
 	}
 }
 
-func (p *kClient) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionsRequest) (r *favorite.FavoriteActionResponse, err error) {
+func (p *kClient) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionRequest) (r *favorite.FavoriteActionResponse, err error) {
 	var _args favorite.FavoriteServiceFavoriteActionArgs
 	_args.Req = req
 	var _result favorite.FavoriteServiceFavoriteActionResult
@@ -92,7 +92,7 @@ func (p *kClient) FavoriteAction(ctx context.Context, req *favorite.FavoriteActi
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) FavoriteList(ctx context.Context, req *favorite.FavoriteActionsRequest) (r *favorite.FavoriteListResponse, err error) {
+func (p *kClient) FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest) (r *favorite.FavoriteListResponse, err error) {
 	var _args favorite.FavoriteServiceFavoriteListArgs
 	_args.Req = req
 	var _result favorite.FavoriteServiceFavoriteListResult

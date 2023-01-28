@@ -14,7 +14,7 @@ import (
 // @router /douyin/favorite/action/ [POST]
 func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req api.FavoriteActionsRequest
+	var req api.FavoriteActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
@@ -30,7 +30,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 // @router /douyin/favorite/list/ [GET]
 func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req api.FavoriteActionsRequest
+	var req api.FavoriteListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())

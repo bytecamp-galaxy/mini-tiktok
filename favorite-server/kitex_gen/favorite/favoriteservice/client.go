@@ -11,8 +11,8 @@ import (
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
-	FavoriteAction(ctx context.Context, req *favorite.FavoriteActionsRequest, callOptions ...callopt.Option) (r *favorite.FavoriteActionResponse, err error)
-	FavoriteList(ctx context.Context, req *favorite.FavoriteActionsRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error)
+	FavoriteAction(ctx context.Context, req *favorite.FavoriteActionRequest, callOptions ...callopt.Option) (r *favorite.FavoriteActionResponse, err error)
+	FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -44,12 +44,12 @@ type kFavoriteServiceClient struct {
 	*kClient
 }
 
-func (p *kFavoriteServiceClient) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionsRequest, callOptions ...callopt.Option) (r *favorite.FavoriteActionResponse, err error) {
+func (p *kFavoriteServiceClient) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionRequest, callOptions ...callopt.Option) (r *favorite.FavoriteActionResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.FavoriteAction(ctx, req)
 }
 
-func (p *kFavoriteServiceClient) FavoriteList(ctx context.Context, req *favorite.FavoriteActionsRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error) {
+func (p *kFavoriteServiceClient) FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.FavoriteList(ctx, req)
 }

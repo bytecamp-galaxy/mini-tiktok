@@ -3,7 +3,6 @@
 package Api
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -17,52 +16,12 @@ func _douyinMw() []app.HandlerFunc {
 	return nil
 }
 
-func _publishMw() []app.HandlerFunc {
+func _favoriteMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
 func _actionMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _publish_ctionMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _registerMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userregisterMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _loginMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userloginMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userqueryMw() []app.HandlerFunc {
-	// your code...
-	return []app.HandlerFunc{mw.JwtMiddleware.MiddlewareFunc()}
-}
-
-func _favoriteMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -82,7 +41,47 @@ func _favoritelistMw() []app.HandlerFunc {
 	return nil
 }
 
+func _publishMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _action0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _publish_ctionMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userqueryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _loginMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userloginMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _registerMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userregisterMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

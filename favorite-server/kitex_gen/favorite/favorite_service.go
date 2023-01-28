@@ -9,57 +9,57 @@ import (
 	"strings"
 )
 
-type FavoriteActionsRequest struct {
+type FavoriteActionRequest struct {
 	UserId     int64  `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
 	Token      string `thrift:"Token,2,required" frugal:"2,required,string" json:"Token"`
 	VideoId    int64  `thrift:"VideoId,3,required" frugal:"3,required,i64" json:"VideoId"`
 	ActionType int32  `thrift:"ActionType,4,required" frugal:"4,required,i32" json:"ActionType"`
 }
 
-func NewFavoriteActionsRequest() *FavoriteActionsRequest {
-	return &FavoriteActionsRequest{}
+func NewFavoriteActionRequest() *FavoriteActionRequest {
+	return &FavoriteActionRequest{}
 }
 
-func (p *FavoriteActionsRequest) InitDefault() {
-	*p = FavoriteActionsRequest{}
+func (p *FavoriteActionRequest) InitDefault() {
+	*p = FavoriteActionRequest{}
 }
 
-func (p *FavoriteActionsRequest) GetUserId() (v int64) {
+func (p *FavoriteActionRequest) GetUserId() (v int64) {
 	return p.UserId
 }
 
-func (p *FavoriteActionsRequest) GetToken() (v string) {
+func (p *FavoriteActionRequest) GetToken() (v string) {
 	return p.Token
 }
 
-func (p *FavoriteActionsRequest) GetVideoId() (v int64) {
+func (p *FavoriteActionRequest) GetVideoId() (v int64) {
 	return p.VideoId
 }
 
-func (p *FavoriteActionsRequest) GetActionType() (v int32) {
+func (p *FavoriteActionRequest) GetActionType() (v int32) {
 	return p.ActionType
 }
-func (p *FavoriteActionsRequest) SetUserId(val int64) {
+func (p *FavoriteActionRequest) SetUserId(val int64) {
 	p.UserId = val
 }
-func (p *FavoriteActionsRequest) SetToken(val string) {
+func (p *FavoriteActionRequest) SetToken(val string) {
 	p.Token = val
 }
-func (p *FavoriteActionsRequest) SetVideoId(val int64) {
+func (p *FavoriteActionRequest) SetVideoId(val int64) {
 	p.VideoId = val
 }
-func (p *FavoriteActionsRequest) SetActionType(val int32) {
+func (p *FavoriteActionRequest) SetActionType(val int32) {
 	p.ActionType = val
 }
 
-var fieldIDToName_FavoriteActionsRequest = map[int16]string{
+var fieldIDToName_FavoriteActionRequest = map[int16]string{
 	1: "UserId",
 	2: "Token",
 	3: "VideoId",
 	4: "ActionType",
 }
 
-func (p *FavoriteActionsRequest) Read(iprot thrift.TProtocol) (err error) {
+func (p *FavoriteActionRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -165,7 +165,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_FavoriteActionsRequest[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_FavoriteActionRequest[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -174,10 +174,10 @@ ReadFieldEndError:
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FavoriteActionsRequest[fieldId]))
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FavoriteActionRequest[fieldId]))
 }
 
-func (p *FavoriteActionsRequest) ReadField1(iprot thrift.TProtocol) error {
+func (p *FavoriteActionRequest) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
@@ -186,7 +186,7 @@ func (p *FavoriteActionsRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *FavoriteActionsRequest) ReadField2(iprot thrift.TProtocol) error {
+func (p *FavoriteActionRequest) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -195,7 +195,7 @@ func (p *FavoriteActionsRequest) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *FavoriteActionsRequest) ReadField3(iprot thrift.TProtocol) error {
+func (p *FavoriteActionRequest) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
@@ -204,7 +204,7 @@ func (p *FavoriteActionsRequest) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *FavoriteActionsRequest) ReadField4(iprot thrift.TProtocol) error {
+func (p *FavoriteActionRequest) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -213,9 +213,9 @@ func (p *FavoriteActionsRequest) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *FavoriteActionsRequest) Write(oprot thrift.TProtocol) (err error) {
+func (p *FavoriteActionRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("FavoriteActionsRequest"); err != nil {
+	if err = oprot.WriteStructBegin("FavoriteActionRequest"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -254,7 +254,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *FavoriteActionsRequest) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *FavoriteActionRequest) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("UserId", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -271,7 +271,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *FavoriteActionsRequest) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *FavoriteActionRequest) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("Token", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -288,7 +288,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *FavoriteActionsRequest) writeField3(oprot thrift.TProtocol) (err error) {
+func (p *FavoriteActionRequest) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("VideoId", thrift.I64, 3); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -305,7 +305,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
-func (p *FavoriteActionsRequest) writeField4(oprot thrift.TProtocol) (err error) {
+func (p *FavoriteActionRequest) writeField4(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("ActionType", thrift.I32, 4); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -322,14 +322,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
-func (p *FavoriteActionsRequest) String() string {
+func (p *FavoriteActionRequest) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("FavoriteActionsRequest(%+v)", *p)
+	return fmt.Sprintf("FavoriteActionRequest(%+v)", *p)
 }
 
-func (p *FavoriteActionsRequest) DeepEqual(ano *FavoriteActionsRequest) bool {
+func (p *FavoriteActionRequest) DeepEqual(ano *FavoriteActionRequest) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -350,28 +350,28 @@ func (p *FavoriteActionsRequest) DeepEqual(ano *FavoriteActionsRequest) bool {
 	return true
 }
 
-func (p *FavoriteActionsRequest) Field1DeepEqual(src int64) bool {
+func (p *FavoriteActionRequest) Field1DeepEqual(src int64) bool {
 
 	if p.UserId != src {
 		return false
 	}
 	return true
 }
-func (p *FavoriteActionsRequest) Field2DeepEqual(src string) bool {
+func (p *FavoriteActionRequest) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Token, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *FavoriteActionsRequest) Field3DeepEqual(src int64) bool {
+func (p *FavoriteActionRequest) Field3DeepEqual(src int64) bool {
 
 	if p.VideoId != src {
 		return false
 	}
 	return true
 }
-func (p *FavoriteActionsRequest) Field4DeepEqual(src int32) bool {
+func (p *FavoriteActionRequest) Field4DeepEqual(src int32) bool {
 
 	if p.ActionType != src {
 		return false
@@ -1112,9 +1112,9 @@ func (p *FavoriteListResponse) Field2DeepEqual(src *string) bool {
 }
 
 type FavoriteService interface {
-	FavoriteAction(ctx context.Context, req *FavoriteActionsRequest) (r *FavoriteActionResponse, err error)
+	FavoriteAction(ctx context.Context, req *FavoriteActionRequest) (r *FavoriteActionResponse, err error)
 
-	FavoriteList(ctx context.Context, req *FavoriteActionsRequest) (r *FavoriteListResponse, err error)
+	FavoriteList(ctx context.Context, req *FavoriteListRequest) (r *FavoriteListResponse, err error)
 }
 
 type FavoriteServiceClient struct {
@@ -1143,7 +1143,7 @@ func (p *FavoriteServiceClient) Client_() thrift.TClient {
 	return p.c
 }
 
-func (p *FavoriteServiceClient) FavoriteAction(ctx context.Context, req *FavoriteActionsRequest) (r *FavoriteActionResponse, err error) {
+func (p *FavoriteServiceClient) FavoriteAction(ctx context.Context, req *FavoriteActionRequest) (r *FavoriteActionResponse, err error) {
 	var _args FavoriteServiceFavoriteActionArgs
 	_args.Req = req
 	var _result FavoriteServiceFavoriteActionResult
@@ -1152,7 +1152,7 @@ func (p *FavoriteServiceClient) FavoriteAction(ctx context.Context, req *Favorit
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *FavoriteServiceClient) FavoriteList(ctx context.Context, req *FavoriteActionsRequest) (r *FavoriteListResponse, err error) {
+func (p *FavoriteServiceClient) FavoriteList(ctx context.Context, req *FavoriteListRequest) (r *FavoriteListResponse, err error) {
 	var _args FavoriteServiceFavoriteListArgs
 	_args.Req = req
 	var _result FavoriteServiceFavoriteListResult
@@ -1301,7 +1301,7 @@ func (p *favoriteServiceProcessorFavoriteList) Process(ctx context.Context, seqI
 }
 
 type FavoriteServiceFavoriteActionArgs struct {
-	Req *FavoriteActionsRequest `thrift:"req,1" frugal:"1,default,FavoriteActionsRequest" json:"req"`
+	Req *FavoriteActionRequest `thrift:"req,1" frugal:"1,default,FavoriteActionRequest" json:"req"`
 }
 
 func NewFavoriteServiceFavoriteActionArgs() *FavoriteServiceFavoriteActionArgs {
@@ -1312,15 +1312,15 @@ func (p *FavoriteServiceFavoriteActionArgs) InitDefault() {
 	*p = FavoriteServiceFavoriteActionArgs{}
 }
 
-var FavoriteServiceFavoriteActionArgs_Req_DEFAULT *FavoriteActionsRequest
+var FavoriteServiceFavoriteActionArgs_Req_DEFAULT *FavoriteActionRequest
 
-func (p *FavoriteServiceFavoriteActionArgs) GetReq() (v *FavoriteActionsRequest) {
+func (p *FavoriteServiceFavoriteActionArgs) GetReq() (v *FavoriteActionRequest) {
 	if !p.IsSetReq() {
 		return FavoriteServiceFavoriteActionArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *FavoriteServiceFavoriteActionArgs) SetReq(val *FavoriteActionsRequest) {
+func (p *FavoriteServiceFavoriteActionArgs) SetReq(val *FavoriteActionRequest) {
 	p.Req = val
 }
 
@@ -1392,7 +1392,7 @@ ReadStructEndError:
 }
 
 func (p *FavoriteServiceFavoriteActionArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewFavoriteActionsRequest()
+	p.Req = NewFavoriteActionRequest()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
@@ -1464,7 +1464,7 @@ func (p *FavoriteServiceFavoriteActionArgs) DeepEqual(ano *FavoriteServiceFavori
 	return true
 }
 
-func (p *FavoriteServiceFavoriteActionArgs) Field1DeepEqual(src *FavoriteActionsRequest) bool {
+func (p *FavoriteServiceFavoriteActionArgs) Field1DeepEqual(src *FavoriteActionRequest) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -1647,7 +1647,7 @@ func (p *FavoriteServiceFavoriteActionResult) Field0DeepEqual(src *FavoriteActio
 }
 
 type FavoriteServiceFavoriteListArgs struct {
-	Req *FavoriteActionsRequest `thrift:"req,1" frugal:"1,default,FavoriteActionsRequest" json:"req"`
+	Req *FavoriteListRequest `thrift:"req,1" frugal:"1,default,FavoriteListRequest" json:"req"`
 }
 
 func NewFavoriteServiceFavoriteListArgs() *FavoriteServiceFavoriteListArgs {
@@ -1658,15 +1658,15 @@ func (p *FavoriteServiceFavoriteListArgs) InitDefault() {
 	*p = FavoriteServiceFavoriteListArgs{}
 }
 
-var FavoriteServiceFavoriteListArgs_Req_DEFAULT *FavoriteActionsRequest
+var FavoriteServiceFavoriteListArgs_Req_DEFAULT *FavoriteListRequest
 
-func (p *FavoriteServiceFavoriteListArgs) GetReq() (v *FavoriteActionsRequest) {
+func (p *FavoriteServiceFavoriteListArgs) GetReq() (v *FavoriteListRequest) {
 	if !p.IsSetReq() {
 		return FavoriteServiceFavoriteListArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *FavoriteServiceFavoriteListArgs) SetReq(val *FavoriteActionsRequest) {
+func (p *FavoriteServiceFavoriteListArgs) SetReq(val *FavoriteListRequest) {
 	p.Req = val
 }
 
@@ -1738,7 +1738,7 @@ ReadStructEndError:
 }
 
 func (p *FavoriteServiceFavoriteListArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewFavoriteActionsRequest()
+	p.Req = NewFavoriteListRequest()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
@@ -1810,7 +1810,7 @@ func (p *FavoriteServiceFavoriteListArgs) DeepEqual(ano *FavoriteServiceFavorite
 	return true
 }
 
-func (p *FavoriteServiceFavoriteListArgs) Field1DeepEqual(src *FavoriteActionsRequest) bool {
+func (p *FavoriteServiceFavoriteListArgs) Field1DeepEqual(src *FavoriteListRequest) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false

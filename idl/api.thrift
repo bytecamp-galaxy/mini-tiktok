@@ -65,7 +65,7 @@ service PublishApi {
                         Favorite Service
 ====================================================================*/
 
-struct FavoriteActionsRequest{
+struct FavoriteActionRequest{
     1: required i64 UserId (api.query="user_id");
     2: required string Token (api.query="token"); //鉴权
     3: required i64 VideoId (api.query="video_id");
@@ -89,6 +89,6 @@ struct FavoriteListResponse{
 }
 
 service FavoriteService{
-    FavoriteActionResponse favoriteAction(1: FavoriteActionsRequest req) (api.post="/douyin/favorite/action/"); // 点赞/取消点赞
-    FavoriteListResponse favoriteList(1: FavoriteActionsRequest req) (api.get="/douyin/favorite/list/"); //return 点赞视频列表
+    FavoriteActionResponse favoriteAction(1: FavoriteActionRequest req) (api.post="/douyin/favorite/action/"); // 点赞/取消点赞
+    FavoriteListResponse favoriteList(1: FavoriteListRequest req) (api.get="/douyin/favorite/list/"); //return 点赞视频列表
 }

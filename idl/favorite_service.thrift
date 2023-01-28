@@ -2,7 +2,7 @@ namespace go favorite
 
 //include "feed_service.thrift"
 
-struct FavoriteActionsRequest{
+struct FavoriteActionRequest{
     1: required i64 UserId;
     2: required string Token; //鉴权
     3: required i64 VideoId;
@@ -26,6 +26,6 @@ struct FavoriteListResponse{
 }
 
 service FavoriteService{
-    FavoriteActionResponse favoriteAction(1: FavoriteActionsRequest req); // 点赞/取消点赞
-    FavoriteListResponse favoriteList(1: FavoriteActionsRequest req); //return 点赞视频列表
+    FavoriteActionResponse favoriteAction(1: FavoriteActionRequest req); // 点赞/取消点赞
+    FavoriteListResponse favoriteList(1: FavoriteListRequest req); //return 点赞视频列表
 }
