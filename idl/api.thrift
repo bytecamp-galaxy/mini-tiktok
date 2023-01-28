@@ -60,3 +60,43 @@ struct PublishActionResponse {
 service PublishApi {
     PublishActionResponse publishAction(1: PublishActionRequest req) (api.post="/douyin/publish/action/");
 }
+
+/*==================================================================
+                        Comment Service
+====================================================================*/
+struct CommentActionRequest {
+    1: required i64 VideoId (api.query="video_id");
+    3: required i32 ActionType (api.query="action_type", api.vd="$ == 1 || $ == 2");
+    4: optional string CommentText (api.query="comment_text");
+    5: optional i64 CommentId (api.query="comment_id");
+    6: required string Token (api.query="token");
+}
+
+struct CommentActionResponse {
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+    3: optional Comment Comment (api.body="comment");
+}
+
+struct CommentListRequest {
+    1: required i64 VideoId (api.query="video_id");
+    2: required string Token (api.query="token");
+}
+
+struct CommentListResponse {
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+    3: list<Comment> CommentList (api.body="comment_list");
+}
+
+struct Comment {
+    1: required i64 Id (api.body="id");
+    2: required User User (api.body="user");
+    3: required string Content (api.body="content");
+    4: required string CreateDate (api.body="create_date");
+}
+
+service CommentApi {
+    CommentActionResponse commentAction(1: CommentActionRequest req) (api.post="/douyin/comment/action/");
+    CommentListResponse commentList(1: CommentListRequest req) (api.get="/douyin/comment/list/");
+}
