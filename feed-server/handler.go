@@ -4,16 +4,13 @@ import (
 	"context"
 	feed "github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/user"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"time"
 )
 
 // FeedServiceImpl implements the last service interface defined in the IDL.
 type FeedServiceImpl struct{}
-
-const (
-	LIMIT = 30 // 单次返回最大视频数
-)
 
 // GetFeed implements the FeedServiceImpl interface. get 30 latest videos with db
 func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
@@ -30,7 +27,7 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	v := q.Video
 
 	// find latest 30 videos
-	videos, err := v.WithContext(ctx).Limit(LIMIT).Order(v.CreatedAt.Desc()).Where(v.CreatedAt.Lt(latestTime)).Find()
+	videos, err := v.WithContext(ctx).Limit(constants.DefaultVideoLimit).Order(v.CreatedAt.Desc()).Where(v.CreatedAt.Lt(latestTime)).Find()
 
 	if err != nil {
 		return nil, err
