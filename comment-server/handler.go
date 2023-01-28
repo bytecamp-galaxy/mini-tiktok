@@ -15,7 +15,6 @@ type CommentServiceImpl struct{}
 // CommentAction implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.CommentActionRequest) (resp *user.CommentActionResponse, err error) {
 	q := query.Use(mysql.DB)
-
 	err = q.Transaction(func(tx *query.Query) error {
 		switch req.ActionType {
 		case 1:
@@ -70,7 +69,9 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 	})
 
 	if err != nil {
-		resp.StatusCode = -1 // TODO(heiyan): return meaningful error code.
+		resp = &user.CommentActionResponse{
+			StatusCode: -1,
+		}
 		return resp, err
 	}
 	return resp, err
