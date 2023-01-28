@@ -61,3 +61,23 @@ func _userqueryMw() []app.HandlerFunc {
 	// your code...
 	return []app.HandlerFunc{mw.JwtMiddleware.MiddlewareFunc()}
 }
+
+func _commentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _commentlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _comment_ctionMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _action0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

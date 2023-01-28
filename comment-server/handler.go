@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/comment"
+	"github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
@@ -123,8 +124,8 @@ func Po2voComment(commentPO model.Comment) comment.Comment {
 	}
 }
 
-func Po2voUser(userPO model.User) comment.User {
-	return comment.User{
+func Po2voUser(userPO model.User) user.User {
+	return user.User{
 		Id:            userPO.ID,
 		Name:          userPO.Username,
 		FollowCount:   userPO.FollowingCount,

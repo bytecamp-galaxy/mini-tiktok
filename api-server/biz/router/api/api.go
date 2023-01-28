@@ -20,10 +20,18 @@ func Register(r *server.Hertz) {
 	{
 		_douyin := root.Group("/douyin", _douyinMw()...)
 		{
+			_comment := _douyin.Group("/comment", _commentMw()...)
+			_comment.GET("/list", append(_commentlistMw(), api.CommentList)...)
+			{
+				_action := _comment.Group("/action", _actionMw()...)
+				_action.POST("/", append(_comment_ctionMw(), api.CommentAction)...)
+			}
+		}
+		{
 			_publish := _douyin.Group("/publish", _publishMw()...)
 			{
-				_action := _publish.Group("/action", _actionMw()...)
-				_action.POST("/", append(_publish_ctionMw(), api.PublishAction)...)
+				_action0 := _publish.Group("/action", _action0Mw()...)
+				_action0.POST("/", append(_publish_ctionMw(), api.PublishAction)...)
 			}
 		}
 		{
