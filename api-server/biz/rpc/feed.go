@@ -3,22 +3,22 @@ package rpc
 import (
 	"fmt"
 	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
+	"github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed/feedservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
-	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 )
 
-var userClient *userservice.Client
+var feedClient *feedservice.Client
 
-func InitUserClient() (*userservice.Client, error) {
+func InitFeedClient() (*feedservice.Client, error) {
 	// lazy initialization
-	if userClient != nil {
-		return userClient, nil
+	if feedClient != nil {
+		return feedClient, nil
 	}
 
 	v := conf.Init().V
@@ -29,14 +29,14 @@ func InitUserClient() (*userservice.Client, error) {
 	}
 
 	provider.NewOpenTelemetryProvider(
-		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithServiceName(v.GetString("feed-server.name")),
 		provider.WithExportEndpoint("localhost:4317"),
 		provider.WithInsecure(),
 	)
 	// TODO(vgalaxy): shutdown provider
 
-	c, err := userservice.NewClient(
-		v.GetString("user-server.name"),
+	c, err := feedservice.NewClient(
+		v.GetString("feed-server.name"),
 		client.WithResolver(r),
 		client.WithMiddleware(mw.CommonMiddleware),
 		client.WithInstanceMW(mw.ClientMiddleware),
@@ -48,10 +48,10 @@ func InitUserClient() (*userservice.Client, error) {
 		return nil, err
 	}
 
-	userClient = &c
+	feedClient = &c
 
 	// init kitex client logger
 	log.InitKLogger()
 
-	return userClient, nil
+	return feedClient, nil
 }

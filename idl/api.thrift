@@ -1,5 +1,8 @@
 namespace go api
 
+/*==================================================================
+                        User Service
+====================================================================*/
 struct UserRegisterRequest {
     1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32)");
     2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32)");
@@ -49,6 +52,9 @@ service UserApi {
     UserQueryResponse userQuery(1: UserQueryRequest req) (api.get="/douyin/user/");
 }
 
+/*==================================================================
+                        Feed Service
+====================================================================*/
 struct FeedRequest {
     1: optional i64 LatestTime (api.query="latest_time");
     2: optional string Token (api.query="token"); // 可选参数，登录用户设置
@@ -75,11 +81,13 @@ struct Video {
     8: string Title (api.body="title"); // 视频标题
 }
 
-service FeedService{
+service FeedApi {
     FeedResponse getFeed(1: FeedRequest req) (api.get="/douyin/feed/");
 }
 
-
+/*==================================================================
+                        Publish Service
+====================================================================*/
 struct PublishActionRequest {
 
 }
@@ -158,7 +166,7 @@ struct FavoriteListResponse{
 //    3: list<feed_service.Video> VidoeList;
 }
 
-service FavoriteService{
+service FavoriteApi {
     FavoriteActionResponse favoriteAction(1: FavoriteActionRequest req) (api.post="/douyin/favorite/action/"); // 点赞/取消点赞
     FavoriteListResponse favoriteList(1: FavoriteListRequest req) (api.get="/douyin/favorite/list/"); //return 点赞视频列表
 }

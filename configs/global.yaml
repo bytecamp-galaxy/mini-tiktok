@@ -11,7 +11,37 @@ api-server:
 user-server:
   name: "tiktok.user.service"
   host: "127.0.0.1"
-  port: 8888
+  port: 8880
+
+feed-server:
+  name: "tiktok.feed.service"
+  host: "127.0.0.1"
+  port: 8881
+
+comment-server:
+  name: "tiktok.comment.service"
+  host: "127.0.0.1"
+  port: 8882
+
+favorite-server:
+  name: "tiktok.favorite.service"
+  host: "127.0.0.1"
+  port: 8883
+
+publish-server:
+  name: "tiktok.publish.service"
+  host: "127.0.0.1"
+  port: 8884
+
+relation-server:
+  name: "tiktok.relation.service"
+  host: "127.0.0.1"
+  port: 8885
+
+message-server:
+  name: "tiktok.message.service"
+  host: "127.0.0.1"
+  port: 8886
 
 mysql:
   host: "127.0.0.1"

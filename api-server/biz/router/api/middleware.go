@@ -142,3 +142,13 @@ func _userregisterMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _list0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _action1Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -4,16 +4,11 @@ package api
 
 import (
 	"context"
-<<<<<<< HEAD
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
-=======
-
-	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
->>>>>>> origin/dev-freeeeeeeeeedom
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -29,7 +24,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-<<<<<<< HEAD
 	// validate password
 	err = utils.ValidatePassword(req.Password)
 	if err != nil {
@@ -91,9 +85,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		UserId:     respRpc.UserId,
 		Token:      token,
 	}
-=======
-	resp := new(api.UserRegisterResponse)
->>>>>>> origin/dev-freeeeeeeeeedom
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -109,7 +100,6 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-<<<<<<< HEAD
 	// set up connection with user server
 	cli, err := rpc.InitUserClient()
 	if err != nil {
@@ -161,9 +151,6 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		UserId:     respRpc.UserId,
 		Token:      token,
 	}
-=======
-	resp := new(api.UserLoginResponse)
->>>>>>> origin/dev-freeeeeeeeeedom
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -179,7 +166,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-<<<<<<< HEAD
 	// fetch user id from token
 	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
@@ -244,9 +230,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 			IsFollow:      false, // TODO(vgalaxy)
 		},
 	}
-=======
-	resp := new(api.UserQueryResponse)
->>>>>>> origin/dev-freeeeeeeeeedom
 
 	c.JSON(consts.StatusOK, resp)
 }
