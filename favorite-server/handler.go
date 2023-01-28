@@ -11,6 +11,7 @@ type FavoriteServiceImpl struct{}
 // FavoriteAction implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionsRequest) (resp *favorite.FavoriteActionResponse, err error) {
 	// TODO: Your code here...
+
 	return
 }
 

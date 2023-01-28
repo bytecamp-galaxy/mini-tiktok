@@ -9,7 +9,6 @@ require (
 	github.com/cloudwego/hertz v0.5.1
 	github.com/cloudwego/kitex v0.4.4
 	github.com/hertz-contrib/jwt v1.0.1
-	github.com/hertz-contrib/pprof v0.1.0
 	github.com/hudl/fargo v1.4.0
 	github.com/kitex-contrib/registry-eureka v0.0.1
 	github.com/wagslane/go-password-validator v0.3.0
@@ -52,7 +51,6 @@ require (
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
 	github.com/oleiade/lane v1.0.1 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
-	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
 	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect

@@ -3,41 +3,12 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/cloudwego/hertz/pkg/app/server/registry"
-	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/cloudwego/hertz/pkg/network/netpoll"
-	"time"
 )
 
-func Init() {
-	dal.Init()
-	mw.Init()
-}
-
 func main() {
-	Init()
-	addr := "localhost:8080"
-	r := eureka.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 40*time.Second)
-	h := server.Default(server.WithHostPorts(addr),
-		server.WithTransport(netpoll.NewTransporter),
-		server.WithExitWaitTime(5*time.Second),
-		server.WithRegistry(r, &registry.Info{
-			ServiceName: "tiktok.api.service",
-			Addr:        utils.NewNetAddr("tcp", addr),
-			Weight:      10,
-			Tags:        nil,
-		}))
-	h.OnShutdown = append(h.OnShutdown, func(ctx context.Context) {
-		fmt.Println("before ctx.Done()")
-		<-ctx.Done()
-		fmt.Println("after ctx.Done()")
-	})
+	h := server.Default()
+
 	register(h)
 	h.Spin()
 }
