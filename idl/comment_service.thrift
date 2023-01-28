@@ -1,6 +1,6 @@
 namespace go user
 
-include "user_service.thrift"
+//include "user_service.thrift"
 
 struct CommentActionRequest {
     1: required i64 VideoId;
@@ -28,9 +28,17 @@ struct CommentListResponse {
 
 struct Comment {
     1: required i64 Id;
-    2: required user_service.User User;
+    2: required User User;
     3: required string Content;
     4: required string CreateDate;
+}
+
+struct User {
+    1: i64 Id;
+    2: string Name;
+    3: i64 FollowCount;
+    4: i64 FollowerCount;
+    5: bool IsFollow;
 }
 
 service CommentService {
