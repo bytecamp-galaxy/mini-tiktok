@@ -33,6 +33,7 @@ func InitUserClient() (*userservice.Client, error) {
 		provider.WithExportEndpoint("localhost:4317"),
 		provider.WithInsecure(),
 	)
+	// TODO(vgalaxy): shutdown provider
 
 	c, err := userservice.NewClient(
 		v.GetString("user-server.name"),
