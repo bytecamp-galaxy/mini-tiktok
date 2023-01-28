@@ -15,7 +15,6 @@ import (
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"
 	kitexzap "github.com/kitex-contrib/obs-opentelemetry/logging/zap"
-	"github.com/kitex-contrib/registry-eureka/resolver"
 )
 
 // GetFeed .

@@ -131,3 +131,34 @@ service CommentApi {
     CommentActionResponse commentAction(1: CommentActionRequest req) (api.post="/douyin/comment/action/");
     CommentListResponse commentList(1: CommentListRequest req) (api.get="/douyin/comment/list/");
 }
+
+/*==================================================================
+                        Favorite Service
+====================================================================*/
+struct FavoriteActionRequest{
+    1: required i64 UserId (api.query="user_id");
+    2: required string Token (api.query="token"); //鉴权
+    3: required i64 VideoId (api.query="video_id");
+    4: required i32 ActionType (api.query="action_type", api.vd="$ == 1 || $ == 2");
+}
+
+struct FavoriteActionResponse{
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+}
+
+struct FavoriteListRequest{
+    1: required i64 UserId (api.query="id");
+    2: required string Token (api.query="token");
+}
+
+struct FavoriteListResponse{
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+//    3: list<feed_service.Video> VidoeList;
+}
+
+service FavoriteService{
+    FavoriteActionResponse favoriteAction(1: FavoriteActionRequest req) (api.post="/douyin/favorite/action/"); // 点赞/取消点赞
+    FavoriteListResponse favoriteList(1: FavoriteListRequest req) (api.get="/douyin/favorite/list/"); //return 点赞视频列表
+}

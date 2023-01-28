@@ -3,6 +3,7 @@
 package main
 
 import (
+<<<<<<< HEAD
 	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
@@ -64,6 +65,14 @@ func main() {
 	h.Use(tracing.ServerMiddleware(cfg))
 
 	// register
+=======
+	"github.com/cloudwego/hertz/pkg/app/server"
+)
+
+func main() {
+	h := server.Default()
+
+>>>>>>> origin/dev-freeeeeeeeeedom
 	register(h)
 
 	// run server

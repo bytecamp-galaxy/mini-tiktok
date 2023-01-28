@@ -48,12 +48,37 @@ func _douyinMw() []app.HandlerFunc {
 	return nil
 }
 
-func _publishMw() []app.HandlerFunc {
+func _favoriteMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
 func _actionMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _favorite_ctionMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _favoritelistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _publishMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _action0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -68,12 +93,7 @@ func _userMw() []app.HandlerFunc {
 	return nil
 }
 
-func _registerMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userregisterMw() []app.HandlerFunc {
+func _userqueryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -88,7 +108,7 @@ func _userloginMw() []app.HandlerFunc {
 	return nil
 }
 
-func _userqueryMw() []app.HandlerFunc {
+func _registerMw() []app.HandlerFunc {
 	// your code...
 	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
 }
@@ -113,12 +133,12 @@ func _comment_ctionMw() []app.HandlerFunc {
 	return nil
 }
 
-func _action0Mw() []app.HandlerFunc {
+func _getfeedMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _getfeedMw() []app.HandlerFunc {
+func _userregisterMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
