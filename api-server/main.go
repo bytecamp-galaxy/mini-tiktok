@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -11,6 +12,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	"github.com/hertz-contrib/obs-opentelemetry/provider"
 	"github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/hertz-contrib/registry/etcd"
 	"net"
@@ -41,6 +43,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithInsecure(),
+	)
+	defer p.Shutdown(context.Background())
 
 	tracer, cfg := tracing.NewServerTracer()
 	h := server.Default(
