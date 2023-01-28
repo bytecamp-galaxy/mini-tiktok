@@ -98,6 +98,11 @@ func _commentMw() []app.HandlerFunc {
 	return nil
 }
 
+func _feedMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _commentlistMw() []app.HandlerFunc {
 	// your code...
 	return nil
@@ -109,6 +114,11 @@ func _comment_ctionMw() []app.HandlerFunc {
 }
 
 func _action0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getfeedMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

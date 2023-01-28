@@ -26,6 +26,8 @@ func Register(r *server.Hertz) {
 				_action := _comment.Group("/action", _actionMw()...)
 				_action.POST("/", append(_comment_ctionMw(), api.CommentAction)...)
 			}
+			_feed := _douyin.Group("/feed", _feedMw()...)
+			_feed.GET("/", append(_getfeedMw(), api.GetFeed)...)
 		}
 		{
 			_publish := _douyin.Group("/publish", _publishMw()...)
