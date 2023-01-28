@@ -29,7 +29,7 @@ struct CommentListResponse {
 struct Comment {
     1: required i64 Id;
     2: required user_service.User User;
-    3: required string Conent;
+    3: required string Content;
     4: required string CreateDate;
 }
 

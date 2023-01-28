@@ -1017,7 +1017,7 @@ func (p *Comment) FastRead(buf []byte) (int, error) {
 	var fieldId int16
 	var issetId bool = false
 	var issetUser bool = false
-	var issetConent bool = false
+	var issetContent bool = false
 	var issetCreateDate bool = false
 	_, l, err = bthrift.Binary.ReadStructBegin(buf)
 	offset += l
@@ -1072,7 +1072,7 @@ func (p *Comment) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetConent = true
+				issetContent = true
 			} else {
 				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1125,7 +1125,7 @@ func (p *Comment) FastRead(buf []byte) (int, error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetConent {
+	if !issetContent {
 		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
@@ -1186,7 +1186,7 @@ func (p *Comment) FastReadField3(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.Conent = v
+		p.Content = v
 
 	}
 	return offset, nil
@@ -1258,8 +1258,8 @@ func (p *Comment) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter)
 
 func (p *Comment) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "Conent", thrift.STRING, 3)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Conent)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "Content", thrift.STRING, 3)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Content)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -1293,8 +1293,8 @@ func (p *Comment) field2Length() int {
 
 func (p *Comment) field3Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("Conent", thrift.STRING, 3)
-	l += bthrift.Binary.StringLengthNocopy(p.Conent)
+	l += bthrift.Binary.FieldBeginLength("Content", thrift.STRING, 3)
+	l += bthrift.Binary.StringLengthNocopy(p.Content)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

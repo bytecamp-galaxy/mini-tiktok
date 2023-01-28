@@ -15,7 +15,7 @@ type CommentServiceImpl struct{}
 // CommentAction implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.CommentActionRequest) (resp *user.CommentActionResponse, err error) {
 	q := query.Use(mysql.DB)
-	err = q.Transaction(func(tx *query.Query) error {
+	q.Transaction(func(tx *query.Query) error {
 		switch req.ActionType {
 		case 1:
 			{
@@ -39,7 +39,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 					Comment: &user.Comment{
 						Id:         c.ID,
 						User:       nil,
-						Conent:     c.Content,
+						Content:    c.Content,
 						CreateDate: time.Unix(c.CreatedAt, 0).String(),
 					},
 				}
@@ -70,7 +70,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 
 	if err != nil {
 		resp = &user.CommentActionResponse{
-			StatusCode: -1,
+			StatusCode: -1, //TODO(heiyan): return more meaningful status code.
 		}
 		return resp, err
 	}
@@ -79,6 +79,56 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 
 // CommentList implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentList(ctx context.Context, req *user.CommentListRequest) (resp *user.CommentListResponse, err error) {
-	// TODO: Your code here...
-	return
+	q := query.Use(mysql.DB)
+	q.Transaction(func(tx *query.Query) error {
+		c := tx.Comment
+		var comments []*model.Comment
+		comments, err = c.WithContext(ctx).Where(c.VideoID.Eq(req.VideoId)).Find()
+
+		if err != nil {
+			return err
+		}
+
+		list := make([]*user.Comment, len(comments))
+		for i, commentPO := range comments {
+			commentVO := Po2voComment(*commentPO)
+			list[i] = &commentVO
+		}
+		resp = &user.CommentListResponse{
+			StatusCode:  0,
+			StatusMsg:   nil,
+			CommentList: list,
+		}
+		return err
+	})
+
+	if err != nil {
+		return &user.CommentListResponse{
+			StatusCode:  -1,
+			StatusMsg:   nil,
+			CommentList: nil,
+		}, err
+	}
+
+	return resp, err
+}
+
+func Po2voComment(commentPO model.Comment) user.Comment {
+	userVO := Po2voUser(commentPO.User)
+	return user.Comment{
+		Id:         commentPO.ID,
+		User:       &userVO,
+		Content:    commentPO.Content,
+		CreateDate: time.Unix(commentPO.CreatedAt, 0).String(),
+	}
+}
+
+func Po2voUser(userPO model.User) user.User {
+	return user.User{
+		Id:            userPO.ID,
+		Name:          userPO.Username,
+		FollowCount:   userPO.FollowingCount,
+		FollowerCount: userPO.FollowerCount,
+		IsFollow:      false,
+	}
 }

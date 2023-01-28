@@ -1285,7 +1285,7 @@ func (p *CommentListResponse) Field3DeepEqual(src []*Comment) bool {
 type Comment struct {
 	Id         int64  `thrift:"Id,1,required" frugal:"1,required,i64" json:"Id"`
 	User       *User  `thrift:"User,2,required" frugal:"2,required,User" json:"User"`
-	Conent     string `thrift:"Conent,3,required" frugal:"3,required,string" json:"Conent"`
+	Content    string `thrift:"Content,3,required" frugal:"3,required,string" json:"Content"`
 	CreateDate string `thrift:"CreateDate,4,required" frugal:"4,required,string" json:"CreateDate"`
 }
 
@@ -1310,8 +1310,8 @@ func (p *Comment) GetUser() (v *User) {
 	return p.User
 }
 
-func (p *Comment) GetConent() (v string) {
-	return p.Conent
+func (p *Comment) GetContent() (v string) {
+	return p.Content
 }
 
 func (p *Comment) GetCreateDate() (v string) {
@@ -1323,8 +1323,8 @@ func (p *Comment) SetId(val int64) {
 func (p *Comment) SetUser(val *User) {
 	p.User = val
 }
-func (p *Comment) SetConent(val string) {
-	p.Conent = val
+func (p *Comment) SetContent(val string) {
+	p.Content = val
 }
 func (p *Comment) SetCreateDate(val string) {
 	p.CreateDate = val
@@ -1333,7 +1333,7 @@ func (p *Comment) SetCreateDate(val string) {
 var fieldIDToName_Comment = map[int16]string{
 	1: "Id",
 	2: "User",
-	3: "Conent",
+	3: "Content",
 	4: "CreateDate",
 }
 
@@ -1347,7 +1347,7 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetId bool = false
 	var issetUser bool = false
-	var issetConent bool = false
+	var issetContent bool = false
 	var issetCreateDate bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -1391,7 +1391,7 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetConent = true
+				issetContent = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -1432,7 +1432,7 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetConent {
+	if !issetContent {
 		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
@@ -1480,7 +1480,7 @@ func (p *Comment) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.Conent = v
+		p.Content = v
 	}
 	return nil
 }
@@ -1570,10 +1570,10 @@ WriteFieldEndError:
 }
 
 func (p *Comment) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("Conent", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("Content", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Conent); err != nil {
+	if err := oprot.WriteString(p.Content); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1622,7 +1622,7 @@ func (p *Comment) DeepEqual(ano *Comment) bool {
 	if !p.Field2DeepEqual(ano.User) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Conent) {
+	if !p.Field3DeepEqual(ano.Content) {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.CreateDate) {
@@ -1647,7 +1647,7 @@ func (p *Comment) Field2DeepEqual(src *User) bool {
 }
 func (p *Comment) Field3DeepEqual(src string) bool {
 
-	if strings.Compare(p.Conent, src) != 0 {
+	if strings.Compare(p.Content, src) != 0 {
 		return false
 	}
 	return true
