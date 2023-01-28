@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	user "github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/user"
+	"github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/comment"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
@@ -13,7 +13,7 @@ import (
 type CommentServiceImpl struct{}
 
 // CommentAction implements the CommentServiceImpl interface.
-func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.CommentActionRequest) (resp *user.CommentActionResponse, err error) {
+func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
 	q := query.Use(mysql.DB)
 	q.Transaction(func(tx *query.Query) error {
 		switch req.ActionType {
@@ -34,9 +34,9 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 					return err
 				}
 
-				resp = &user.CommentActionResponse{
+				resp = &comment.CommentActionResponse{
 					StatusCode: 0,
-					Comment: &user.Comment{
+					Comment: &comment.Comment{
 						Id:         c.ID,
 						User:       nil,
 						Content:    c.Content,
@@ -58,7 +58,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 					return err
 				}
 
-				resp = &user.CommentActionResponse{
+				resp = &comment.CommentActionResponse{
 					StatusCode: 0,
 				}
 			}
@@ -69,7 +69,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 	})
 
 	if err != nil {
-		resp = &user.CommentActionResponse{
+		resp = &comment.CommentActionResponse{
 			StatusCode: -1, //TODO(heiyan): return more meaningful status code.
 		}
 		return resp, err
@@ -78,7 +78,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *user.Commen
 }
 
 // CommentList implements the CommentServiceImpl interface.
-func (s *CommentServiceImpl) CommentList(ctx context.Context, req *user.CommentListRequest) (resp *user.CommentListResponse, err error) {
+func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
 	q := query.Use(mysql.DB)
 	q.Transaction(func(tx *query.Query) error {
 		c := tx.Comment
@@ -89,12 +89,12 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *user.CommentL
 			return err
 		}
 
-		list := make([]*user.Comment, len(comments))
+		list := make([]*comment.Comment, len(comments))
 		for i, commentPO := range comments {
 			commentVO := Po2voComment(*commentPO)
 			list[i] = &commentVO
 		}
-		resp = &user.CommentListResponse{
+		resp = &comment.CommentListResponse{
 			StatusCode:  0,
 			StatusMsg:   nil,
 			CommentList: list,
@@ -103,7 +103,7 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *user.CommentL
 	})
 
 	if err != nil {
-		return &user.CommentListResponse{
+		return &comment.CommentListResponse{
 			StatusCode:  -1,
 			StatusMsg:   nil,
 			CommentList: nil,
@@ -113,9 +113,9 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *user.CommentL
 	return resp, err
 }
 
-func Po2voComment(commentPO model.Comment) user.Comment {
+func Po2voComment(commentPO model.Comment) comment.Comment {
 	userVO := Po2voUser(commentPO.User)
-	return user.Comment{
+	return comment.Comment{
 		Id:         commentPO.ID,
 		User:       &userVO,
 		Content:    commentPO.Content,
@@ -123,8 +123,8 @@ func Po2voComment(commentPO model.Comment) user.Comment {
 	}
 }
 
-func Po2voUser(userPO model.User) user.User {
-	return user.User{
+func Po2voUser(userPO model.User) comment.User {
+	return comment.User{
 		Id:            userPO.ID,
 		Name:          userPO.Username,
 		FollowCount:   userPO.FollowingCount,
