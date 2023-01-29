@@ -49,7 +49,7 @@ func UploadLocalFile(bucketName string, objectName string, filePath string, cont
 	return info.Size, nil
 }
 
-// UploadFile 上传文件（提供reader）至 minio
+// UploadFile 上传文件（提供 reader）至 minio
 func UploadFile(bucketName string, objectName string, reader io.Reader, objectsize int64) error {
 	ctx := context.Background()
 	n, err := minioClient.PutObject(ctx, bucketName, objectName, reader, objectsize, minio.PutObjectOptions{
@@ -63,7 +63,7 @@ func UploadFile(bucketName string, objectName string, reader io.Reader, objectsi
 	return nil
 }
 
-// GetFileUrl 从 minio 获取文件Url
+// GetFileUrl 从 minio 获取文件 Url
 func GetFileUrl(bucketName string, fileName string, expires time.Duration) (*url.URL, error) {
 	ctx := context.Background()
 	reqParams := make(url.Values)
@@ -75,7 +75,7 @@ func GetFileUrl(bucketName string, fileName string, expires time.Duration) (*url
 		klog.Errorf("get url of file %s from bucket %s failed, %s", fileName, bucketName, err)
 		return nil, err
 	}
-	// TODO: url可能要做截取
+	// TODO: url 可能要做截取
 	return presignedUrl, nil
 }
 

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	etcd "github.com/bytecamp-galaxy/kitex-registry-etcd"
 	comment "github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/comment/commentservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
@@ -14,6 +13,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	etcd "github.com/kitex-contrib/registry-etcd"
 	"net"
 )
 

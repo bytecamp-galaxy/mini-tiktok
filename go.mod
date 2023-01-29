@@ -6,7 +6,6 @@ replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
 	github.com/apache/thrift v0.13.0
-	github.com/bytecamp-galaxy/kitex-registry-etcd v0.0.1
 	github.com/cloudwego/hertz v0.5.1
 	github.com/cloudwego/kitex v0.4.4
 	github.com/hertz-contrib/gzip v0.0.1
@@ -17,6 +16,7 @@ require (
 	github.com/hertz-contrib/registry/etcd v0.0.0-20221226122036-3c451682dc72
 	github.com/kitex-contrib/obs-opentelemetry v0.1.0
 	github.com/kitex-contrib/obs-opentelemetry/logging/zap v0.0.0-20221109071748-a433b0b57972
+	github.com/kitex-contrib/registry-etcd v0.1.0
 	github.com/minio/minio-go/v7 v7.0.47
 	github.com/spf13/viper v1.15.0
 	github.com/wagslane/go-password-validator v0.3.0
