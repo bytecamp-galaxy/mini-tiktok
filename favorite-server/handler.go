@@ -25,6 +25,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 		panic("FavoriteActionType Error!")
 	}
 	return
+
 }
 
 // FavoriteList implements the FavoriteServiceImpl interface.

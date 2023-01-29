@@ -11,7 +11,6 @@ import (
 )
 
 func Favorite(ctx context.Context, uid int64, vid int64) error {
-
 	err := mysql.DB.Transaction(func(tx *gorm.DB) error {
 		user := new(model.User)
 		if err := tx.WithContext(ctx).First(user, uid).Error; err != nil {

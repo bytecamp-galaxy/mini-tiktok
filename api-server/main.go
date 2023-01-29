@@ -23,7 +23,7 @@ func Init() {
 func main() {
 	Init()
 	addr := "localhost:8080"
-	r := eureka.NewEurekaRegistry([]string{"http://localhost:8761/eureka"}, 40*time.Second)
+	r := eureka.NewEurekaRegistry([]string{"http://81.68.219.146:8761/eureka"}, 40*time.Second)
 	h := server.Default(server.WithHostPorts(addr),
 		server.WithTransport(netpoll.NewTransporter),
 		server.WithExitWaitTime(5*time.Second),

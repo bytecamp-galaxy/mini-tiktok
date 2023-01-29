@@ -18,3 +18,7 @@ func TestPing(t *testing.T) {
 	assert.DeepEqual(t, 200, resp.StatusCode())
 	assert.DeepEqual(t, "{\"message\":\"pong\"}", string(resp.Body()))
 }
+
+func TestFavoriteAction(t *testing.T) {
+
+}
