@@ -3,13 +3,34 @@
 package main
 
 import (
+	"context"
 	handler "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/handler"
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/pprof"
 )
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 
-	// your code ...
+	// register pprof
+	pprof.Register(r)
+
+	// set NoRoute handler
+	r.NoRoute(func(c context.Context, ctx *app.RequestContext) {
+		ctx.JSON(consts.StatusNotFound, map[string]interface{}{
+			"status_code":    1,
+			"status_message": "no route",
+		})
+	})
+
+	// set NoMethod handler
+	r.NoMethod(func(c context.Context, ctx *app.RequestContext) {
+		ctx.JSON(consts.StatusMethodNotAllowed, map[string]interface{}{
+			"status_code":    1,
+			"status_message": "no method",
+		})
+	})
 }

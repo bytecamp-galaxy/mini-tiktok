@@ -85,10 +85,21 @@ struct FavoriteListRequest{
 struct FavoriteListResponse{
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
-//    3: list<feed_service.Video> VidoeList;
+    3: list<Video> VidoeList (api.body="video_list");
 }
 
 service FavoriteService{
     FavoriteActionResponse favoriteAction(1: FavoriteActionRequest req) (api.post="/douyin/favorite/action/"); // 点赞/取消点赞
     FavoriteListResponse favoriteList(1: FavoriteListRequest req) (api.get="/douyin/favorite/list/"); //return 点赞视频列表
+}
+
+struct Video {
+    1: i64 Id (api.body="id"); // 视频唯一标识
+    2: User author (api.body="auther"); // 视频作者信息
+    3: string PlayUrl (api.body="play_url"); // 视频播放地址
+    4: string CoverUrl (api.body="cover_url"); // 视频封面地址
+    5: i64 FavoriteCount (api.body="favorite_count"); // 视频的点赞总数
+    6: i64 CommentCount (api.body="comment_count"); // 视频的评论总数
+    7: bool IsFavorite (api.body="is_favorite"); // true-已点赞，false-未点赞
+    8: string Title (api.body="title"); // 视频标题
 }

@@ -8,8 +8,8 @@ import (
 )
 
 // https://github.com/go-sql-driver/mysql#dsn-data-source-name
-var dsn = "gorm:gorm@tcp(localhost:3306)/gorm?charset=utf8&parseTime=True&loc=Local"
-
+// var dsn = "gorm:gorm@tcp(localhost:3306)/gorm?charset=utf8&parseTime=True&loc=Local"
+var dsn = "root:123456@tcp(81.68.219.146:3305)/mini_tiktok?charset=utf8&parseTime=True&loc=Local"
 var DB *gorm.DB
 
 func Init() {

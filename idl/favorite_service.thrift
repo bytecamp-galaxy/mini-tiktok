@@ -1,12 +1,12 @@
 namespace go favorite
 
-//include "feed_service.thrift"
+include "feed_service.thrift"
 
 struct FavoriteActionRequest{
     1: required i64 UserId;
     2: required string Token; //鉴权
     3: required i64 VideoId;
-    4: required i32 ActionType;
+    4: required i32 ActionType; //1 点赞  2 取消
 }
 
 struct FavoriteActionResponse{
@@ -22,7 +22,7 @@ struct FavoriteListRequest{
 struct FavoriteListResponse{
     1: required i32 StatusCode;
     2: optional string StatusMsg;
-//    3: list<feed_service.Video> VidoeList;
+    3: list<feed_service.Video> VidoeList;
 }
 
 service FavoriteService{
