@@ -16,7 +16,7 @@ func Init() {
 	var err error
 	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:   "mini-tiktok",
-		Key:     []byte("114514"),
+		Key:     []byte("cyvG2OzO9KQNsY3"),
 		Timeout: time.Hour,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(int64); ok { // save user id
@@ -29,8 +29,8 @@ func Init() {
 		TokenLookup: "query:token",
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
 			c.JSON(code, map[string]interface{}{
-				"status_code":    code,
-				"status_message": message,
+				"status_code": code, // TODO(vgalaxy): do not use http status code
+				"status_msg":  message,
 			})
 		},
 		IdentityKey: IdentityKey,

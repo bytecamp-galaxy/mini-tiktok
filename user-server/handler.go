@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"errors"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 )
 
 // UserServiceImpl implements the last service interface defined in the IDL.
@@ -17,7 +18,7 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 	// hash password
 	hash, err := utils.HashPassword(req.Password)
 	if err != nil {
-		return nil, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrPasswordHash), err.Error())
 	}
 
 	// create user in db
@@ -26,7 +27,7 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 		Password: hash,
 	})
 	if err != nil {
-		return nil, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	// query user id in db
@@ -36,14 +37,12 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 
 	data, err := query.User.WithContext(ctx).Where(t.Username.Eq(req.Username)).Take()
 	if err != nil {
-		return nil, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	// response to user server
 	resp = &user.UserRegisterResponse{
-		StatusCode: 0,
-		StatusMsg:  "success",
-		UserId:     data.ID,
+		UserId: data.ID,
 	}
 	return resp, nil
 }
@@ -55,18 +54,16 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 	t := q.User
 	data, err := query.User.WithContext(ctx).Where(t.Username.Eq(req.Username)).Take()
 	if err != nil {
-		return nil, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	// check password
 	if !utils.CheckPasswordHash(req.Password, data.Password) {
-		return nil, errors.New("incorrect password")
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrPasswordIncorrect), "")
 	}
 
 	resp = &user.UserLoginResponse{
-		StatusCode: 0,
-		StatusMsg:  "success",
-		UserId:     data.ID,
+		UserId: data.ID,
 	}
 	return resp, nil
 }
@@ -78,12 +75,10 @@ func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequ
 	t := q.User
 	data, err := query.User.WithContext(ctx).Where(t.ID.Eq(req.UserId)).Take()
 	if err != nil {
-		return nil, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	resp = &user.UserQueryResponse{
-		StatusCode: 0,
-		StatusMsg:  "success",
 		User: &user.User{
 			Id:            data.ID,
 			Name:          data.Username,

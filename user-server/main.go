@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
@@ -20,6 +22,9 @@ import (
 func main() {
 	// init db
 	dal.Init()
+
+	// init errno
+	errno.Init()
 
 	// init log
 	log.InitKLogger()
@@ -56,6 +61,7 @@ func main() {
 		server.WithMuxTransport(),
 		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: v.GetString("user-server.name")}),
+		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),
 	)
 
 	// run server

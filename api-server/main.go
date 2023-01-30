@@ -8,6 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
@@ -25,6 +26,9 @@ func main() {
 
 	// init jwt
 	jwt.Init()
+
+	// init errno
+	errno.Init()
 
 	// init log
 	log.InitHLogger()

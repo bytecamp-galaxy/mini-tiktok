@@ -33,8 +33,8 @@ func rootMw() []app.HandlerFunc {
 			func(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
 				hlog.SystemLogger().CtxErrorf(ctx, "[Recovery] err=%v\nstack=%s", err, stack)
 				c.JSON(consts.StatusInternalServerError, utils.H{
-					"status_code":    1,
-					"status_message": fmt.Sprintf("[Recovery] err=%v\nstack=%s", err, stack),
+					"status_code": consts.StatusInternalServerError, // TODO(vgalaxy): do not use http status code
+					"status_msg":  fmt.Sprintf("[Recovery] err=%v\nstack=%s", err, stack),
 				})
 			},
 		)),
@@ -95,7 +95,7 @@ func _userMw() []app.HandlerFunc {
 
 func _userqueryMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
 }
 
 func _loginMw() []app.HandlerFunc {
@@ -110,7 +110,7 @@ func _userloginMw() []app.HandlerFunc {
 
 func _registerMw() []app.HandlerFunc {
 	// your code...
-	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
+	return nil
 }
 
 func _commentMw() []app.HandlerFunc {

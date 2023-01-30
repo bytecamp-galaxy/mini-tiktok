@@ -6,9 +6,7 @@ struct UserRegisterRequest {
 }
 
 struct UserRegisterResponse {
-    1: i32 StatusCode;
-    2: string StatusMsg;
-    3: i64 UserId;
+    1: i64 UserId;
 }
 
 struct UserLoginRequest {
@@ -17,9 +15,7 @@ struct UserLoginRequest {
 }
 
 struct UserLoginResponse {
-    1: i32 StatusCode;
-    2: string StatusMsg;
-    3: i64 UserId;
+    1: i64 UserId;
 }
 
 struct UserQueryRequest {
@@ -27,9 +23,7 @@ struct UserQueryRequest {
 }
 
 struct UserQueryResponse {
-    1: i32 StatusCode;
-    2: string StatusMsg;
-    3: User User;
+    1: User User;
 }
 
 struct User {
