@@ -61,11 +61,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 
-	// handle status code
-	if respRpc.StatusCode != 0 {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, "broken invariant"))
-	}
-
 	// generate token
 	token, _, err := jwt.JwtMiddleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
@@ -119,11 +114,6 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
-	}
-
-	// handle status code
-	if respRpc.StatusCode != 0 {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
 	}
 
 	// generate token
@@ -191,12 +181,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
-	}
-
-	// handle status code
-	if respRpc.StatusCode != 0 {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
-		return
 	}
 
 	// response to client
