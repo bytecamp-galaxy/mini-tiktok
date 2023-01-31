@@ -3,16 +3,72 @@
 package Api
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
+	"context"
+	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/gzip"
+	"time"
 )
 
 func rootMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		// access log
+		func(c context.Context, ctx *app.RequestContext) {
+			start := time.Now()
+			ctx.Next(c)
+			end := time.Now()
+			latency := end.Sub(start).Microseconds
+			hlog.Infof("status=%d cost=%d method=%s full_path=%s client_ip=%s host=%s",
+				ctx.Response.StatusCode(), latency,
+				ctx.Request.Header.Method(), ctx.Request.URI().PathOriginal(), ctx.ClientIP(), ctx.Request.Host())
+		},
+		// use recovery mw
+		recovery.Recovery(recovery.WithRecoveryHandler(
+			func(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
+				hlog.SystemLogger().CtxErrorf(ctx, "[Recovery] err=%v\nstack=%s", err, stack)
+				c.JSON(consts.StatusInternalServerError, utils.H{
+					"status_code":    1,
+					"status_message": fmt.Sprintf("[Recovery] err=%v\nstack=%s", err, stack),
+				})
+			},
+		)),
+		// use gzip mw
+		gzip.Gzip(gzip.DefaultCompression),
+	}
 }
 
 func _douyinMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _favoriteMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _actionMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _favorite_ctionMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _favoritelistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -22,7 +78,7 @@ func _publishMw() []app.HandlerFunc {
 	return nil
 }
 
-func _actionMw() []app.HandlerFunc {
+func _action0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -37,12 +93,7 @@ func _userMw() []app.HandlerFunc {
 	return nil
 }
 
-func _registerMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userregisterMw() []app.HandlerFunc {
+func _userqueryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -57,12 +108,17 @@ func _userloginMw() []app.HandlerFunc {
 	return nil
 }
 
-func _userqueryMw() []app.HandlerFunc {
+func _registerMw() []app.HandlerFunc {
 	// your code...
-	return []app.HandlerFunc{mw.JwtMiddleware.MiddlewareFunc()}
+	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
 }
 
 func _commentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _feedMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -77,7 +133,22 @@ func _comment_ctionMw() []app.HandlerFunc {
 	return nil
 }
 
-func _action0Mw() []app.HandlerFunc {
+func _getfeedMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userregisterMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _list0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _action1Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

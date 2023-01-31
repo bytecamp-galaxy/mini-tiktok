@@ -1,6 +1,6 @@
 package model
 
-// Relation TODO
+// Relation TODO(vgalaxy)
 type Relation struct {
 	ID       int64 `gorm:"primaryKey;" json:"id"`
 	User     User  `gorm:"foreignKey:UserID;references:ID;" json:"user"`

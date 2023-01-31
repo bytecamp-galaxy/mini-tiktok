@@ -4,15 +4,12 @@ package api
 
 import (
 	"context"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/comment"
-	"github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/comment/commentservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/comment-server/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
-	"github.com/cloudwego/kitex/client"
-	"github.com/kitex-contrib/registry-eureka/resolver"
-
-	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -23,7 +20,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CommentActionRequest
 
-	// step1: bind and validate request.
+	// bind and validate request.
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
@@ -33,19 +30,8 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// set up connection with comment server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := commentservice.NewClient("tiktok.comment.service", client.WithResolver(r))
-	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
-
 	// fetch user_id from token
-	id, ok := c.Get(mw.IdentityKey)
+	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
 		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
 			StatusCode: 1,
@@ -62,7 +48,17 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		CommentId:   req.CommentId,
 	}
 
-	respRPC, err := cli.CommentAction(ctx, reqRPC)
+	// set up connection with comment server
+	cli, err := rpc.InitCommentClient()
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	respRPC, err := (*cli).CommentAction(ctx, reqRPC)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
 			StatusCode: 1,
@@ -103,10 +99,9 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with comment server
-	r := resolver.NewEurekaResolver([]string{"http://localhost:8761/eureka"})
-	cli, err := commentservice.NewClient("tiktok.comment.service", client.WithResolver(r))
+	cli, err := rpc.InitCommentClient()
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
 			StatusMsg:  utils.String(err.Error()),
 		})
@@ -114,7 +109,7 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	reqRPC := comment.CommentListRequest{VideoId: req.VideoId}
-	respRPC, err := cli.CommentList(ctx, &reqRPC)
+	respRPC, err := (*cli).CommentList(ctx, &reqRPC)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
 			StatusCode: 1,

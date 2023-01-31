@@ -30,7 +30,7 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 	}
 
 	// query user id in db
-	// TODO: simplify
+	// TODO(vgalaxy): simplify
 	q := query.Q
 	t := q.User
 
@@ -50,10 +50,9 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 
 // UserLogin implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
+	// query user in db
 	q := query.Q
 	t := q.User
-
-	// query user in db
 	data, err := query.User.WithContext(ctx).Where(t.Username.Eq(req.Username)).Take()
 	if err != nil {
 		return nil, err
@@ -74,10 +73,9 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 
 // UserQuery implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequest) (resp *user.UserQueryResponse, err error) {
+	// query user in db
 	q := query.Q
 	t := q.User
-
-	// query user in db
 	data, err := query.User.WithContext(ctx).Where(t.ID.Eq(req.UserId)).Take()
 	if err != nil {
 		return nil, err
@@ -91,7 +89,7 @@ func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequ
 			Name:          data.Username,
 			FollowCount:   data.FollowerCount,
 			FollowerCount: data.FollowingCount,
-			IsFollow:      false, // TODO
+			IsFollow:      false, // TODO(vgalaxy)
 		},
 	}
 	return resp, nil
