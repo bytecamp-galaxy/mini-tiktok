@@ -8,8 +8,8 @@ mini-tiktok 系统错误码列表，由 `codegen -type=int -doc` 命令生成，
 
 ```json
 {
-  "status_code": 100101,
-  "status_msg": "Database error"
+  "status_code": 100001,
+  "status_msg": "Internal server error"
 }
 ```
 
@@ -21,16 +21,15 @@ mini-tiktok 系统支持的错误码列表如下：
 
 | Identifier | Code | HTTP Code | Description |
 | ---------- | ---- | --------- | ----------- |
-| ErrSuccess | 100001 | 200 | OK |
-| ErrUnknown | 100002 | 500 | Internal server error |
-| ErrTokenInvalid | 100003 | 401 | Token invalid |
-| ErrTokenGeneration | 100004 | 500 | Error occurred while generating token |
-| ErrBindAndValidation | 100005 | 400 | Error occurred while binding the request body to the struct or validation failed |
-| ErrDatabase | 100006 | 500 | Database error |
-| ErrPasswordInvalid | 100007 | 401 | Password invalid |
-| ErrPasswordIncorrect | 100008 | 401 | Password incorrect |
-| ErrPasswordHash | 100009 | 500 | Error occurred while hashing password |
-| ErrClientRPCInit | 100010 | 500 | RPC client initialization error |
-| ErrRPCProcess | 100011 | 500 | RPC service process error |
-| ErrRPCLink | 100012 | 500 | RPC service link error |
+| ErrUnknown | 100001 | 500 | Internal server error |
+| ErrTokenInvalid | 100002 | 401 | Token invalid |
+| ErrTokenGeneration | 100003 | 500 | Error occurred while generating token |
+| ErrBindAndValidation | 100004 | 400 | Error occurred while binding the request body to the struct or validation failed |
+| ErrDatabase | 100005 | 500 | Database error |
+| ErrPasswordInvalid | 100006 | 401 | Password invalid |
+| ErrPasswordIncorrect | 100007 | 401 | Password incorrect |
+| ErrPasswordHash | 100008 | 500 | Error occurred while hashing password |
+| ErrClientRPCInit | 100009 | 500 | RPC client initialization error |
+| ErrRPCProcess | 100010 | 500 | RPC service process error |
+| ErrRPCLink | 100011 | 500 | RPC service link error |
 

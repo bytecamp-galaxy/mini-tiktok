@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/cloudwego/hertz/pkg/app/client"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/client/sd"
@@ -18,9 +20,11 @@ import (
 func main() {
 	log.InitHLogger()
 
+	v := conf.Init().V
+
 	p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName("tiktok.client"),
-		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
 	defer p.Shutdown(context.Background())
@@ -29,17 +33,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	r, err := etcd.NewEtcdResolver([]string{"localhost:2379"})
+	r, err := etcd.NewEtcdResolver([]string{fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))})
 	if err != nil {
 		panic(err)
 	}
 	c.Use(hertztracing.ClientMiddleware(), sd.Discovery(r))
 
 	ctx, span := otel.Tracer("github.com/hertz-contrib/obs-opentelemetry").
-		Start(context.Background(), "login")
+		Start(context.Background(), "register")
 	_, b, err := c.Post(
 		ctx, nil,
-		"http://tiktok.api.service/douyin/user/login/?username=123456&password=ohkO4OSSw1611fR", // note no port here
+		"http://tiktok.api.service/douyin/user/register/?username=123456&password=ohkO4OSSw1611fR", // note no port here
 		nil, config.WithSD(true))
 	if err != nil {
 		hlog.CtxErrorf(ctx, err.Error())

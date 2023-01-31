@@ -1,19 +1,21 @@
 package test
 
 import (
+	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/gavv/httpexpect/v2"
 	"net/http"
 	"testing"
 )
 
-var serverAddr = "http://localhost:8080"
 var testUserA = "XK1W5EQRyMdt76C"
 var testUserB = "JPgQwIiILqHbZxL"
 
 func newExpect(t *testing.T) *httpexpect.Expect {
+	v := conf.Init().V
 	return httpexpect.WithConfig(httpexpect.Config{
 		Client:   http.DefaultClient,
-		BaseURL:  serverAddr,
+		BaseURL:  fmt.Sprintf("http://%s:%d", v.GetString("api-server.host"), v.GetInt("api-server.port")),
 		Reporter: httpexpect.NewAssertReporter(t),
 		Printers: []httpexpect.Printer{
 			httpexpect.NewDebugPrinter(t, true),

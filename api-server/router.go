@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	handler "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/handler"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -21,7 +22,7 @@ func customizedRegister(r *server.Hertz) {
 	// set NoRoute handler
 	r.NoRoute(func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusNotFound, map[string]interface{}{
-			"status_code": consts.StatusNotFound, // TODO(vgalaxy): do not use http status code
+			"status_code": errno.ErrStatusNotFound,
 			"status_msg":  "no route",
 		})
 	})
@@ -29,7 +30,7 @@ func customizedRegister(r *server.Hertz) {
 	// set NoMethod handler
 	r.NoMethod(func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusMethodNotAllowed, map[string]interface{}{
-			"status_code": consts.StatusMethodNotAllowed, // TODO(vgalaxy): do not use http status code
+			"status_code": errno.ErrStatusMethodNotAllowed,
 			"status_msg":  "no method",
 		})
 	})

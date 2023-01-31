@@ -36,8 +36,8 @@ mini-tiktok 系统错误码列表，由 {{.}}codegen -type=int -doc{{.}} 命令�
 
 {{.}}{{.}}{{.}}json
 {
-  "status_code": 100101,
-  "status_msg": "Database error"
+  "status_code": 100001,
+  "status_msg": "Internal server error"
 }
 {{.}}{{.}}{{.}}
 

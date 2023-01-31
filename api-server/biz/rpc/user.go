@@ -32,7 +32,7 @@ func InitUserClient() (*userservice.Client, error) {
 
 	provider.NewOpenTelemetryProvider(
 		provider.WithServiceName(v.GetString("api-server.name")),
-		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
 	// TODO(vgalaxy): shutdown provider

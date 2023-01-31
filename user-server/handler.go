@@ -5,6 +5,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
 	"github.com/cloudwego/kitex/pkg/kerrors"
@@ -22,7 +23,9 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 	}
 
 	// create user in db
+	id := snowflake.Generate()
 	err = query.User.WithContext(ctx).Create(&model.User{
+		ID:       id,
 		Username: req.Username,
 		Password: hash,
 	})
@@ -30,19 +33,9 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
-	// query user id in db
-	// TODO(vgalaxy): simplify
-	q := query.Q
-	t := q.User
-
-	data, err := query.User.WithContext(ctx).Where(t.Username.Eq(req.Username)).Take()
-	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
-	}
-
 	// response to user server
 	resp = &user.UserRegisterResponse{
-		UserId: data.ID,
+		UserId: id,
 	}
 	return resp, nil
 }

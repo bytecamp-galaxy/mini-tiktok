@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/jwt"
 	"time"
@@ -29,7 +30,7 @@ func Init() {
 		TokenLookup: "query:token",
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
 			c.JSON(code, map[string]interface{}{
-				"status_code": code, // TODO(vgalaxy): do not use http status code
+				"status_code": errno.ErrUnauthorized,
 				"status_msg":  message,
 			})
 		},

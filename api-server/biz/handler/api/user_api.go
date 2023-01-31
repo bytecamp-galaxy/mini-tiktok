@@ -70,7 +70,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 
 	// response to client
 	resp := &api.UserRegisterResponse{
-		StatusCode: 0,
+		StatusCode: errno.ErrSuccess,
 		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 		UserId:     respRpc.UserId,
 		Token:      token,
@@ -125,7 +125,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 
 	// response to client
 	resp := &api.UserLoginResponse{
-		StatusCode: 0,
+		StatusCode: errno.ErrSuccess,
 		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 		UserId:     respRpc.UserId,
 		Token:      token,
@@ -185,7 +185,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 
 	// response to client
 	resp := &api.UserQueryResponse{
-		StatusCode: 0,
+		StatusCode: errno.ErrSuccess,
 		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 		User: &api.User{
 			Id:            respRpc.User.Id,

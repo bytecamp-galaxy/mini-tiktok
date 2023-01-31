@@ -7,6 +7,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -25,6 +26,9 @@ func main() {
 	// init log
 	log.InitKLogger()
 
+	// init snowflake id generator
+	snowflake.Init()
+
 	// init server
 	v := conf.Init().V
 
@@ -42,7 +46,7 @@ func main() {
 
 	p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName(v.GetString("user-server.name")),
-		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
 	defer p.Shutdown(context.Background())

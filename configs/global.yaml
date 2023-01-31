@@ -2,6 +2,10 @@ etcd:
   host: "127.0.0.1"
   port: 2379
 
+otlp-receiver:
+  host: "127.0.0.1"
+  port: 4317
+
 api-server:
   name: "tiktok.api.service"
   host: "127.0.0.1"

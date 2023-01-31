@@ -10,6 +10,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
@@ -28,7 +29,11 @@ func main() {
 	jwt.Init()
 
 	// init errno
+	// NOTE: only register error code when api server setup, since only parse error in api server
 	errno.Init()
+
+	// init snowflake id generator
+	snowflake.Init()
 
 	// init log
 	log.InitHLogger()
@@ -50,7 +55,7 @@ func main() {
 
 	p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName(v.GetString("api-server.name")),
-		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
 	defer p.Shutdown(context.Background())

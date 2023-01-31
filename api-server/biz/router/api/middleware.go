@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -33,7 +34,7 @@ func rootMw() []app.HandlerFunc {
 			func(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
 				hlog.SystemLogger().CtxErrorf(ctx, "[Recovery] err=%v\nstack=%s", err, stack)
 				c.JSON(consts.StatusInternalServerError, utils.H{
-					"status_code": consts.StatusInternalServerError, // TODO(vgalaxy): do not use http status code
+					"status_code": errno.ErrStatusInternalServerError,
 					"status_msg":  fmt.Sprintf("[Recovery] err=%v\nstack=%s", err, stack),
 				})
 			},
