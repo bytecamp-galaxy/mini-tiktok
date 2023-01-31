@@ -11,9 +11,15 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/obs-opentelemetry/provider"
 	"github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/hertz-contrib/registry/etcd"
@@ -61,7 +67,7 @@ func main() {
 	defer p.Shutdown(context.Background())
 
 	tracer, cfg := tracing.NewServerTracer()
-	h := server.Default(
+	h := server.New(
 		server.WithHostPorts(serverAddr),
 		server.WithTransport(netpoll.NewTransporter),
 		server.WithExitWaitTime(time.Duration(v.GetInt("api-server.exit-wait-time"))*time.Second),
@@ -70,7 +76,50 @@ func main() {
 			Addr:        addr,
 		}),
 		tracer)
-	h.Use(tracing.ServerMiddleware(cfg))
+
+	// set global middleware
+	h.Use(
+		// tracer
+		tracing.ServerMiddleware(cfg),
+		// access log
+		func(c context.Context, ctx *app.RequestContext) {
+			start := time.Now()
+			ctx.Next(c)
+			end := time.Now()
+			latency := end.Sub(start).Microseconds
+			hlog.Infof("status=%d cost=%d method=%s full_path=%s client_ip=%s host=%s",
+				ctx.Response.StatusCode(), latency,
+				ctx.Request.Header.Method(), ctx.Request.URI().PathOriginal(), ctx.ClientIP(), ctx.Request.Host())
+		},
+		// recovery
+		recovery.Recovery(recovery.WithRecoveryHandler(
+			func(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
+				hlog.SystemLogger().CtxErrorf(ctx, "[Recovery] err=%v\nstack=%s", err, stack)
+				c.JSON(consts.StatusInternalServerError, utils.H{
+					"status_code": errno.ErrStatusInternalServerError,
+					"status_msg":  fmt.Sprintf("[Recovery] err=%v\nstack=%s", err, stack),
+				})
+			},
+		)),
+		// gzip
+		gzip.Gzip(gzip.DefaultCompression),
+	)
+
+	// set NoRoute handler
+	h.NoRoute(func(c context.Context, ctx *app.RequestContext) {
+		ctx.JSON(consts.StatusNotFound, map[string]interface{}{
+			"status_code": errno.ErrStatusNotFound,
+			"status_msg":  "no route",
+		})
+	})
+
+	// set NoMethod handler
+	h.NoMethod(func(c context.Context, ctx *app.RequestContext) {
+		ctx.JSON(consts.StatusMethodNotAllowed, map[string]interface{}{
+			"status_code": errno.ErrStatusMethodNotAllowed,
+			"status_msg":  "no method",
+		})
+	})
 
 	// register
 	register(h)
