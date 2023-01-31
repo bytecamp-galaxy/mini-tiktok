@@ -5,17 +5,11 @@ package api
 import (
 	"context"
 	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed"
-	"github.com/bytecamp-galaxy/mini-tiktok/feed-server/kitex_gen/feed/feedservice"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/klog"
-	kitexzap "github.com/kitex-contrib/obs-opentelemetry/logging/zap"
-	"github.com/kitex-contrib/registry-eureka/resolver"
 )
 
 // GetFeed .
@@ -32,7 +26,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	// get the latest time.
 	// if the latest time hasn't been passed as param, it's 0 by default.
-	latest_time := req.GetLatestTime()
+	latestTime := req.GetLatestTime()
 	token := req.GetToken()
 	// fetch user id from token
 	//id, ok := c.Get(jwt.IdentityKey)
@@ -47,29 +41,21 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	//}
 
 	// set up connection with feed server
-	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
-	cli, err := feedservice.NewClient("tiktok.feed.service",
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
+	cli, err := rpc.InitFeedClient()
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FeedResponse{
+		c.JSON(consts.StatusBadRequest, &api.FeedResponse{
 			StatusCode: 1,
 			StatusMsg:  utils.String(err.Error()),
-			VideoList:  nil,
-			NextTime:   nil,
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
 
 	// call rpc service
 	reqRpc := &feed.FeedRequest{
-		LatestTime: &latest_time,
+		LatestTime: &latestTime,
 		Token:      &token,
 	}
-	respRpc, err := cli.GetFeed(ctx, reqRpc)
+	respRpc, err := (*cli).GetFeed(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.FeedResponse{
 			StatusCode: 1,

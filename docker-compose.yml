@@ -1,32 +1,88 @@
-version: '3'
+version: "3.7"
 
 services:
   mysql:
     image: mysql:latest
     ports:
-      - "3305:3306"
+      - "3306:3306"
     environment:
       - MYSQL_DATABASE=gorm
       - MYSQL_USER=gorm
       - MYSQL_PASSWORD=gorm
       - MYSQL_RANDOM_ROOT_PASSWORD="yes"  # https://dev.mysql.com/doc/refman/5.7/en/docker-mysql-more-topics.html#docker_var_mysql_random_root_password
 
-  eureka:
-    image: xdockerh/eureka-server:latest
-    ports:
-      - "8761:8761"
-
-  minio:
-    image: minio/minio
-    volumes:
-      - /home/minio/data:/data
-      - /home/minio/config:/root/.minio
-    command:
-      - server --console-address ":9090" -address ":9000" /data #指定容器中的目录 /data
+  etcd:
+    image: bitnami/etcd:latest
     environment:
-      MINIO_ROOT_USER: tiktokMinio
-      MINIO_ROOT_PASSWORD: tiktokMinio
-    restart: always
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
     ports:
-      - "9090:9090" # server
-      - "9000:9000" # client
+      - "2379:2379"
+      - "2380:2380"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib-dev:latest
+    command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
+    volumes:
+      - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888"        # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "55679"       # zpages extension
+    depends_on:
+      - jaeger-all-in-one
+
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+      - "14268"
+      - "14250:14250"
+      - "6831:6831"
+
+  victoriametrics:
+    container_name: victoriametrics
+    image: victoriametrics/victoria-metrics
+    ports:
+      - "8428:8428"
+      - "8089:8089"
+      - "8089:8089/udp"
+      - "2003:2003"
+      - "2003:2003/udp"
+      - "4242:4242"
+    command:
+      - '--storageDataPath=/storage'
+      - '--graphiteListenAddr=:2003'
+      - '--opentsdbListenAddr=:4242'
+      - '--httpListenAddr=:8428'
+      - '--influxListenAddr=:8089'
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+
+#  minio:
+#    image: minio/minio
+#    volumes:
+#      - /home/minio/data:/data
+#      - /home/minio/config:/root/.minio
+#    command:
+#      - server --console-address ":9090" -address ":9000" /data #指定容器中的目录 /data
+#    environment:
+#      MINIO_ROOT_USER: tiktokMinio
+#      MINIO_ROOT_PASSWORD: tiktokMinio
+#    restart: always
+#    ports:
+#      - "9090:9090" # server
+#      - "9000:9000" # client

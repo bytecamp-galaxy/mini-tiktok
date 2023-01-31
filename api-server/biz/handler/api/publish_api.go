@@ -3,11 +3,16 @@
 package api
 
 import (
+	"bytes"
 	"context"
-
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
+	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
+	"github.com/bytecamp-galaxy/mini-tiktok/publish-server/kitex_gen/publish"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"io"
 )
 
 // PublishAction .
@@ -21,7 +26,85 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(api.PublishActionResponse)
+	title := req.GetTitle()
+	fileHeader, err := c.Request.FormFile("data")
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(".mp4 param encoding failed"),
+		})
+		return
+	}
+
+	// get .mp4 data
+	file, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(".mp4 param encoding failed"),
+		})
+		return
+	}
+	defer file.Close()
+
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, file); err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String("copy bytes failed"),
+		})
+		return
+	}
+
+	// fetch user id from token
+	id, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	// set up connection with publish server
+	cli, err := rpc.InitPublishClient()
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	// call rpc service
+	reqRpc := &publish.PublishRequest{
+		Uid:   id.(int64),
+		Data:  buf.Bytes(),
+		Title: title,
+	}
+
+	respRpc, err := (*cli).PublishVideo(ctx, reqRpc)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	// handle status code
+	if respRpc.StatusCode != 0 {
+		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
+			StatusCode: respRpc.StatusCode,
+			StatusMsg:  utils.String(*respRpc.StatusMsg),
+		})
+		return
+	}
+
+	resp := &api.PublishActionResponse{
+		StatusCode: respRpc.StatusCode,
+		StatusMsg:  utils.String(*respRpc.StatusMsg),
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

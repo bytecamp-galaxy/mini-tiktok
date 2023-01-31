@@ -5,17 +5,10 @@ package api
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user"
-	"github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/klog"
-	kitexzap "github.com/kitex-contrib/obs-opentelemetry/logging/zap"
-	"github.com/kitex-contrib/registry-eureka/resolver"
-
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -25,14 +18,9 @@ import (
 func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserRegisterRequest
-
-	// bind and validate request
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &api.UserRegisterResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -47,11 +35,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
-	cli, err := userservice.NewClient("tiktok.user.service",
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
+	cli, err := rpc.InitUserClient()
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -59,8 +43,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
 
 	// call rpc service
 	reqRpc := &user.UserRegisterRequest{
@@ -68,7 +50,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		Password: req.Password,
 	}
 
-	respRpc, err := cli.UserRegister(ctx, reqRpc)
+	respRpc, err := (*cli).UserRegister(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
@@ -112,32 +94,21 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 func UserLogin(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserLoginRequest
-
-	// bind and validate request
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &api.UserLoginResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
-	cli, err := userservice.NewClient("tiktok.user.service",
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
+	cli, err := rpc.InitUserClient()
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
 			StatusCode: 1,
 			StatusMsg:  utils.String(err.Error()),
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
 
 	// call rpc service
 	reqRpc := &user.UserLoginRequest{
@@ -145,7 +116,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		Password: req.Password,
 	}
 
-	respRpc, err := cli.UserLogin(ctx, reqRpc)
+	respRpc, err := (*cli).UserLogin(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserLoginResponse{
 			StatusCode: 1,
@@ -189,14 +160,9 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 func UserQuery(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserQueryRequest
-
-	// bind and validate request
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &api.UserQueryResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -220,11 +186,21 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	r := resolver.NewEurekaResolver([]string{constants.EurekaServerUrl})
-	cli, err := userservice.NewClient("tiktok.user.service",
-		client.WithMiddleware(mw.CommonMiddleware),
-		client.WithInstanceMW(mw.ClientMiddleware),
-		client.WithResolver(r))
+	cli, err := rpc.InitUserClient()
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	// call rpc service
+	reqRpc := &user.UserQueryRequest{
+		UserId: req.UserId,
+	}
+
+	respRpc, err := (*cli).UserQuery(ctx, reqRpc)
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, &api.UserQueryResponse{
 			StatusCode: 1,
@@ -232,15 +208,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	klog.SetLogger(kitexzap.NewLogger())
-	klog.SetLevel(klog.LevelDebug)
-
-	// call rpc service
-	reqRpc := &user.UserQueryRequest{
-		UserId: req.UserId,
-	}
-
-	respRpc, err := cli.UserQuery(ctx, reqRpc)
 
 	// handle status code
 	if respRpc.StatusCode != 0 {
@@ -260,7 +227,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 			Name:          respRpc.User.Name,
 			FollowCount:   utils.Int64(respRpc.User.FollowerCount),
 			FollowerCount: utils.Int64(respRpc.User.FollowerCount),
-			IsFollow:      false, // TODO
+			IsFollow:      false, // TODO(vgalaxy)
 		},
 	}
 

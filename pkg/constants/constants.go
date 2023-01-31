@@ -1,7 +1,6 @@
 package constants
 
 const (
-	VideoTableName    = "video"
 	MinioAccessKey    = "HD5sotcOvhzVV3p8"
 	MinioSecretKey    = "Aq8TOqRL5GS2iMckVfm1FVjtAqBf8Gv4"
 	MinioServerUrl    = "81.68.219.146:9000"

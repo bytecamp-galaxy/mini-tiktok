@@ -21,16 +21,16 @@ func customizedRegister(r *server.Hertz) {
 	// set NoRoute handler
 	r.NoRoute(func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusNotFound, map[string]interface{}{
-			"status_code":    1,
-			"status_message": "no route",
+			"status_code": consts.StatusNotFound, // TODO(vgalaxy): do not use http status code
+			"status_msg":  "no route",
 		})
 	})
 
 	// set NoMethod handler
 	r.NoMethod(func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusMethodNotAllowed, map[string]interface{}{
-			"status_code":    1,
-			"status_message": "no method",
+			"status_code": consts.StatusMethodNotAllowed, // TODO(vgalaxy): do not use http status code
+			"status_msg":  "no method",
 		})
 	})
 }

@@ -6,61 +6,65 @@ import (
 	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
-	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/registry/eureka"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/network/netpoll"
-	hertzzap "github.com/hertz-contrib/logger/zap"
+	"github.com/hertz-contrib/obs-opentelemetry/provider"
+	"github.com/hertz-contrib/obs-opentelemetry/tracing"
+	"github.com/hertz-contrib/registry/etcd"
+	"net"
 	"time"
 )
 
-func Init() {
-	dal.Init()
-	jwt.Init()
-}
-
 func main() {
-	Init()
+	// init db
+	dal.Init()
+
+	// init jwt
+	jwt.Init()
+
+	// init log
+	log.InitHLogger()
 
 	// init server
-	addr := "localhost:8080"
-	r := eureka.NewEurekaRegistry([]string{constants.EurekaServerUrl}, 40*time.Second)
-	h := server.Default(server.WithHostPorts(addr),
+	v := conf.Init().V
+
+	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
+	r, err := etcd.NewEtcdRegistry([]string{etcdAddr})
+	if err != nil {
+		panic(err)
+	}
+
+	serverAddr := fmt.Sprintf("%s:%d", v.GetString("api-server.host"), v.GetInt("api-server.port"))
+	addr, err := net.ResolveTCPAddr("tcp", serverAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithInsecure(),
+	)
+	defer p.Shutdown(context.Background())
+
+	tracer, cfg := tracing.NewServerTracer()
+	h := server.Default(
+		server.WithHostPorts(serverAddr),
 		server.WithTransport(netpoll.NewTransporter),
-		server.WithExitWaitTime(5*time.Second),
+		server.WithExitWaitTime(time.Duration(v.GetInt("api-server.exit-wait-time"))*time.Second),
 		server.WithRegistry(r, &registry.Info{
-			ServiceName: "tiktok.api.service",
-			Addr:        utils.NewNetAddr("tcp", addr),
-			Weight:      10,
-			Tags:        nil,
-		}))
-	h.OnShutdown = append(h.OnShutdown, func(ctx context.Context) {
-		fmt.Println("before ctx.Done()")
-		<-ctx.Done()
-		fmt.Println("after ctx.Done()")
-	})
+			ServiceName: v.GetString("api-server.name"),
+			Addr:        addr,
+		}),
+		tracer)
+	h.Use(tracing.ServerMiddleware(cfg))
 
 	// register
 	register(h)
-
-	// init log
-	//f, err := os.OpenFile("./output.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer func(f *os.File) {
-	//	err := f.Close()
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//}(f)
-	//hlog.SetOutput(f)
-	hlog.SetLogger(hertzzap.NewLogger())
-	hlog.SetLevel(hlog.LevelDebug)
 
 	// run server
 	h.Spin()

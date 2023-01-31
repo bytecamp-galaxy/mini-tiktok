@@ -1,0 +1,54 @@
+etcd:
+  host: "127.0.0.1"
+  port: 2379
+
+api-server:
+  name: "tiktok.api.service"
+  host: "127.0.0.1"
+  port: 8080
+  exit-wait-time: 5
+
+user-server:
+  name: "tiktok.user.service"
+  host: "127.0.0.1"
+  port: 8880
+
+feed-server:
+  name: "tiktok.feed.service"
+  host: "127.0.0.1"
+  port: 8881
+
+comment-server:
+  name: "tiktok.comment.service"
+  host: "127.0.0.1"
+  port: 8882
+
+favorite-server:
+  name: "tiktok.favorite.service"
+  host: "127.0.0.1"
+  port: 8883
+
+publish-server:
+  name: "tiktok.publish.service"
+  host: "127.0.0.1"
+  port: 8884
+
+relation-server:
+  name: "tiktok.relation.service"
+  host: "127.0.0.1"
+  port: 8885
+
+message-server:
+  name: "tiktok.message.service"
+  host: "127.0.0.1"
+  port: 8886
+
+mysql:
+  host: "127.0.0.1"
+  port: 3305
+  user: "gorm"
+  password: "gorm"
+  dbname: "gorm"
+  charset: "utf8"
+  parseTime: "True"
+  loc: "Local"
