@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	user "github.com/bytecamp-galaxy/mini-tiktok/user-server/kitex_gen/user/userservice"
@@ -22,9 +21,6 @@ import (
 func main() {
 	// init db
 	dal.Init()
-
-	// init errno
-	errno.Init()
 
 	// init log
 	log.InitKLogger()
