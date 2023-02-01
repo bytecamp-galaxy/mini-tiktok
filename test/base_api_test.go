@@ -90,3 +90,7 @@ func TestPublish(t *testing.T) {
 		video.Value("cover_url").String().NotEmpty()
 	}
 }
+
+func TestFavoriteAction(t *testing.T) {
+
+}

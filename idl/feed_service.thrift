@@ -27,6 +27,6 @@ struct Video {
     8: string Title; // 视频标题
 }
 
-service FeedService{
+service FeedService {
     FeedResponse getFeed(1: FeedRequest req); // 刷视频，返回一个视频列表
 }

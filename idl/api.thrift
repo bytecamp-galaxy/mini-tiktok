@@ -146,27 +146,27 @@ service CommentApi {
 /*==================================================================
                         Favorite Service
 ====================================================================*/
-struct FavoriteActionRequest{
+struct FavoriteActionRequest {
     1: required i64 UserId (api.query="user_id");
     2: required string Token (api.query="token"); //鉴权
     3: required i64 VideoId (api.query="video_id");
     4: required i32 ActionType (api.query="action_type", api.vd="$ == 1 || $ == 2");
 }
 
-struct FavoriteActionResponse{
+struct FavoriteActionResponse {
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
 }
 
-struct FavoriteListRequest{
+struct FavoriteListRequest {
     1: required i64 UserId (api.query="id");
     2: required string Token (api.query="token");
 }
 
-struct FavoriteListResponse{
+struct FavoriteListResponse {
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
-//    3: list<feed_service.Video> VidoeList;
+    3: list<Video> VideoList (api.body="video_list");
 }
 
 service FavoriteApi {

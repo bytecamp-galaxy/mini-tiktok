@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/jwt"
-	api "github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/api-server/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/bytecamp-galaxy/mini-tiktok/publish-server/kitex_gen/publish"

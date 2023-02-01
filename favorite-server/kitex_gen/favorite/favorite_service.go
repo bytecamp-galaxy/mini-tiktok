@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"github.com/bytecamp-galaxy/mini-tiktok/favorite-server/kitex_gen/feed"
 	"strings"
 )
 
@@ -865,8 +866,9 @@ func (p *FavoriteListRequest) Field2DeepEqual(src string) bool {
 }
 
 type FavoriteListResponse struct {
-	StatusCode int32   `thrift:"StatusCode,1,required" frugal:"1,required,i32" json:"StatusCode"`
-	StatusMsg  *string `thrift:"StatusMsg,2,optional" frugal:"2,optional,string" json:"StatusMsg,omitempty"`
+	StatusCode int32         `thrift:"StatusCode,1,required" frugal:"1,required,i32" json:"StatusCode"`
+	StatusMsg  *string       `thrift:"StatusMsg,2,optional" frugal:"2,optional,string" json:"StatusMsg,omitempty"`
+	VidoeList  []*feed.Video `thrift:"VidoeList,3" frugal:"3,default,list<feed.Video>" json:"VidoeList"`
 }
 
 func NewFavoriteListResponse() *FavoriteListResponse {
@@ -889,16 +891,24 @@ func (p *FavoriteListResponse) GetStatusMsg() (v string) {
 	}
 	return *p.StatusMsg
 }
+
+func (p *FavoriteListResponse) GetVidoeList() (v []*feed.Video) {
+	return p.VidoeList
+}
 func (p *FavoriteListResponse) SetStatusCode(val int32) {
 	p.StatusCode = val
 }
 func (p *FavoriteListResponse) SetStatusMsg(val *string) {
 	p.StatusMsg = val
 }
+func (p *FavoriteListResponse) SetVidoeList(val []*feed.Video) {
+	p.VidoeList = val
+}
 
 var fieldIDToName_FavoriteListResponse = map[int16]string{
 	1: "StatusCode",
 	2: "StatusMsg",
+	3: "VidoeList",
 }
 
 func (p *FavoriteListResponse) IsSetStatusMsg() bool {
@@ -939,6 +949,16 @@ func (p *FavoriteListResponse) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.LIST {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1000,6 +1020,26 @@ func (p *FavoriteListResponse) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *FavoriteListResponse) ReadField3(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return err
+	}
+	p.VidoeList = make([]*feed.Video, 0, size)
+	for i := 0; i < size; i++ {
+		_elem := feed.NewVideo()
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		p.VidoeList = append(p.VidoeList, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *FavoriteListResponse) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("FavoriteListResponse"); err != nil {
@@ -1012,6 +1052,10 @@ func (p *FavoriteListResponse) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
 			goto WriteFieldError
 		}
 
@@ -1069,6 +1113,31 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
+func (p *FavoriteListResponse) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("VidoeList", thrift.LIST, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.VidoeList)); err != nil {
+		return err
+	}
+	for _, v := range p.VidoeList {
+		if err := v.Write(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
 func (p *FavoriteListResponse) String() string {
 	if p == nil {
 		return "<nil>"
@@ -1086,6 +1155,9 @@ func (p *FavoriteListResponse) DeepEqual(ano *FavoriteListResponse) bool {
 		return false
 	}
 	if !p.Field2DeepEqual(ano.StatusMsg) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.VidoeList) {
 		return false
 	}
 	return true
@@ -1107,6 +1179,19 @@ func (p *FavoriteListResponse) Field2DeepEqual(src *string) bool {
 	}
 	if strings.Compare(*p.StatusMsg, *src) != 0 {
 		return false
+	}
+	return true
+}
+func (p *FavoriteListResponse) Field3DeepEqual(src []*feed.Video) bool {
+
+	if len(p.VidoeList) != len(src) {
+		return false
+	}
+	for i, v := range p.VidoeList {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
 	}
 	return true
 }

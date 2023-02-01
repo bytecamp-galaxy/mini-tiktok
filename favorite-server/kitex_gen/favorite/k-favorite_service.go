@@ -10,6 +10,7 @@ import (
 
 	"github.com/apache/thrift/lib/go/thrift"
 
+	"github.com/bytecamp-galaxy/mini-tiktok/favorite-server/kitex_gen/feed"
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 
@@ -21,6 +22,7 @@ var (
 	_ = reflect.Type(nil)
 	_ = thrift.TProtocol(nil)
 	_ = bthrift.BinaryWriter(nil)
+	_ = feed.KitexUnusedProtection
 )
 
 func (p *FavoriteActionRequest) FastRead(buf []byte) (int, error) {
@@ -760,6 +762,20 @@ func (p *FavoriteListResponse) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 3:
+			if fieldTypeId == thrift.LIST {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -828,6 +844,33 @@ func (p *FavoriteListResponse) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *FavoriteListResponse) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	_, size, l, err := bthrift.Binary.ReadListBegin(buf[offset:])
+	offset += l
+	if err != nil {
+		return offset, err
+	}
+	p.VidoeList = make([]*feed.Video, 0, size)
+	for i := 0; i < size; i++ {
+		_elem := feed.NewVideo()
+		if l, err := _elem.FastRead(buf[offset:]); err != nil {
+			return offset, err
+		} else {
+			offset += l
+		}
+
+		p.VidoeList = append(p.VidoeList, _elem)
+	}
+	if l, err := bthrift.Binary.ReadListEnd(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *FavoriteListResponse) FastWrite(buf []byte) int {
 	return 0
@@ -839,6 +882,7 @@ func (p *FavoriteListResponse) FastWriteNocopy(buf []byte, binaryWriter bthrift.
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -851,6 +895,7 @@ func (p *FavoriteListResponse) BLength() int {
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
+		l += p.field3Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -877,6 +922,22 @@ func (p *FavoriteListResponse) fastWriteField2(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
+func (p *FavoriteListResponse) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "VidoeList", thrift.LIST, 3)
+	listBeginOffset := offset
+	offset += bthrift.Binary.ListBeginLength(thrift.STRUCT, 0)
+	var length int
+	for _, v := range p.VidoeList {
+		length++
+		offset += v.FastWriteNocopy(buf[offset:], binaryWriter)
+	}
+	bthrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRUCT, length)
+	offset += bthrift.Binary.WriteListEnd(buf[offset:])
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *FavoriteListResponse) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("StatusCode", thrift.I32, 1)
@@ -894,6 +955,18 @@ func (p *FavoriteListResponse) field2Length() int {
 
 		l += bthrift.Binary.FieldEndLength()
 	}
+	return l
+}
+
+func (p *FavoriteListResponse) field3Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("VidoeList", thrift.LIST, 3)
+	l += bthrift.Binary.ListBeginLength(thrift.STRUCT, len(p.VidoeList))
+	for _, v := range p.VidoeList {
+		l += v.BLength()
+	}
+	l += bthrift.Binary.ListEndLength()
+	l += bthrift.Binary.FieldEndLength()
 	return l
 }
 
