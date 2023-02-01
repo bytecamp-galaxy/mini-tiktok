@@ -27,6 +27,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1
 	github.com/wagslane/go-password-validator v0.3.0
+	go.etcd.io/etcd/client/v3 v3.5.6
 	go.opentelemetry.io/otel v1.9.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.5.0
@@ -116,7 +117,6 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.6 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.6 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.6 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.33.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.9.0 // indirect
 	go.opentelemetry.io/contrib/propagators/ot v1.9.0 // indirect
