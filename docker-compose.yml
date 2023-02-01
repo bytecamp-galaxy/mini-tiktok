@@ -71,3 +71,18 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     ports:
       - "3000:3000"
+
+#  minio:
+#    image: minio/minio
+#    volumes:
+#      - /home/minio/data:/data
+#      - /home/minio/config:/root/.minio
+#    command:
+#      - server --console-address ":9090" -address ":9000" /data #指定容器中的目录 /data
+#    environment:
+#      MINIO_ROOT_USER: tiktokMinio
+#      MINIO_ROOT_PASSWORD: tiktokMinio
+#    restart: always
+#    ports:
+#      - "9090:9090" # server
+#      - "9000:9000" # client

@@ -54,7 +54,7 @@ func _action0Mw() []app.HandlerFunc {
 
 func _publish_ctionMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.JwtMiddleware.MiddlewareFunc()}
 }
 
 func _userMw() []app.HandlerFunc {

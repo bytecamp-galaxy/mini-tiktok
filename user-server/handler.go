@@ -75,8 +75,8 @@ func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequ
 		User: &user.User{
 			Id:            data.ID,
 			Name:          data.Username,
-			FollowCount:   data.FollowerCount,
-			FollowerCount: data.FollowingCount,
+			FollowCount:   data.FollowingCount,
+			FollowerCount: data.FollowerCount,
 			IsFollow:      false, // TODO(vgalaxy)
 		},
 	}
