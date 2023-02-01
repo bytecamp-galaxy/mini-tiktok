@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/router"
+	router "github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/router"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

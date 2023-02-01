@@ -8,6 +8,8 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/transmeta"
+	"github.com/cloudwego/kitex/transport"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	etcd "github.com/kitex-contrib/registry-etcd"
@@ -29,8 +31,8 @@ func InitFeedClient() (*feedservice.Client, error) {
 	}
 
 	provider.NewOpenTelemetryProvider(
-		provider.WithServiceName(v.GetString("feed-server.name")),
-		provider.WithExportEndpoint("localhost:4317"),
+		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
 	// TODO(vgalaxy): shutdown provider
@@ -43,6 +45,8 @@ func InitFeedClient() (*feedservice.Client, error) {
 		client.WithMuxConnection(1),
 		client.WithSuite(tracing.NewClientSuite()),
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: v.GetString("api-server.name")}),
+		client.WithTransportProtocol(transport.TTHeader),
+		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 	)
 	if err != nil {
 		return nil, err

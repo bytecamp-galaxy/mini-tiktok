@@ -3,7 +3,7 @@
 package Api
 
 import (
-	api2 "github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler/api"
+	api "github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler/api"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -23,45 +23,45 @@ func Register(r *server.Hertz) {
 			_comment := _douyin.Group("/comment", _commentMw()...)
 			{
 				_action := _comment.Group("/action", _actionMw()...)
-				_action.POST("/", append(_comment_ctionMw(), api2.CommentAction)...)
+				_action.POST("/", append(_comment_ctionMw(), api.CommentAction)...)
 			}
 			{
 				_list := _comment.Group("/list", _listMw()...)
-				_list.GET("/", append(_commentlistMw(), api2.CommentList)...)
+				_list.GET("/", append(_commentlistMw(), api.CommentList)...)
 			}
 		}
 		{
 			_favorite := _douyin.Group("/favorite", _favoriteMw()...)
 			{
 				_action0 := _favorite.Group("/action", _action0Mw()...)
-				_action0.POST("/", append(_favorite_ctionMw(), api2.FavoriteAction)...)
+				_action0.POST("/", append(_favorite_ctionMw(), api.FavoriteAction)...)
 			}
 			{
 				_list0 := _favorite.Group("/list", _list0Mw()...)
-				_list0.GET("/", append(_favoritelistMw(), api2.FavoriteList)...)
+				_list0.GET("/", append(_favoritelistMw(), api.FavoriteList)...)
 			}
 		}
 		{
 			_feed := _douyin.Group("/feed", _feedMw()...)
-			_feed.GET("/", append(_getfeedMw(), api2.GetFeed)...)
+			_feed.GET("/", append(_getfeedMw(), api.GetFeed)...)
 		}
 		{
 			_publish := _douyin.Group("/publish", _publishMw()...)
 			{
 				_action1 := _publish.Group("/action", _action1Mw()...)
-				_action1.POST("/", append(_publish_ctionMw(), api2.PublishAction)...)
+				_action1.POST("/", append(_publish_ctionMw(), api.PublishAction)...)
 			}
 		}
 		{
 			_user := _douyin.Group("/user", _userMw()...)
-			_user.GET("/", append(_userqueryMw(), api2.UserQuery)...)
+			_user.GET("/", append(_userqueryMw(), api.UserQuery)...)
 			{
 				_login := _user.Group("/login", _loginMw()...)
-				_login.POST("/", append(_userloginMw(), api2.UserLogin)...)
+				_login.POST("/", append(_userloginMw(), api.UserLogin)...)
 			}
 			{
 				_register := _user.Group("/register", _registerMw()...)
-				_register.POST("/", append(_userregisterMw(), api2.UserRegister)...)
+				_register.POST("/", append(_userregisterMw(), api.UserRegister)...)
 			}
 		}
 	}
