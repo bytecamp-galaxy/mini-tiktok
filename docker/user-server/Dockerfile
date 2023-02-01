@@ -9,7 +9,9 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-COPY . .
+COPY user-server user-server
+COPY configs configs
+COPY pkg pkg
 WORKDIR /root/user-server
 RUN chmod +x build.sh
 RUN ./build.sh

@@ -1,24 +1,39 @@
 package conf
 
 import (
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+const (
+	configPathKey = "config"
+)
+
+var (
 	V *viper.Viper
-}
+)
 
-func Init() Config {
+func Init() *viper.Viper {
+	if V != nil {
+		return V
+	}
+
 	v := viper.New()
-	config := Config{V: v}
 
-	v.SetConfigName("global")
-	v.SetConfigType("yaml")
-	v.AddConfigPath("configs")
+	pflag.String(configPathKey, "configs/global.yaml", "Path to config file")
+	pflag.Parse()
+	err := v.BindPFlags(pflag.CommandLine)
+	if err != nil {
+		panic(err)
+	}
+
+	path := v.GetString(configPathKey)
+	v.SetConfigFile(path)
 
 	if err := v.ReadInConfig(); err != nil {
 		panic(err)
 	}
 
-	return config
+	V = v
+	return V
 }

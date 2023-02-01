@@ -21,7 +21,7 @@ func InitFeedClient() (*feedservice.Client, error) {
 		return feedClient, nil
 	}
 
-	v := conf.Init().V
+	v := conf.Init()
 	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
 	r, err := etcd.NewEtcdResolver([]string{etcdAddr})
 	if err != nil {

@@ -12,7 +12,7 @@ var testUserA = "XK1W5EQRyMdt76C"
 var testUserB = "JPgQwIiILqHbZxL"
 
 func newExpect(t *testing.T) *httpexpect.Expect {
-	v := conf.Init().V
+	v := conf.Init()
 	return httpexpect.WithConfig(httpexpect.Config{
 		Client:   http.DefaultClient,
 		BaseURL:  fmt.Sprintf("http://%s:%d", v.GetString("api-server.host"), v.GetInt("api-server.port")),

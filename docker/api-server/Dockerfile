@@ -9,7 +9,14 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-COPY . .
+COPY api-server api-server
+COPY configs configs
+COPY pkg pkg
+# TODO(vgalaxy): archive kitex_gen
+COPY user-server user-server
+COPY comment-server comment-server
+COPY favorite-server favorite-server
+COPY feed-server feed-server
 WORKDIR /root/api-server
 RUN chmod +x build.sh
 RUN ./build.sh

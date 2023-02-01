@@ -20,7 +20,7 @@ import (
 func main() {
 	log.InitHLogger()
 
-	v := conf.Init().V
+	v := conf.Init()
 
 	p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName("tiktok.client"),

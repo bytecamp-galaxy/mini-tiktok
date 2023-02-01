@@ -15,7 +15,7 @@ var DB *gorm.DB
 func Init() {
 	var err error
 
-	v := conf.Init().V
+	v := conf.Init()
 	// https://github.com/go-sql-driver/mysql#dsn-data-source-name
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t&loc=%s",
 		v.GetString("mysql.user"),
