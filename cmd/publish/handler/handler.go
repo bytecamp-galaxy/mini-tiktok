@@ -97,7 +97,8 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 
 func getAuthorInfo(ctx context.Context, uid int64) (data *model.User, err error) {
 	// set up connection with user server
-	cli, err := rpc.InitUserClient()
+	v := conf.Init()
+	cli, err := rpc.InitUserClient(v.GetString("publish-server.name"))
 	if err != nil {
 		return nil, err
 	}

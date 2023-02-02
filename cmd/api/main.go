@@ -29,7 +29,7 @@ import (
 
 func main() {
 	// init db
-	dal.Init()
+	dal.Init(true)
 
 	// init jwt
 	jwt.Init()

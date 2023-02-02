@@ -9,6 +9,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -36,7 +37,8 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	cli, err := rpc.InitUserClient()
+	v := conf.Init()
+	cli, err := rpc.InitUserClient(v.GetString("api-server.name"))
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
@@ -91,7 +93,8 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	cli, err := rpc.InitUserClient()
+	v := conf.Init()
+	cli, err := rpc.InitUserClient(v.GetString("api-server.name"))
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
@@ -159,7 +162,8 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with user server
-	cli, err := rpc.InitUserClient()
+	v := conf.Init()
+	cli, err := rpc.InitUserClient(v.GetString("api-server.name"))
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return

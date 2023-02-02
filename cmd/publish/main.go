@@ -22,7 +22,7 @@ import (
 
 func main() {
 	// init db
-	dal.Init()
+	dal.Init(false)
 
 	// init log
 	log.InitKLogger()

@@ -10,6 +10,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -51,7 +52,8 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// set up connection with publish server
-	cli, err := rpc.InitPublishClient()
+	v := conf.Init()
+	cli, err := rpc.InitPublishClient(v.GetString("api-server.name"))
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return

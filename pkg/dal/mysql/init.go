@@ -12,7 +12,7 @@ import (
 
 var DB *gorm.DB
 
-func Init() {
+func Init(migrated bool) {
 	var err error
 
 	v := conf.Init()
@@ -37,8 +37,12 @@ func Init() {
 		panic(err)
 	}
 
-	if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
-		panic(err)
+	if migrated {
+		// NOTE: concurrent `AutoMigrate` is not supported
+		// only `AutoMigrate` when api server setup
+		if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
+			panic(err)
+		}
 	}
 
 	if err := DB.Use(tracing.NewPlugin()); err != nil {

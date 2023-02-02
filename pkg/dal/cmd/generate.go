@@ -12,7 +12,7 @@ func main() {
 		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface, // generate mode
 	})
 
-	mysql.Init()
+	mysql.Init(true)
 	g.UseDB(mysql.DB)
 
 	// Generate struct `User` based on table `users`

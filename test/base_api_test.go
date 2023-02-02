@@ -9,7 +9,14 @@ import (
 func TestFeed(t *testing.T) {
 	e := newExpect(t)
 
-	feedResp := e.GET("/douyin/feed/").Expect().Status(http.StatusOK).JSON().Object()
+	username := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	_, token := userRegisterAndPublish(username, e)
+
+	feedResp := e.GET("/douyin/feed/").
+		WithQuery("token", token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object()
 	feedResp.Value("status_code").Number().Equal(0)
 	feedResp.Value("video_list").Array().Length().Gt(0)
 
@@ -61,13 +68,13 @@ func TestPublish(t *testing.T) {
 	e := newExpect(t)
 
 	username := utils.RandStringBytesMaskImprSrcUnsafe(15)
-	userId, token := userRegister(username, e)
+	userId, token := userRegisterAndPublish(username, e)
 
 	publishResp := e.POST("/douyin/publish/action/").
 		WithMultipart().
-		WithFile("data", "assets/test.mp4").
+		WithFile("data", "../assets/test.mp4").
 		WithFormField("token", token).
-		WithFormField("title", "test").
+		WithFormField("title", "test video").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()

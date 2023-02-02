@@ -12,8 +12,8 @@ func TestRelation(t *testing.T) {
 
 	testUserA := utils.RandStringBytesMaskImprSrcUnsafe(15)
 	testUserB := utils.RandStringBytesMaskImprSrcUnsafe(15)
-	userIdA, tokenA := userRegister(testUserA, e)
-	userIdB, tokenB := userRegister(testUserB, e)
+	userIdA, tokenA := userRegisterAndPublish(testUserA, e)
+	userIdB, tokenB := userRegisterAndPublish(testUserB, e)
 
 	relationResp := e.POST("/douyin/relation/action/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).
@@ -62,8 +62,8 @@ func TestChat(t *testing.T) {
 
 	testUserA := utils.RandStringBytesMaskImprSrcUnsafe(15)
 	testUserB := utils.RandStringBytesMaskImprSrcUnsafe(15)
-	userIdA, tokenA := userRegister(testUserA, e)
-	userIdB, tokenB := userRegister(testUserB, e)
+	userIdA, tokenA := userRegisterAndPublish(testUserA, e)
+	userIdB, tokenB := userRegisterAndPublish(testUserB, e)
 
 	messageResp := e.POST("/douyin/message/action/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).WithQuery("content", "Send to UserB").

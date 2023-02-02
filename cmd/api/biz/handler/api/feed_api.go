@@ -8,6 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -34,7 +35,8 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	// TODO(vgalaxy): use token
 
 	// set up connection with feed server
-	cli, err := rpc.InitFeedClient()
+	v := conf.Init()
+	cli, err := rpc.InitFeedClient(v.GetString("api-server.name"))
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return

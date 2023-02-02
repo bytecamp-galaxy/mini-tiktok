@@ -17,7 +17,7 @@ import (
 
 var feedClient *feedservice.Client
 
-func InitFeedClient() (*feedservice.Client, error) {
+func InitFeedClient(serviceName string) (*feedservice.Client, error) {
 	// lazy initialization
 	if feedClient != nil {
 		return feedClient, nil
@@ -31,7 +31,7 @@ func InitFeedClient() (*feedservice.Client, error) {
 	}
 
 	provider.NewOpenTelemetryProvider(
-		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithServiceName(serviceName),
 		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
@@ -44,7 +44,7 @@ func InitFeedClient() (*feedservice.Client, error) {
 		client.WithInstanceMW(mw.ClientMiddleware),
 		client.WithMuxConnection(1),
 		client.WithSuite(tracing.NewClientSuite()),
-		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: v.GetString("api-server.name")}),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: serviceName}),
 		client.WithTransportProtocol(transport.TTHeader),
 		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 	)

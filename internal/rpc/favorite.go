@@ -17,7 +17,7 @@ import (
 
 var favoriteClient *favoriteservice.Client
 
-func InitFavoriteClient() (*favoriteservice.Client, error) {
+func InitFavoriteClient(serviceName string) (*favoriteservice.Client, error) {
 	// lazy initialization
 	if favoriteClient != nil {
 		return favoriteClient, nil
@@ -31,7 +31,7 @@ func InitFavoriteClient() (*favoriteservice.Client, error) {
 	}
 
 	provider.NewOpenTelemetryProvider(
-		provider.WithServiceName(v.GetString("api-server.name")),
+		provider.WithServiceName(serviceName),
 		provider.WithExportEndpoint(fmt.Sprintf("%s:%d", v.GetString("otlp-receiver.host"), v.GetInt("otlp-receiver.port"))),
 		provider.WithInsecure(),
 	)
@@ -44,7 +44,7 @@ func InitFavoriteClient() (*favoriteservice.Client, error) {
 		client.WithInstanceMW(mw.ClientMiddleware),
 		client.WithMuxConnection(1),
 		client.WithSuite(tracing.NewClientSuite()),
-		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: v.GetString("api-server.name")}),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: serviceName}),
 		client.WithTransportProtocol(transport.TTHeader),
 		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 	)
