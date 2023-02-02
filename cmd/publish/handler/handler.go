@@ -39,13 +39,13 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	// 上传视频
 	err = minio.UploadFile(videoBucketName, fileName, reader, int64(len(videoData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取视频链接
 	playUrl, err := minio.GetFileUrl(videoBucketName, fileName, 0)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取封面
@@ -53,26 +53,26 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	coverPath := coverUid.String() + "." + "jpg"
 	coverData, err := utils.ReadFrameAsJpeg(playUrl.String())
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrEncodingFailed), err.Error())
 	}
 
 	// 上传封面
 	coverReader := bytes.NewReader(coverData)
 	err = minio.UploadFile(coverBucketName, coverPath, coverReader, int64(len(coverData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取封面链接
 	coverUrl, err := minio.GetFileUrl(coverBucketName, coverPath, 0)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取 user
 	author, err := getAuthorInfo(ctx, authorId)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRPCMutualCall), err.Error())
 	}
 
 	// 封装 video

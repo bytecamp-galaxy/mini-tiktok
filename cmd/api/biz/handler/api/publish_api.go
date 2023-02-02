@@ -32,21 +32,21 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	// get .mp4 data
 	file, err := fileHeader.Open()
 	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrOpenFormFile, err.Error()))
 		return
 	}
 	defer file.Close()
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrEncodingFailed, err.Error()))
 		return
 	}
 
 	// fetch user id from token
 	userId, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
 		return
 	}
 

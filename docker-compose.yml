@@ -72,6 +72,8 @@ services:
       - "3000:3000"
 
   minio:
+    # default admin name: minioadmin
+    # default admin pwd: minioadmin
     image: quay.io/minio/minio
     command: server /data --console-address ":9001" -address ":9000"
     ports:
