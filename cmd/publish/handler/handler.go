@@ -14,7 +14,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/google/uuid"
-	"strings"
 )
 
 // PublishServiceImpl implements the last service interface defined in the IDL.
@@ -44,8 +43,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	}
 
 	// 获取视频链接
-	url, err := minio.GetFileUrl(videoBucketName, fileName, 0)
-	playUrl := strings.Split(url.String(), "?")[0]
+	playUrl, err := minio.GetFileUrl(videoBucketName, fileName, 0)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
 	}
@@ -53,7 +51,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	// 获取封面
 	coverUid := uuid.New()
 	coverPath := coverUid.String() + "." + "jpg"
-	coverData, err := utils.ReadFrameAsJpeg(playUrl)
+	coverData, err := utils.ReadFrameAsJpeg(playUrl.String())
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
 	}
@@ -71,7 +69,6 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
 	}
 
-	// CoverUrl := strings.Split(coverUrl.String(), "?")[0]
 	// 获取 user
 	author, err := getAuthorInfo(ctx, authorId)
 	if err != nil {
@@ -82,7 +79,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	video := &model.Video{
 		AuthorID: authorId,
 		Author:   *author,
-		PlayUrl:  playUrl,
+		PlayUrl:  playUrl.String(),
 		CoverUrl: coverUrl.String(),
 		Title:    videoTitle,
 	}

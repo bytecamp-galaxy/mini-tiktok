@@ -72,7 +72,7 @@ struct FeedResponse {
 
 struct Video {
     1: required i64 Id (api.body="id"); // 视频唯一标识
-    2: required User author (api.body="auther"); // 视频作者信息
+    2: required User author (api.body="author"); // 视频作者信息
     3: required string PlayUrl (api.body="play_url"); // 视频播放地址
     4: required string CoverUrl (api.body="cover_url"); // 视频封面地址
     5: required i64 FavoriteCount (api.body="favorite_count"); // 视频的点赞总数

@@ -2401,7 +2401,7 @@ func (p *FeedResponse) String() string {
 
 type Video struct {
 	Id            int64  `thrift:"Id,1,required" form:"id,required" json:"id,required"`
-	Author        *User  `thrift:"author,2,required" form:"auther,required" json:"auther,required"`
+	Author        *User  `thrift:"author,2,required" form:"author,required" json:"author,required"`
 	PlayUrl       string `thrift:"PlayUrl,3,required" form:"play_url,required" json:"play_url,required"`
 	CoverUrl      string `thrift:"CoverUrl,4,required" form:"cover_url,required" json:"cover_url,required"`
 	FavoriteCount int64  `thrift:"FavoriteCount,5,required" form:"favorite_count,required" json:"favorite_count,required"`
