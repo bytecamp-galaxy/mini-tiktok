@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/rpc"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"

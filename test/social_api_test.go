@@ -32,7 +32,7 @@ func TestRelation(t *testing.T) {
 	for _, element := range followListResp.Value("user_list").Array().Iter() {
 		user := element.Object()
 		user.ContainsKey("id")
-		if int(user.Value("id").Number().Raw()) == userIdB {
+		if int64(user.Value("id").Number().Raw()) == userIdB {
 			containTestUserB = true
 		}
 	}
@@ -50,7 +50,7 @@ func TestRelation(t *testing.T) {
 	for _, element := range followerListResp.Value("user_list").Array().Iter() {
 		user := element.Object()
 		user.ContainsKey("id")
-		if int(user.Value("id").Number().Raw()) == userIdA {
+		if int64(user.Value("id").Number().Raw()) == userIdA {
 			containTestUserA = true
 		}
 	}

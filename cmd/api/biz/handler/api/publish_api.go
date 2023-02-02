@@ -8,7 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
-	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/rpc"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
@@ -22,18 +22,9 @@ import (
 // PublishAction .
 // @router /douyin/publish/action/ [POST]
 func PublishAction(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.PublishActionRequest
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
-		return
-	}
-
-	title := req.GetTitle()
 	fileHeader, err := c.Request.FormFile("data")
 	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
@@ -52,7 +43,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// fetch user id from token
-	id, ok := c.Get(jwt.IdentityKey)
+	userId, ok := c.Get(jwt.IdentityKey)
 	if !ok {
 		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
 		return
@@ -67,9 +58,9 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &publish.PublishRequest{
-		UserId: id.(int64),
+		UserId: userId.(int64),
 		Data:   buf.Bytes(),
-		Title:  title,
+		Title:  c.PostForm("title"),
 	}
 
 	_, err = (*cli).PublishVideo(ctx, reqRpc)

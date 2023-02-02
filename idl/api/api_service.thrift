@@ -89,9 +89,9 @@ service FeedApi {
                         Publish Service
 ====================================================================*/
 struct PublishActionRequest {
-    1: required string Token (api.body="token"); // 登录用户设置
-    2: required string Title (api.body="title"); // 视频标题
-    3: required binary data (api.body="data"); // 视频数据
+    1: required string Token (api.form="token"); // 登录用户设置
+    2: required string Title (api.form="title"); // 视频标题
+    3: required binary Data (api.form="data"); // 视频数据
 }
 
 struct PublishActionResponse {

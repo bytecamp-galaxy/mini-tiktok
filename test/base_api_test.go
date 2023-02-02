@@ -25,38 +25,35 @@ func TestFeed(t *testing.T) {
 func TestUserAction(t *testing.T) {
 	e := newExpect(t)
 
-	registerValue := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	userName := utils.RandStringBytesMaskImprSrcUnsafe(15)
 
 	registerResp := e.POST("/douyin/user/register/").
-		WithQuery("username", registerValue).WithQuery("password", registerValue).
+		WithQuery("username", userName).WithQuery("password", userName).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 	registerResp.Value("status_code").Number().Equal(0)
-	registerResp.Value("user_id").Number().Gt(0)
-	registerResp.Value("token").String().Length().Gt(0)
 
 	loginResp := e.POST("/douyin/user/login/").
-		WithQuery("username", registerValue).WithQuery("password", registerValue).
+		WithQuery("username", userName).WithQuery("password", userName).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 	loginResp.Value("status_code").Number().Equal(0)
-	loginResp.Value("user_id").Number().Gt(0)
-	loginResp.Value("token").String().Length().Gt(0)
 
+	userId := int64(loginResp.Value("user_id").Number().Raw())
 	token := loginResp.Value("token").String().Raw()
-	userId := loginResp.Value("user_id").Number().Raw()
 	userResp := e.GET("/douyin/user/").
-		WithQuery("token", token).WithQuery("user_id", userId).
+		WithQuery("user_id", userId).WithQuery("token", token).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 	userResp.Value("status_code").Number().Equal(0)
+
 	userInfo := userResp.Value("user").Object()
 	userInfo.NotEmpty()
-	userInfo.Value("id").Number().Gt(0)
-	userInfo.Value("name").String().Length().Gt(0)
+	userInfo.Value("id").Number().Equal(userId)
+	userInfo.Value("name").String().Equal(userName)
 }
 
 func TestPublish(t *testing.T) {
@@ -66,9 +63,9 @@ func TestPublish(t *testing.T) {
 
 	publishResp := e.POST("/douyin/publish/action/").
 		WithMultipart().
-		WithFile("data", "../public/bear.mp4").
+		WithFile("data", "assets/test.mp4").
 		WithFormField("token", token).
-		WithFormField("title", "Bear").
+		WithFormField("title", "test").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()

@@ -2065,7 +2065,7 @@ func (p *FeedRequest) String() string {
 	return fmt.Sprintf("FeedRequest(%+v)", *p)
 }
 
-// 例如当前请求的 latest_time 为 9:00，那么返回的视频列表时间戳为 [8:55,7:40, 6:30, 6:00]
+// 例如当前请求的 latest_time 为 9:00，那么返回的视频列表时间戳为 [8:55, 7:40, 6:30, 6:00]
 // 所有这些视频中，最早发布的是 6:00 的视频，那么 6:00 作为下一次请求时的 latest_time
 // 那么下次请求返回的视频时间戳就会小于 6:00
 type FeedResponse struct {
@@ -2931,9 +2931,9 @@ func (p *Video) String() string {
 ====================================================================
 */
 type PublishActionRequest struct {
-	Token string `thrift:"Token,1,required" form:"token,required" json:"token,required"`
-	Title string `thrift:"Title,2,required" form:"title,required" json:"title,required"`
-	Data  []byte `thrift:"data,3,required" form:"data,required" json:"data,required"`
+	Token string `thrift:"Token,1,required" form:"token,required" json:"Token,required"`
+	Title string `thrift:"Title,2,required" form:"title,required" json:"Title,required"`
+	Data  []byte `thrift:"Data,3,required" form:"data,required" json:"Data,required"`
 }
 
 func NewPublishActionRequest() *PublishActionRequest {
@@ -2955,7 +2955,7 @@ func (p *PublishActionRequest) GetData() (v []byte) {
 var fieldIDToName_PublishActionRequest = map[int16]string{
 	1: "Token",
 	2: "Title",
-	3: "data",
+	3: "Data",
 }
 
 func (p *PublishActionRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -3158,7 +3158,7 @@ WriteFieldEndError:
 }
 
 func (p *PublishActionRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("Data", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteBinary([]byte(p.Data)); err != nil {

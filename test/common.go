@@ -23,29 +23,14 @@ func newExpect(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func getTestUserToken(user string, e *httpexpect.Expect) (int, string) {
+func getTestUserToken(user string, e *httpexpect.Expect) (int64, string) {
 	registerResp := e.POST("/douyin/user/register/").
 		WithQuery("username", user).WithQuery("password", user).
-		WithFormField("username", user).WithFormField("password", user).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 
-	userId := 0
+	userId := int64(registerResp.Value("user_id").Number().Raw())
 	token := registerResp.Value("token").String().Raw()
-	if len(token) == 0 {
-		loginResp := e.POST("/douyin/user/login/").
-			WithQuery("username", user).WithQuery("password", user).
-			WithFormField("username", user).WithFormField("password", user).
-			Expect().
-			Status(http.StatusOK).
-			JSON().Object()
-		loginToken := loginResp.Value("token").String()
-		loginToken.Length().Gt(0)
-		token = loginToken.Raw()
-		userId = int(loginResp.Value("user_id").Number().Raw())
-	} else {
-		userId = int(registerResp.Value("user_id").Number().Raw())
-	}
 	return userId, token
 }

@@ -27,7 +27,7 @@ func Init() {
 			}
 			return jwt.MapClaims{}
 		},
-		TokenLookup: "query:token",
+		TokenLookup: "query:token,form:token",
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
 			c.JSON(code, map[string]interface{}{
 				"status_code": errno.ErrUnauthorized,
