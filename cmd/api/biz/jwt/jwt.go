@@ -9,13 +9,13 @@ import (
 )
 
 var (
-	JwtMiddleware *jwt.HertzJWTMiddleware
-	IdentityKey   = "id"
+	Middleware  *jwt.HertzJWTMiddleware
+	IdentityKey = "id"
 )
 
 func Init() {
 	var err error
-	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
+	Middleware, err = jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:   "mini-tiktok",
 		Key:     []byte("cyvG2OzO9KQNsY3"),
 		Timeout: time.Hour,

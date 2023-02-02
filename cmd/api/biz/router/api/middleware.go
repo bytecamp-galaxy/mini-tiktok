@@ -3,6 +3,7 @@
 package Api
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -98,7 +99,7 @@ func _userMw() []app.HandlerFunc {
 
 func _userqueryMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
 
 func _loginMw() []app.HandlerFunc {

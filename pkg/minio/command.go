@@ -42,7 +42,7 @@ func UploadLocalFile(bucketName string, objectName string, filePath string, cont
 		ContentType: contentType,
 	})
 	if err != nil {
-		klog.Errorf("localfile upload failed, %s", err)
+		klog.Errorf("local file upload failed, %s", err)
 		return 0, err
 	}
 	klog.Infof("upload %s of size %d successfully", objectName, info.Size)
@@ -81,7 +81,7 @@ func GetFileUrl(bucketName string, fileName string, expires time.Duration) (*url
 
 // RemoveOneFile 从 minio 中删除文件
 func RemoveOneFile(bucketName string, fileName string) error {
-	//删除一个文件
+	// 删除一个文件
 	ctx := context.Background()
 	_ = minioClient.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{GovernanceBypass: true})
 	return nil

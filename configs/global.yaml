@@ -6,6 +6,14 @@ otlp-receiver:
   host: "127.0.0.1"
   port: 4317
 
+minio:
+  host: "127.0.0.1"
+  port: 9000
+  ak: "minioadmin"
+  sk: "minioadmin"
+  video-bucket-name: "video"
+  cover-bucket-name: "cover"
+
 api-server:
   name: "tiktok.api.service"
   host: "0.0.0.0"
@@ -21,6 +29,7 @@ feed-server:
   name: "tiktok.feed.service"
   host: "127.0.0.1"
   port: 8881
+  default-limit: 30
 
 comment-server:
   name: "tiktok.comment.service"
@@ -49,7 +58,7 @@ message-server:
 
 mysql:
   host: "127.0.0.1"
-  port: 3305
+  port: 3306
   user: "gorm"
   password: "gorm"
   dbname: "gorm"

@@ -62,7 +62,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// generate token
-	token, _, err := jwt.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	token, _, err := jwt.Middleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrTokenGeneration, err.Error()))
 		return
@@ -117,7 +117,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// generate token
-	token, _, err := jwt.JwtMiddleware.TokenGenerator(respRpc.UserId)
+	token, _, err := jwt.Middleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrTokenGeneration, err.Error()))
 		return

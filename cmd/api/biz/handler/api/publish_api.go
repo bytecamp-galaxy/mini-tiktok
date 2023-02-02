@@ -7,11 +7,15 @@ import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/marmotedu/errors"
 	"io"
 )
 
@@ -22,88 +26,68 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	var req api.PublishActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
 	title := req.GetTitle()
 	fileHeader, err := c.Request.FormFile("data")
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(".mp4 param encoding failed"),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
 		return
 	}
 
 	// get .mp4 data
 	file, err := fileHeader.Open()
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(".mp4 param encoding failed"),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
 		return
 	}
 	defer file.Close()
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String("copy bytes failed"),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
 		return
 	}
 
 	// fetch user id from token
 	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
 	// set up connection with publish server
 	cli, err := rpc.InitPublishClient()
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
 	}
 
 	// call rpc service
 	reqRpc := &publish.PublishRequest{
-		Uid:   id.(int64),
-		Data:  buf.Bytes(),
-		Title: title,
+		UserId: id.(int64),
+		Data:   buf.Bytes(),
+		Title:  title,
 	}
 
-	respRpc, err := (*cli).PublishVideo(ctx, reqRpc)
+	_, err = (*cli).PublishVideo(ctx, reqRpc)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
-
-	// handle status code
-	if respRpc.StatusCode != 0 {
-		c.JSON(consts.StatusInternalServerError, &api.PublishActionResponse{
-			StatusCode: respRpc.StatusCode,
-			StatusMsg:  utils.String(*respRpc.StatusMsg),
-		})
-		return
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
 	}
 
 	resp := &api.PublishActionResponse{
-		StatusCode: respRpc.StatusCode,
-		StatusMsg:  utils.String(*respRpc.StatusMsg),
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 	}
 
 	c.JSON(consts.StatusOK, resp)

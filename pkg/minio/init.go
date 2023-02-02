@@ -1,30 +1,24 @@
 package minio
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
+	"fmt"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 var (
-	minioClient     *minio.Client
-	Endpoint        = constants.MinioServerUrl
-	AccessKeyId     = constants.MinioAccessKey
-	SecretAccessKey = constants.MinioSecretKey
-	UseSSL          = constants.MinioUseSSL
+	minioClient *minio.Client
 )
 
 // Minio 对象存储初始化
 func init() {
-	client, err := minio.New(Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(AccessKeyId, SecretAccessKey, ""),
-		Secure: UseSSL,
-	})
+	v := conf.Init()
+	endpoint := fmt.Sprintf("%s:%d", v.GetString("minio.host"), v.GetInt("minio.port"))
+	client, err := minio.New(endpoint, &minio.Options{})
 	if err != nil {
 		klog.Errorf("minio client init failed: %v", err)
 	}
-	// fmt.Println(client)
 	klog.Debug("minio client init successfully")
 	minioClient = client
 }

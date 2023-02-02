@@ -5,11 +5,15 @@ package api
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/marmotedu/errors"
 )
 
 // GetFeed .
@@ -20,61 +24,37 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
 	// get the latest time.
 	// if the latest time hasn't been passed as param, it's 0 by default.
 	latestTime := req.GetLatestTime()
-	token := req.GetToken()
-	// fetch user id from token
-	//id, ok := c.Get(jwt.IdentityKey)
-	//if !ok {
-	//	c.JSON(consts.StatusInternalServerError, &api.FeedResponse{
-	//		StatusCode: 1,
-	//		StatusMsg:  utils.String("broken invariant"),
-	//		VideoList:  nil,
-	//		NextTime:  nil,
-	//	})
-	//	return
-	//}
+	// TODO(vgalaxy): use token
 
 	// set up connection with feed server
 	cli, err := rpc.InitFeedClient()
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &api.FeedResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
 	}
 
 	// call rpc service
 	reqRpc := &feed.FeedRequest{
 		LatestTime: &latestTime,
-		Token:      &token,
 	}
 	respRpc, err := (*cli).GetFeed(ctx, reqRpc)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FeedResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-			VideoList:  nil,
-			NextTime:   nil,
-		})
-		return
-	}
-
-	// handle status code
-	if respRpc.StatusCode != 0 {
-		c.JSON(consts.StatusInternalServerError, &api.FeedResponse{
-			StatusCode: respRpc.StatusCode,
-			StatusMsg:  utils.String(*respRpc.StatusMsg),
-			VideoList:  nil,
-			NextTime:   nil,
-		})
-		return
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
 	}
 
 	// convert model.Videos to feed.Videos
@@ -102,8 +82,8 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	// response to client
 	resp := &api.FeedResponse{
-		StatusCode: respRpc.StatusCode,
-		StatusMsg:  utils.String(*respRpc.StatusMsg),
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 		VideoList:  respVideos,
 		NextTime:   respRpc.NextTime,
 	}

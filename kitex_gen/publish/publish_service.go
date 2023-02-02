@@ -11,9 +11,9 @@ import (
 )
 
 type PublishRequest struct {
-	Uid   int64  `thrift:"uid,1,required" frugal:"1,required,i64" json:"uid"`
-	Title string `thrift:"Title,2,required" frugal:"2,required,string" json:"Title"`
-	Data  []byte `thrift:"data,3,required" frugal:"3,required,binary" json:"data"`
+	UserId int64  `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	Title  string `thrift:"Title,2,required" frugal:"2,required,string" json:"Title"`
+	Data   []byte `thrift:"Data,3,required" frugal:"3,required,binary" json:"Data"`
 }
 
 func NewPublishRequest() *PublishRequest {
@@ -24,8 +24,8 @@ func (p *PublishRequest) InitDefault() {
 	*p = PublishRequest{}
 }
 
-func (p *PublishRequest) GetUid() (v int64) {
-	return p.Uid
+func (p *PublishRequest) GetUserId() (v int64) {
+	return p.UserId
 }
 
 func (p *PublishRequest) GetTitle() (v string) {
@@ -35,8 +35,8 @@ func (p *PublishRequest) GetTitle() (v string) {
 func (p *PublishRequest) GetData() (v []byte) {
 	return p.Data
 }
-func (p *PublishRequest) SetUid(val int64) {
-	p.Uid = val
+func (p *PublishRequest) SetUserId(val int64) {
+	p.UserId = val
 }
 func (p *PublishRequest) SetTitle(val string) {
 	p.Title = val
@@ -46,16 +46,16 @@ func (p *PublishRequest) SetData(val []byte) {
 }
 
 var fieldIDToName_PublishRequest = map[int16]string{
-	1: "uid",
+	1: "UserId",
 	2: "Title",
-	3: "data",
+	3: "Data",
 }
 
 func (p *PublishRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetUid bool = false
+	var issetUserId bool = false
 	var issetTitle bool = false
 	var issetData bool = false
 
@@ -78,7 +78,7 @@ func (p *PublishRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetUid = true
+				issetUserId = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -120,7 +120,7 @@ func (p *PublishRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetUid {
+	if !issetUserId {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -156,7 +156,7 @@ func (p *PublishRequest) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.Uid = v
+		p.UserId = v
 	}
 	return nil
 }
@@ -217,10 +217,10 @@ WriteStructEndError:
 }
 
 func (p *PublishRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("uid", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("UserId", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Uid); err != nil {
+	if err := oprot.WriteI64(p.UserId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -251,7 +251,7 @@ WriteFieldEndError:
 }
 
 func (p *PublishRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("Data", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteBinary([]byte(p.Data)); err != nil {
@@ -280,7 +280,7 @@ func (p *PublishRequest) DeepEqual(ano *PublishRequest) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.Uid) {
+	if !p.Field1DeepEqual(ano.UserId) {
 		return false
 	}
 	if !p.Field2DeepEqual(ano.Title) {
@@ -294,7 +294,7 @@ func (p *PublishRequest) DeepEqual(ano *PublishRequest) bool {
 
 func (p *PublishRequest) Field1DeepEqual(src int64) bool {
 
-	if p.Uid != src {
+	if p.UserId != src {
 		return false
 	}
 	return true
@@ -315,8 +315,6 @@ func (p *PublishRequest) Field3DeepEqual(src []byte) bool {
 }
 
 type PublishResponse struct {
-	StatusCode int32   `thrift:"StatusCode,1,required" frugal:"1,required,i32" json:"StatusCode"`
-	StatusMsg  *string `thrift:"StatusMsg,2,optional" frugal:"2,optional,string" json:"StatusMsg,omitempty"`
 }
 
 func NewPublishResponse() *PublishResponse {
@@ -327,39 +325,12 @@ func (p *PublishResponse) InitDefault() {
 	*p = PublishResponse{}
 }
 
-func (p *PublishResponse) GetStatusCode() (v int32) {
-	return p.StatusCode
-}
-
-var PublishResponse_StatusMsg_DEFAULT string
-
-func (p *PublishResponse) GetStatusMsg() (v string) {
-	if !p.IsSetStatusMsg() {
-		return PublishResponse_StatusMsg_DEFAULT
-	}
-	return *p.StatusMsg
-}
-func (p *PublishResponse) SetStatusCode(val int32) {
-	p.StatusCode = val
-}
-func (p *PublishResponse) SetStatusMsg(val *string) {
-	p.StatusMsg = val
-}
-
-var fieldIDToName_PublishResponse = map[int16]string{
-	1: "StatusCode",
-	2: "StatusMsg",
-}
-
-func (p *PublishResponse) IsSetStatusMsg() bool {
-	return p.StatusMsg != nil
-}
+var fieldIDToName_PublishResponse = map[int16]string{}
 
 func (p *PublishResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetStatusCode bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -373,33 +344,8 @@ func (p *PublishResponse) Read(iprot thrift.TProtocol) (err error) {
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetStatusCode = true
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
+		if err = iprot.Skip(fieldTypeId); err != nil {
+			goto SkipFieldTypeError
 		}
 
 		if err = iprot.ReadFieldEnd(); err != nil {
@@ -410,60 +356,25 @@ func (p *PublishResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetStatusCode {
-		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_PublishResponse[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+SkipFieldTypeError:
+	return thrift.PrependError(fmt.Sprintf("%T skip field type %d error", p, fieldTypeId), err)
 
 ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_PublishResponse[fieldId]))
-}
-
-func (p *PublishResponse) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.StatusCode = v
-	}
-	return nil
-}
-
-func (p *PublishResponse) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.StatusMsg = &v
-	}
-	return nil
 }
 
 func (p *PublishResponse) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
 	if err = oprot.WriteStructBegin("PublishResponse"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
 
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
@@ -475,48 +386,10 @@ func (p *PublishResponse) Write(oprot thrift.TProtocol) (err error) {
 	return nil
 WriteStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
 WriteFieldStopError:
 	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
 WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *PublishResponse) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("StatusCode", thrift.I32, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.StatusCode); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *PublishResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetStatusMsg() {
-		if err = oprot.WriteFieldBegin("StatusMsg", thrift.STRING, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteString(*p.StatusMsg); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *PublishResponse) String() string {
@@ -530,32 +403,6 @@ func (p *PublishResponse) DeepEqual(ano *PublishResponse) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.StatusCode) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.StatusMsg) {
-		return false
-	}
-	return true
-}
-
-func (p *PublishResponse) Field1DeepEqual(src int32) bool {
-
-	if p.StatusCode != src {
-		return false
-	}
-	return true
-}
-func (p *PublishResponse) Field2DeepEqual(src *string) bool {
-
-	if p.StatusMsg == src {
-		return true
-	} else if p.StatusMsg == nil || src == nil {
-		return false
-	}
-	if strings.Compare(*p.StatusMsg, *src) != 0 {
 		return false
 	}
 	return true

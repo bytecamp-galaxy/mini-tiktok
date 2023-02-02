@@ -4,8 +4,10 @@ import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/constants"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"time"
 )
 
@@ -14,11 +16,10 @@ type FeedServiceImpl struct{}
 
 // GetFeed implements the FeedServiceImpl interface. get 30 latest videos with db
 func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
-
 	latestTime := req.GetLatestTime()
-	// if there isn't  latestTime, use current time
+	// if there isn't latestTime, use current time
 	if latestTime == 0 {
-		curTime := int64(time.Now().UnixMilli())
+		curTime := time.Now().UnixMilli()
 		latestTime = curTime
 	}
 
@@ -27,10 +28,10 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	v := q.Video
 
 	// find latest 30 videos
-	videos, err := v.WithContext(ctx).Limit(constants.DefaultVideoLimit).Order(v.CreatedAt.Desc()).Where(v.CreatedAt.Lt(latestTime)).Find()
-
+	viper := conf.Init()
+	videos, err := v.WithContext(ctx).Limit(viper.GetInt("feed-server.default-limit")).Order(v.CreatedAt.Desc()).Where(v.CreatedAt.Lt(latestTime)).Find()
 	if err != nil {
-		return nil, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	var nextTime int64
@@ -63,12 +64,9 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 		}
 	}
 
-	statusCode := "success"
 	resp = &feed.FeedResponse{
-		StatusCode: 0,
-		StatusMsg:  &statusCode,
-		VideoList:  respVideos,
-		NextTime:   &nextTime,
+		VideoList: respVideos,
+		NextTime:  &nextTime,
 	}
 	return resp, nil
 }

@@ -9,12 +9,14 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-COPY user-server user-server
+COPY cmd cmd
+COPY kitex_gen kitex_gen
 COPY configs configs
 COPY pkg pkg
-WORKDIR /root/user-server
+
+WORKDIR /root/cmd/user
 RUN chmod +x build.sh
 RUN ./build.sh
 
 WORKDIR /root
-ENTRYPOINT ["/root/user-server/output/bin/user"]
+ENTRYPOINT ["/root/cmd/user/output/user"]
