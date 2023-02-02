@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -9,12 +10,13 @@ import (
 func TestRelation(t *testing.T) {
 	e := newExpect(t)
 
-	userIdA, tokenA := getTestUserToken(testUserA, e)
-	userIdB, tokenB := getTestUserToken(testUserB, e)
+	testUserA := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	testUserB := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	userIdA, tokenA := userRegister(testUserA, e)
+	userIdB, tokenB := userRegister(testUserB, e)
 
 	relationResp := e.POST("/douyin/relation/action/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).
-		WithFormField("token", tokenA).WithFormField("to_user_id", userIdB).WithFormField("action_type", 1).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -22,7 +24,6 @@ func TestRelation(t *testing.T) {
 
 	followListResp := e.GET("/douyin/relation/follow/list/").
 		WithQuery("token", tokenA).WithQuery("user_id", userIdA).
-		WithFormField("token", tokenA).WithFormField("user_id", userIdA).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -40,7 +41,6 @@ func TestRelation(t *testing.T) {
 
 	followerListResp := e.GET("/douyin/relation/follower/list/").
 		WithQuery("token", tokenB).WithQuery("user_id", userIdB).
-		WithFormField("token", tokenB).WithFormField("user_id", userIdB).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -60,12 +60,13 @@ func TestRelation(t *testing.T) {
 func TestChat(t *testing.T) {
 	e := newExpect(t)
 
-	userIdA, tokenA := getTestUserToken(testUserA, e)
-	userIdB, tokenB := getTestUserToken(testUserB, e)
+	testUserA := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	testUserB := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	userIdA, tokenA := userRegister(testUserA, e)
+	userIdB, tokenB := userRegister(testUserB, e)
 
 	messageResp := e.POST("/douyin/message/action/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).WithQuery("content", "Send to UserB").
-		WithFormField("token", tokenA).WithFormField("to_user_id", userIdB).WithFormField("action_type", 1).WithQuery("content", "Send to UserB").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -73,7 +74,6 @@ func TestChat(t *testing.T) {
 
 	chatResp := e.GET("/douyin/message/chat/").
 		WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).
-		WithFormField("token", tokenA).WithFormField("to_user_id", userIdB).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -82,7 +82,6 @@ func TestChat(t *testing.T) {
 
 	chatResp = e.GET("/douyin/message/chat/").
 		WithQuery("token", tokenB).WithQuery("to_user_id", userIdA).
-		WithFormField("token", tokenB).WithFormField("to_user_id", userIdA).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()

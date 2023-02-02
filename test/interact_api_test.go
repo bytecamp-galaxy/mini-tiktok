@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -15,11 +16,11 @@ func TestFavorite(t *testing.T) {
 	firstVideo := feedResp.Value("video_list").Array().First().Object()
 	videoId := firstVideo.Value("id").Number().Raw()
 
-	userId, token := getTestUserToken(testUserA, e)
+	username := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	userId, token := userRegister(username, e)
 
 	favoriteResp := e.POST("/douyin/favorite/action/").
 		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 1).
-		WithFormField("token", token).WithFormField("video_id", videoId).WithFormField("action_type", 1).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -27,7 +28,6 @@ func TestFavorite(t *testing.T) {
 
 	favoriteListResp := e.GET("/douyin/favorite/list/").
 		WithQuery("token", token).WithQuery("user_id", userId).
-		WithFormField("token", token).WithFormField("user_id", userId).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -50,11 +50,11 @@ func TestComment(t *testing.T) {
 	firstVideo := feedResp.Value("video_list").Array().First().Object()
 	videoId := firstVideo.Value("id").Number().Raw()
 
-	_, token := getTestUserToken(testUserA, e)
+	username := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	_, token := userRegister(username, e)
 
 	addCommentResp := e.POST("/douyin/comment/action/").
 		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 1).WithQuery("comment_text", "测试评论").
-		WithFormField("token", token).WithFormField("video_id", videoId).WithFormField("action_type", 1).WithFormField("comment_text", "测试评论").
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -64,7 +64,6 @@ func TestComment(t *testing.T) {
 
 	commentListResp := e.GET("/douyin/comment/list/").
 		WithQuery("token", token).WithQuery("video_id", videoId).
-		WithFormField("token", token).WithFormField("video_id", videoId).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -85,7 +84,6 @@ func TestComment(t *testing.T) {
 
 	delCommentResp := e.POST("/douyin/comment/action/").
 		WithQuery("token", token).WithQuery("video_id", videoId).WithQuery("action_type", 2).WithQuery("comment_id", commentId).
-		WithFormField("token", token).WithFormField("video_id", videoId).WithFormField("action_type", 2).WithFormField("comment_id", commentId).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()

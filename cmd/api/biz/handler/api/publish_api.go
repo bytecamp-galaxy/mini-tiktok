@@ -22,6 +22,7 @@ import (
 // PublishAction .
 // @router /douyin/publish/action/ [POST]
 func PublishAction(ctx context.Context, c *app.RequestContext) {
+	// NOTE: DO NOT USE `BindAndValidate`
 	fileHeader, err := c.Request.FormFile("data")
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))

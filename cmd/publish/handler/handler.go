@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
@@ -12,13 +11,9 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/minio"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/google/uuid"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
-
-	"image"
-	"image/jpeg"
-	"os"
 	"strings"
 )
 
@@ -58,7 +53,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	// 获取封面
 	coverUid := uuid.New()
 	coverPath := coverUid.String() + "." + "jpg"
-	coverData, err := readFrameAsJpeg(playUrl)
+	coverData, err := utils.ReadFrameAsJpeg(playUrl)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
 	}
@@ -129,27 +124,4 @@ func getAuthorInfo(ctx context.Context, uid int64) (data *model.User, err error)
 		FollowingCount: authorData.FollowCount,
 	}
 	return author, err
-}
-
-// ReadFrameAsJpeg
-// 从视频流中截取一帧并返回 需要在本地环境中安装 ffmpeg 并将 bin 添加到环境变量
-func readFrameAsJpeg(filePath string) ([]byte, error) {
-	reader := bytes.NewBuffer(nil)
-	err := ffmpeg.Input(filePath).
-		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", 1)}).
-		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
-		WithOutput(reader, os.Stdout).
-		Run()
-	if err != nil {
-		return nil, err
-	}
-	img, _, err := image.Decode(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	buf := new(bytes.Buffer)
-	jpeg.Encode(buf, img, nil)
-
-	return buf.Bytes(), err
 }

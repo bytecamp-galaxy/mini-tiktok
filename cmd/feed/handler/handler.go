@@ -29,7 +29,7 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 
 	// find latest 30 videos
 	viper := conf.Init()
-	videos, err := v.WithContext(ctx).Limit(viper.GetInt("feed-server.default-limit")).Order(v.CreatedAt.Desc()).Where(v.CreatedAt.Lt(latestTime)).Find()
+	videos, err := v.WithContext(ctx).Preload(v.Author).Limit(viper.GetInt("feed-server.default-limit")).Order(v.CreatedAt.Desc()).Where(v.CreatedAt.Lt(latestTime)).Find()
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}

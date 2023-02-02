@@ -25,17 +25,18 @@ func TestFeed(t *testing.T) {
 func TestUserAction(t *testing.T) {
 	e := newExpect(t)
 
-	userName := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	username := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	password := utils.RandStringBytesMaskImprSrcUnsafe(15)
 
 	registerResp := e.POST("/douyin/user/register/").
-		WithQuery("username", userName).WithQuery("password", userName).
+		WithQuery("username", username).WithQuery("password", password).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
 	registerResp.Value("status_code").Number().Equal(0)
 
 	loginResp := e.POST("/douyin/user/login/").
-		WithQuery("username", userName).WithQuery("password", userName).
+		WithQuery("username", username).WithQuery("password", password).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
@@ -53,13 +54,14 @@ func TestUserAction(t *testing.T) {
 	userInfo := userResp.Value("user").Object()
 	userInfo.NotEmpty()
 	userInfo.Value("id").Number().Equal(userId)
-	userInfo.Value("name").String().Equal(userName)
+	userInfo.Value("name").String().Equal(username)
 }
 
 func TestPublish(t *testing.T) {
 	e := newExpect(t)
 
-	userId, token := getTestUserToken(testUserA, e)
+	username := utils.RandStringBytesMaskImprSrcUnsafe(15)
+	userId, token := userRegister(username, e)
 
 	publishResp := e.POST("/douyin/publish/action/").
 		WithMultipart().

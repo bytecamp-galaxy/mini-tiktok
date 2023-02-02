@@ -3,13 +3,11 @@ package test
 import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/gavv/httpexpect/v2"
 	"net/http"
 	"testing"
 )
-
-var testUserA = "XK1W5EQRyMdt76C"
-var testUserB = "JPgQwIiILqHbZxL"
 
 func newExpect(t *testing.T) *httpexpect.Expect {
 	v := conf.Init()
@@ -23,9 +21,10 @@ func newExpect(t *testing.T) *httpexpect.Expect {
 	})
 }
 
-func getTestUserToken(user string, e *httpexpect.Expect) (int64, string) {
+func userRegister(username string, e *httpexpect.Expect) (int64, string) {
+	password := utils.RandStringBytesMaskImprSrcUnsafe(15)
 	registerResp := e.POST("/douyin/user/register/").
-		WithQuery("username", user).WithQuery("password", user).
+		WithQuery("username", username).WithQuery("password", password).
 		Expect().
 		Status(http.StatusOK).
 		JSON().Object()
