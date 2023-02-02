@@ -4,120 +4,117 @@ import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/favorite"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
-	"gorm.io/gorm"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
+	"github.com/cloudwego/kitex/pkg/klog"
 )
 
-func Favorite(ctx context.Context, uid int64, vid int64) error {
-	err := mysql.DB.Transaction(func(tx *gorm.DB) error {
-		user := new(model.User)
-		if err := tx.WithContext(ctx).First(user, uid).Error; err != nil {
+func doFavorite(ctx context.Context, uid int64, vid int64) error {
+	// NOTE: DO NOT USE `query.Q`
+	// otherwise `favoriteList` reports "sql: transaction has already been committed or rolled back"
+	q := query.Use(mysql.DB)
+	err := q.Transaction(func(tx *query.Query) error {
+		// 1. 添加点赞数据
+		u, err := tx.User.WithContext(ctx).Where(tx.User.ID.Eq(uid)).Take()
+		if err != nil {
 			return err
 		}
 
-		video := new(model.Video)
-		if err := tx.WithContext(ctx).First(video, vid).Error; err != nil {
+		v, err := tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(vid)).Take()
+		if err != nil {
 			return err
 		}
 
-		if err := tx.WithContext(ctx).Model(&user).Association("FavoriteVideos").Append(video); err != nil {
+		err = tx.User.FavoriteVideos.WithContext(ctx).Model(u).Append(v)
+		if err != nil {
 			return err
 		}
+
 		// 2.改变 video 表中的 FavoriteCount
-		res := tx.Model(video).Update("FavoriteCount", gorm.Expr("FavoriteCount + ?", 1))
-		if res.Error != nil {
-			return res.Error
+		_, err = tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(vid)).
+			Update(tx.Video.FavoriteCount, tx.Video.FavoriteCount.Add(1))
+		if err != nil {
+			return err
 		}
 
 		return nil
 	})
+
 	return err
 }
 
-func DisFavorite(ctx context.Context, uid int64, vid int64) error {
-	err := mysql.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
+	q := query.Use(mysql.DB)
+	err := q.Transaction(func(tx *query.Query) error {
 		// 1. 删除点赞数据
-		user := new(model.User)
-		if err := tx.WithContext(ctx).First(user, uid).Error; err != nil {
-			return err
-		}
-
-		video, err := GetFavoriteRelation(ctx, uid, vid)
+		u, err := tx.User.WithContext(ctx).Where(tx.User.ID.Eq(uid)).Take()
 		if err != nil {
 			return err
 		}
 
-		err = tx.Unscoped().WithContext(ctx).Model(&user).Association("FavoriteVideos").Delete(video)
+		v, err := tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(vid)).Take()
+		if err != nil {
+			return err
+		}
+
+		err = tx.User.FavoriteVideos.WithContext(ctx).Model(u).Delete(v)
 		if err != nil {
 			return err
 		}
 
 		// 2.改变 video 表中的 FavoriteCount
-		res := tx.Model(video).Update("FavoriteCount", gorm.Expr("FavoriteCount - ?", 1))
-		if res.Error != nil {
-			return res.Error
+		_, err = tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(vid)).
+			Update(tx.Video.FavoriteCount, tx.Video.FavoriteCount.Sub(1))
+		if err != nil {
+			return err
 		}
 
 		return nil
 	})
+
 	return err
 }
 
-// GetFavoriteRelation get favorite video info
-func GetFavoriteRelation(ctx context.Context, uid int64, vid int64) (*model.Video, error) {
-	user := new(model.User)
-	if err := mysql.DB.WithContext(ctx).First(user, uid).Error; err != nil {
+func (s *FavoriteServiceImpl) favoriteList(ctx context.Context, req *favorite.FavoriteListRequest) ([]*rpcmodel.Video, error) {
+	q := query.Q
+	u, err := q.User.WithContext(ctx).Where(q.User.ID.Eq(req.UserId)).Take()
+	if err != nil {
+		klog.CtxErrorf(ctx, err.Error())
 		return nil, err
 	}
 
-	video := new(model.Video)
-
-	if err := mysql.DB.WithContext(ctx).Model(&user).Association("FavoriteVideos").Find(&video, vid); err != nil {
+	vs, err := q.User.FavoriteVideos.WithContext(ctx).Model(u).Find()
+	if err != nil {
+		klog.CtxErrorf(ctx, err.Error())
 		return nil, err
 	}
-	return video, nil
-}
 
-// FavoriteList returns a list of Favorite videos.
-func (s *FavoriteServiceImpl) _FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest) ([]*rpcmodel.Video, error) {
-	var Favoritevideos []model.Video
-	videos, err := FavoriteVideos(ctx, Favoritevideos, &req.UserId)
-	return videos, err
-}
-
-func FavoriteVideos(ctx context.Context, vs []model.Video, uid *int64) ([]*rpcmodel.Video, error) {
-	videos := make([]*model.Video, 0)
-	for _, v := range vs {
-		videos = append(videos, &v)
-	}
-
-	packVideos, err := Videos(ctx, videos, uid)
-
-	return packVideos, err
-}
-
-func Videos(ctx context.Context, vs []*model.Video, fromID *int64) ([]*rpcmodel.Video, error) {
-	respVideos := make([]*rpcmodel.Video, len(vs))
-	for i, video := range vs {
-		author := video.Author
-		u := &rpcmodel.User{
-			Id:            author.ID,
-			Name:          author.Username,
-			FollowCount:   author.FollowingCount,
-			FollowerCount: author.FollowerCount,
+	videos := make([]*rpcmodel.Video, len(vs))
+	for i, v := range vs {
+		// TODO(vgalaxy): optimize join
+		u, err := q.User.WithContext(ctx).Where(q.User.ID.Eq(v.AuthorID)).Take()
+		if err != nil {
+			klog.CtxErrorf(ctx, err.Error())
+			return nil, err
+		}
+		author := &rpcmodel.User{
+			Id:            u.ID,
+			Name:          u.Username,
+			FollowCount:   u.FollowingCount,
+			FollowerCount: u.FollowerCount,
 			IsFollow:      false, // TODO
 		}
-		respVideos[i] = &rpcmodel.Video{
-			Id:            video.ID,
-			Author:        u,
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
-			IsFavorite:    false, // TODO: 如果用户登录状态下刷视频，如何高效的获取这些用户对刷到的视频的点赞信息？
-			Title:         video.Title,
+		videos[i] = &rpcmodel.Video{
+			Id:            v.ID,
+			Author:        author,
+			PlayUrl:       v.PlayUrl,
+			CoverUrl:      v.CoverUrl,
+			FavoriteCount: v.FavoriteCount,
+			CommentCount:  v.CommentCount,
+			IsFavorite:    true,
+			Title:         v.Title,
 		}
 	}
-	return respVideos, nil
+
+	return videos, err
 }

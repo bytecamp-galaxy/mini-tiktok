@@ -18,7 +18,7 @@ type CommentServiceImpl struct{}
 // CommentAction implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
 	q := query.Use(mysql.DB)
-	q.Transaction(func(tx *query.Query) error {
+	err = q.Transaction(func(tx *query.Query) error {
 		switch req.ActionType {
 		case 1:
 			{
@@ -31,6 +31,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 				if err != nil {
 					return err
 				}
+
 				v := tx.Video
 				_, err = v.WithContext(ctx).Preload(v.Author).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
 				if err != nil {
@@ -38,7 +39,6 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 				}
 
 				resp = &comment.CommentActionResponse{
-					StatusCode: 0,
 					Comment: &rpcmodel.Comment{
 						Id:         c.ID,
 						User:       Po2voUser(c.User),
@@ -61,12 +61,10 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return err
 				}
 
-				resp = &comment.CommentActionResponse{
-					StatusCode: 0,
-				}
+				resp = &comment.CommentActionResponse{}
 			}
 		default:
-			panic("Request argument violates convention")
+			return kerrors.NewBizStatusError(int32(errno.ErrUnknown), "request argument violates convention")
 		}
 		return nil
 	})
@@ -80,7 +78,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 // CommentList implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
 	q := query.Use(mysql.DB)
-	q.Transaction(func(tx *query.Query) error {
+	err = q.Transaction(func(tx *query.Query) error {
 		c := tx.Comment
 		var comments []*model.Comment
 		comments, err = c.WithContext(ctx).Where(c.VideoID.Eq(req.VideoId)).Find()
@@ -95,8 +93,6 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 			list[i] = &commentVO
 		}
 		resp = &comment.CommentListResponse{
-			StatusCode:  0,
-			StatusMsg:   nil,
 			CommentList: list,
 		}
 		return err

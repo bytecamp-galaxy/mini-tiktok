@@ -10,8 +10,8 @@ struct FeedRequest {
 // 所有这些视频中，最早发布的是 6:00 的视频，那么 6:00 作为下一次请求时的 latest_time
 // 那么下次请求返回的视频时间戳就会小于 6:00
 struct FeedResponse {
-    3: list<rpcmodel.Video> VideoList; // 视频列表
-    4: optional i64 NextTime; // 本次返回的视频中，发布最早的时间，作为下次请求时的 latest_time
+    1: list<rpcmodel.Video> VideoList; // 视频列表
+    2: optional i64 NextTime; // 本次返回的视频中，发布最早的时间，作为下次请求时的 latest_time
 }
 
 service FeedService {

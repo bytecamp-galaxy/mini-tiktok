@@ -54,7 +54,7 @@ func _action0Mw() []app.HandlerFunc {
 
 func _favorite_ctionMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
 
 func _list0Mw() []app.HandlerFunc {
@@ -64,7 +64,7 @@ func _list0Mw() []app.HandlerFunc {
 
 func _favoritelistMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
 
 func _feedMw() []app.HandlerFunc {

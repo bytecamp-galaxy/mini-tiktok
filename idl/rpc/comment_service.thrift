@@ -11,9 +11,7 @@ struct CommentActionRequest {
 }
 
 struct CommentActionResponse {
-    1: required i32 StatusCode;
-    2: optional string StatusMsg;
-    3: optional rpcmodel.Comment Comment;
+    1: optional rpcmodel.Comment Comment;
 }
 
 struct CommentListRequest {
@@ -21,9 +19,7 @@ struct CommentListRequest {
 }
 
 struct CommentListResponse {
-    1: required i32 StatusCode;
-    2: optional string StatusMsg;
-    3: list<rpcmodel.Comment> CommentList;
+    1: list<rpcmodel.Comment> CommentList;
 }
 
 service CommentService {

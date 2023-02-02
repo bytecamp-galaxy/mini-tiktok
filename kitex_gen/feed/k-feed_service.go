@@ -180,9 +180,9 @@ func (p *FeedResponse) FastRead(buf []byte) (int, error) {
 			break
 		}
 		switch fieldId {
-		case 3:
+		case 1:
 			if fieldTypeId == thrift.LIST {
-				l, err = p.FastReadField3(buf[offset:])
+				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -194,9 +194,9 @@ func (p *FeedResponse) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 4:
+		case 2:
 			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField4(buf[offset:])
+				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -243,7 +243,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *FeedResponse) FastReadField3(buf []byte) (int, error) {
+func (p *FeedResponse) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	_, size, l, err := bthrift.Binary.ReadListBegin(buf[offset:])
@@ -270,7 +270,7 @@ func (p *FeedResponse) FastReadField3(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *FeedResponse) FastReadField4(buf []byte) (int, error) {
+func (p *FeedResponse) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
@@ -292,8 +292,8 @@ func (p *FeedResponse) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWr
 	offset := 0
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "FeedResponse")
 	if p != nil {
-		offset += p.fastWriteField4(buf[offset:], binaryWriter)
-		offset += p.fastWriteField3(buf[offset:], binaryWriter)
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -304,17 +304,17 @@ func (p *FeedResponse) BLength() int {
 	l := 0
 	l += bthrift.Binary.StructBeginLength("FeedResponse")
 	if p != nil {
-		l += p.field3Length()
-		l += p.field4Length()
+		l += p.field1Length()
+		l += p.field2Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
 	return l
 }
 
-func (p *FeedResponse) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *FeedResponse) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "VideoList", thrift.LIST, 3)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "VideoList", thrift.LIST, 1)
 	listBeginOffset := offset
 	offset += bthrift.Binary.ListBeginLength(thrift.STRUCT, 0)
 	var length int
@@ -328,10 +328,10 @@ func (p *FeedResponse) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWr
 	return offset
 }
 
-func (p *FeedResponse) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *FeedResponse) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	if p.IsSetNextTime() {
-		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "NextTime", thrift.I64, 4)
+		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "NextTime", thrift.I64, 2)
 		offset += bthrift.Binary.WriteI64(buf[offset:], *p.NextTime)
 
 		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
@@ -339,9 +339,9 @@ func (p *FeedResponse) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWr
 	return offset
 }
 
-func (p *FeedResponse) field3Length() int {
+func (p *FeedResponse) field1Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("VideoList", thrift.LIST, 3)
+	l += bthrift.Binary.FieldBeginLength("VideoList", thrift.LIST, 1)
 	l += bthrift.Binary.ListBeginLength(thrift.STRUCT, len(p.VideoList))
 	for _, v := range p.VideoList {
 		l += v.BLength()
@@ -351,10 +351,10 @@ func (p *FeedResponse) field3Length() int {
 	return l
 }
 
-func (p *FeedResponse) field4Length() int {
+func (p *FeedResponse) field2Length() int {
 	l := 0
 	if p.IsSetNextTime() {
-		l += bthrift.Binary.FieldBeginLength("NextTime", thrift.I64, 4)
+		l += bthrift.Binary.FieldBeginLength("NextTime", thrift.I64, 2)
 		l += bthrift.Binary.I64Length(*p.NextTime)
 
 		l += bthrift.Binary.FieldEndLength()

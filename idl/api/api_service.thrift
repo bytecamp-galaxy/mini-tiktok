@@ -147,10 +147,9 @@ service CommentApi {
                         Favorite Service
 ====================================================================*/
 struct FavoriteActionRequest {
-    1: required i64 UserId (api.query="user_id");
-    2: required string Token (api.query="token"); // 鉴权
-    3: required i64 VideoId (api.query="video_id");
-    4: required i32 ActionType (api.query="action_type", api.vd="$ == 1 || $ == 2");
+    1: required string Token (api.query="token"); // 鉴权
+    2: required i64 VideoId (api.query="video_id");
+    3: required i32 ActionType (api.query="action_type", api.vd="$ == 1 || $ == 2");
 }
 
 struct FavoriteActionResponse {
@@ -159,7 +158,7 @@ struct FavoriteActionResponse {
 }
 
 struct FavoriteListRequest {
-    1: required i64 UserId (api.query="id");
+    1: required i64 UserId (api.query="user_id");
     2: required string Token (api.query="token");
 }
 

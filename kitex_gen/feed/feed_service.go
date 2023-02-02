@@ -190,8 +190,8 @@ func (p *FeedRequest) Field1DeepEqual(src *int64) bool {
 }
 
 type FeedResponse struct {
-	VideoList []*rpcmodel.Video `thrift:"VideoList,3" frugal:"3,default,list<rpcmodel.Video>" json:"VideoList"`
-	NextTime  *int64            `thrift:"NextTime,4,optional" frugal:"4,optional,i64" json:"NextTime,omitempty"`
+	VideoList []*rpcmodel.Video `thrift:"VideoList,1" frugal:"1,default,list<rpcmodel.Video>" json:"VideoList"`
+	NextTime  *int64            `thrift:"NextTime,2,optional" frugal:"2,optional,i64" json:"NextTime,omitempty"`
 }
 
 func NewFeedResponse() *FeedResponse {
@@ -222,8 +222,8 @@ func (p *FeedResponse) SetNextTime(val *int64) {
 }
 
 var fieldIDToName_FeedResponse = map[int16]string{
-	3: "VideoList",
-	4: "NextTime",
+	1: "VideoList",
+	2: "NextTime",
 }
 
 func (p *FeedResponse) IsSetNextTime() bool {
@@ -249,9 +249,9 @@ func (p *FeedResponse) Read(iprot thrift.TProtocol) (err error) {
 		}
 
 		switch fieldId {
-		case 3:
+		case 1:
 			if fieldTypeId == thrift.LIST {
-				if err = p.ReadField3(iprot); err != nil {
+				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -259,9 +259,9 @@ func (p *FeedResponse) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
-		case 4:
+		case 2:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField4(iprot); err != nil {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -299,7 +299,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *FeedResponse) ReadField3(iprot thrift.TProtocol) error {
+func (p *FeedResponse) ReadField1(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return err
@@ -319,7 +319,7 @@ func (p *FeedResponse) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *FeedResponse) ReadField4(iprot thrift.TProtocol) error {
+func (p *FeedResponse) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
@@ -334,12 +334,12 @@ func (p *FeedResponse) Write(oprot thrift.TProtocol) (err error) {
 		goto WriteStructBeginError
 	}
 	if p != nil {
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
 			goto WriteFieldError
 		}
-		if err = p.writeField4(oprot); err != nil {
-			fieldId = 4
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -361,8 +361,8 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *FeedResponse) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("VideoList", thrift.LIST, 3); err != nil {
+func (p *FeedResponse) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("VideoList", thrift.LIST, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.VideoList)); err != nil {
@@ -381,14 +381,14 @@ func (p *FeedResponse) writeField3(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *FeedResponse) writeField4(oprot thrift.TProtocol) (err error) {
+func (p *FeedResponse) writeField2(oprot thrift.TProtocol) (err error) {
 	if p.IsSetNextTime() {
-		if err = oprot.WriteFieldBegin("NextTime", thrift.I64, 4); err != nil {
+		if err = oprot.WriteFieldBegin("NextTime", thrift.I64, 2); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteI64(*p.NextTime); err != nil {
@@ -400,9 +400,9 @@ func (p *FeedResponse) writeField4(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *FeedResponse) String() string {
@@ -418,16 +418,16 @@ func (p *FeedResponse) DeepEqual(ano *FeedResponse) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.VideoList) {
+	if !p.Field1DeepEqual(ano.VideoList) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.NextTime) {
+	if !p.Field2DeepEqual(ano.NextTime) {
 		return false
 	}
 	return true
 }
 
-func (p *FeedResponse) Field3DeepEqual(src []*rpcmodel.Video) bool {
+func (p *FeedResponse) Field1DeepEqual(src []*rpcmodel.Video) bool {
 
 	if len(p.VideoList) != len(src) {
 		return false
@@ -440,7 +440,7 @@ func (p *FeedResponse) Field3DeepEqual(src []*rpcmodel.Video) bool {
 	}
 	return true
 }
-func (p *FeedResponse) Field4DeepEqual(src *int64) bool {
+func (p *FeedResponse) Field2DeepEqual(src *int64) bool {
 
 	if p.NextTime == src {
 		return true

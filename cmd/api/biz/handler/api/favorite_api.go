@@ -6,45 +6,32 @@ import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/favorite"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/marmotedu/errors"
 )
 
 // FavoriteAction .
 // @router /douyin/favorite/action/ [POST]
 func FavoriteAction(ctx context.Context, c *app.RequestContext) {
-	//var err error
-	//var req api.FavoriteActionRequest
-	//err = c.BindAndValidate(&req)
-	//if err != nil {
-	//	c.String(consts.StatusBadRequest, err.Error())
-	//	return
-	//}
-	//
-	//resp := new(api.FavoriteActionResponse)
-	//
-	//c.JSON(consts.StatusOK, resp)
-
 	var err error
 	var req api.FavoriteActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
 	uid, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
@@ -54,40 +41,32 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 		ActionType: req.ActionType,
 	}
 
-	cli, err := rpc.InitFavoriteClient()
-
+	v := conf.Init()
+	cli, err := rpc.InitFavoriteClient(v.GetString("api-server.name"))
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
 	}
 
-	respRPC, err := (*cli).FavoriteAction(ctx, reqRPC)
+	_, err = (*cli).FavoriteAction(ctx, reqRPC)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
-	}
-
-	if respRPC.StatusCode != 0 {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
-			StatusCode: respRPC.StatusCode,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
 	}
 
 	resp := &api.FavoriteActionResponse{
-		StatusCode: 0,
-		StatusMsg:  respRPC.StatusMsg,
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 	}
 
 	c.JSON(consts.StatusOK, resp)
-
 }
 
 // FavoriteList .
@@ -95,24 +74,29 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.FavoriteListRequest
-
-	// step1: bind and validate request.
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
+		return
+	}
+
+	uid, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
+		return
+	}
+
+	// check user id
+	if uid != req.UserId {
+		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, "inconsistent user id"))
 		return
 	}
 
 	// set up connection with comment server
-	cli, err := rpc.InitFavoriteClient()
+	v := conf.Init()
+	cli, err := rpc.InitFavoriteClient(v.GetString("api-server.name"))
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
 	}
 
@@ -121,25 +105,21 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	respRPC, err := (*cli).FavoriteList(ctx, &reqRPC)
-
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-		return
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
 	}
 
-	if respRPC.StatusCode != 0 {
-		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
-			StatusCode: respRPC.StatusCode,
-			StatusMsg:  utils.String(err.Error()),
-		})
-	}
+	list := make([]*api.Video, len(respRPC.VideoList))
 
-	list := make([]*api.Video, len(respRPC.VidoeList))
-
-	for i, video := range respRPC.VidoeList {
+	for i, video := range respRPC.VideoList {
 		author := video.Author
 		u := &api.User{
 			Id:            author.Id,
@@ -161,8 +141,8 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := &api.FavoriteListResponse{
-		StatusCode: 0,
-		StatusMsg:  respRPC.StatusMsg,
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 		VideoList:  list,
 	}
 

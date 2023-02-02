@@ -113,13 +113,6 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		})
 	}
 
-	if respRPC.StatusCode != 0 {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: respRPC.StatusCode,
-			StatusMsg:  utils.String(err.Error()),
-		})
-	}
-
 	list := make([]*api.Comment, len(respRPC.CommentList))
 
 	for i, c := range respRPC.CommentList {

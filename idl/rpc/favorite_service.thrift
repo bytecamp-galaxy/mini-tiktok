@@ -4,25 +4,18 @@ include "rpcmodel.thrift"
 
 struct FavoriteActionRequest {
     1: required i64 UserId;
-    2: required string Token; // 鉴权
-    3: required i64 VideoId;
-    4: required i32 ActionType; // 1 点赞, 2 取消
+    2: required i64 VideoId;
+    3: required i32 ActionType; // 1 点赞, 2 取消
 }
 
-struct FavoriteActionResponse {
-    1: required i32 StatusCode;
-    2: optional string StatusMsg;
-}
+struct FavoriteActionResponse {}
 
 struct FavoriteListRequest {
     1: required i64 UserId;
-    2: required string Token;
 }
 
 struct FavoriteListResponse {
-    1: required i32 StatusCode;
-    2: optional string StatusMsg;
-    3: list<rpcmodel.Video> VidoeList;
+    1: list<rpcmodel.Video> VideoList;
 }
 
 service FavoriteService {
