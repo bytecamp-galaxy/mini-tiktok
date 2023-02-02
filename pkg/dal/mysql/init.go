@@ -33,6 +33,7 @@ func Init() {
 		PrepareStmt:            true,
 		Logger:                 log.InitDBLogger(),
 	})
+
 	if err != nil {
 		panic(err)
 	}

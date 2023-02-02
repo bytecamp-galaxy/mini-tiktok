@@ -4,7 +4,11 @@ package api
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
+	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/favorite"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -12,17 +16,78 @@ import (
 // FavoriteAction .
 // @router /douyin/favorite/action/ [POST]
 func FavoriteAction(ctx context.Context, c *app.RequestContext) {
+	//var err error
+	//var req api.FavoriteActionRequest
+	//err = c.BindAndValidate(&req)
+	//if err != nil {
+	//	c.String(consts.StatusBadRequest, err.Error())
+	//	return
+	//}
+	//
+	//resp := new(api.FavoriteActionResponse)
+	//
+	//c.JSON(consts.StatusOK, resp)
+
 	var err error
 	var req api.FavoriteActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
 		return
 	}
 
-	resp := new(api.FavoriteActionResponse)
+	uid, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	reqRPC := &favorite.FavoriteActionRequest{
+		UserId:     uid.(int64),
+		VideoId:    req.VideoId,
+		ActionType: req.ActionType,
+	}
+
+	cli, err := rpc.InitFavoriteClient()
+
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	respRPC, err := (*cli).FavoriteAction(ctx, reqRPC)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	if respRPC.StatusCode != 0 {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteActionResponse{
+			StatusCode: respRPC.StatusCode,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	resp := &api.FavoriteActionResponse{
+		StatusCode: 0,
+		StatusMsg:  respRPC.StatusMsg,
+	}
 
 	c.JSON(consts.StatusOK, resp)
+
 }
 
 // FavoriteList .
@@ -30,13 +95,76 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.FavoriteListRequest
+
+	// step1: bind and validate request.
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
 		return
 	}
 
-	resp := new(api.FavoriteListResponse)
+	// set up connection with comment server
+	cli, err := rpc.InitFavoriteClient()
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	reqRPC := favorite.FavoriteListRequest{
+		UserId: req.UserId,
+	}
+
+	respRPC, err := (*cli).FavoriteList(ctx, &reqRPC)
+
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
+			StatusCode: 1,
+			StatusMsg:  utils.String(err.Error()),
+		})
+		return
+	}
+
+	if respRPC.StatusCode != 0 {
+		c.JSON(consts.StatusInternalServerError, &api.FavoriteListResponse{
+			StatusCode: respRPC.StatusCode,
+			StatusMsg:  utils.String(err.Error()),
+		})
+	}
+
+	list := make([]*api.Video, len(respRPC.VidoeList))
+
+	for i, video := range respRPC.VidoeList {
+		author := video.Author
+		u := &api.User{
+			Id:            author.Id,
+			Name:          author.Name,
+			FollowCount:   &author.FollowCount,
+			FollowerCount: &author.FollowerCount,
+			IsFollow:      author.IsFollow,
+		}
+		list[i] = &api.Video{
+			Id:            video.Id,
+			Author:        u,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    video.IsFavorite,
+			Title:         video.Title,
+		}
+	}
+
+	resp := &api.FavoriteListResponse{
+		StatusCode: 0,
+		StatusMsg:  respRPC.StatusMsg,
+		VideoList:  list,
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
