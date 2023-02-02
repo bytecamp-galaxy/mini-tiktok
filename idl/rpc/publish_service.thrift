@@ -1,5 +1,7 @@
 namespace go publish
 
+include "rpcmodel.thrift"
+
 struct PublishRequest {
     1: required i64 UserId; // 登录用户 id，用于 UserQueryRequest
     2: required string Title; // 视频标题
@@ -8,6 +10,17 @@ struct PublishRequest {
 
 struct PublishResponse {}
 
+struct PublishListRequest {
+    1: required i64 Id; // 用户 id
+}
+
+struct PublishListResponse {
+    1: required i32 StatusCode; // 状态码，0 - 成功，其他值 - 失败
+    2: optional string StatusMsg; // 返回状态描述
+    3: required list<rpcmodel.Video> VideoList;
+}
+
 service PublishService {
     PublishResponse publishVideo(1: PublishRequest req); // 刷视频，返回一个视频列表
+    PublishListResponse publishList(1: PublishListRequest req); // 获取用户曾上传的视频
 }

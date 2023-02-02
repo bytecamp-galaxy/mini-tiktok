@@ -84,3 +84,19 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 
 	c.JSON(consts.StatusOK, resp)
 }
+
+// PublishList .
+// @router /douyin/publish/list/ [GET]
+func PublishList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.PublishListRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(api.PublishListResponse)
+
+	c.JSON(consts.StatusOK, resp)
+}

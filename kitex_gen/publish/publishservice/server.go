@@ -2,7 +2,7 @@
 package publishservice
 
 import (
-	publish "github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
+	publish "github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/publish"
 	server "github.com/cloudwego/kitex/server"
 )
 

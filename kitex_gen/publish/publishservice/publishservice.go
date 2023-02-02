@@ -4,7 +4,7 @@ package publishservice
 
 import (
 	"context"
-	publish "github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
+	publish "github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/publish"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
 )
@@ -20,6 +20,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	handlerType := (*publish.PublishService)(nil)
 	methods := map[string]kitex.MethodInfo{
 		"publishVideo": kitex.NewMethodInfo(publishVideoHandler, newPublishServicePublishVideoArgs, newPublishServicePublishVideoResult, false),
+		"publishList":  kitex.NewMethodInfo(publishListHandler, newPublishServicePublishListArgs, newPublishServicePublishListResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "publish",
@@ -53,6 +54,24 @@ func newPublishServicePublishVideoResult() interface{} {
 	return publish.NewPublishServicePublishVideoResult()
 }
 
+func publishListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*publish.PublishServicePublishListArgs)
+	realResult := result.(*publish.PublishServicePublishListResult)
+	success, err := handler.(publish.PublishService).PublishList(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPublishServicePublishListArgs() interface{} {
+	return publish.NewPublishServicePublishListArgs()
+}
+
+func newPublishServicePublishListResult() interface{} {
+	return publish.NewPublishServicePublishListResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -68,6 +87,16 @@ func (p *kClient) PublishVideo(ctx context.Context, req *publish.PublishRequest)
 	_args.Req = req
 	var _result publish.PublishServicePublishVideoResult
 	if err = p.c.Call(ctx, "publishVideo", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) PublishList(ctx context.Context, req *publish.PublishListRequest) (r *publish.PublishListResponse, err error) {
+	var _args publish.PublishServicePublishListArgs
+	_args.Req = req
+	var _result publish.PublishServicePublishListResult
+	if err = p.c.Call(ctx, "publishList", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -99,8 +99,21 @@ struct PublishActionResponse {
     2: optional string StatusMsg (api.body="status_msg"); // 返回状态描述
 }
 
+struct PublishListRequest {
+    1: required string Token (api.query="token"); // 登录用户设置
+    2: required i64 Id (api.query="id"); // 用户 id
+}
+
+struct PublishListResponse {
+    1: required i32 StatusCode (api.body="status_code"); // 状态码，0 - 成功，其他值 - 失败
+    2: optional string StatusMsg (api.body="status_msg"); // 返回状态描述
+    3: required list<Video> VideoList (api.body="video_list")
+}
+
+
 service PublishApi {
     PublishActionResponse publishAction(1: PublishActionRequest req) (api.post="/douyin/publish/action/");
+    PublishListResponse publishList(1: PublishListRequest req) (api.get="/douyin/publish/list/");
 }
 
 /*==================================================================

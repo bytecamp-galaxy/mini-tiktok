@@ -10,7 +10,7 @@ import (
 
 	"github.com/apache/thrift/lib/go/thrift"
 
-	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
+	"github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/rpcmodel"
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 
@@ -50,6 +50,20 @@ func (p *FeedRequest) FastRead(buf []byte) (int, error) {
 		case 1:
 			if fieldTypeId == thrift.I64 {
 				l, err = p.FastReadField1(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -109,6 +123,19 @@ func (p *FeedRequest) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *FeedRequest) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		p.Uid = &v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *FeedRequest) FastWrite(buf []byte) int {
 	return 0
@@ -119,6 +146,7 @@ func (p *FeedRequest) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWri
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "FeedRequest")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -130,6 +158,7 @@ func (p *FeedRequest) BLength() int {
 	l += bthrift.Binary.StructBeginLength("FeedRequest")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -147,11 +176,33 @@ func (p *FeedRequest) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWri
 	return offset
 }
 
+func (p *FeedRequest) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	if p.IsSetUid() {
+		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "uid", thrift.I64, 2)
+		offset += bthrift.Binary.WriteI64(buf[offset:], *p.Uid)
+
+		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	}
+	return offset
+}
+
 func (p *FeedRequest) field1Length() int {
 	l := 0
 	if p.IsSetLatestTime() {
 		l += bthrift.Binary.FieldBeginLength("LatestTime", thrift.I64, 1)
 		l += bthrift.Binary.I64Length(*p.LatestTime)
+
+		l += bthrift.Binary.FieldEndLength()
+	}
+	return l
+}
+
+func (p *FeedRequest) field2Length() int {
+	l := 0
+	if p.IsSetUid() {
+		l += bthrift.Binary.FieldBeginLength("uid", thrift.I64, 2)
+		l += bthrift.Binary.I64Length(*p.Uid)
 
 		l += bthrift.Binary.FieldEndLength()
 	}
