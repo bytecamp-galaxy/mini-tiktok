@@ -29,7 +29,7 @@ func _actionMw() []app.HandlerFunc {
 
 func _comment_ctionMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
 
 func _listMw() []app.HandlerFunc {
@@ -39,7 +39,7 @@ func _listMw() []app.HandlerFunc {
 
 func _commentlistMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
 
 func _favoriteMw() []app.HandlerFunc {

@@ -7,6 +7,8 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
+	"github.com/cloudwego/kitex/pkg/kerrors"
 	"time"
 )
 
@@ -25,12 +27,12 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					UserID:  req.UserId,
 					Content: *req.CommentText,
 				}
-				err = tx.Comment.WithContext(ctx).Create(&c)
+				err = tx.Comment.WithContext(ctx).Preload(tx.Comment.User).Create(&c)
 				if err != nil {
 					return err
 				}
 				v := tx.Video
-				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
+				_, err = v.WithContext(ctx).Preload(v.Author).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
 				if err != nil {
 					return err
 				}
@@ -39,7 +41,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					StatusCode: 0,
 					Comment: &rpcmodel.Comment{
 						Id:         c.ID,
-						User:       nil,
+						User:       Po2voUser(c.User),
 						Content:    c.Content,
 						CreateDate: time.Unix(c.CreatedAt, 0).String(),
 					},
@@ -48,13 +50,13 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 		case 2:
 			{
 				c := tx.Comment
-				_, err = c.WithContext(ctx).Where(c.ID.Eq(*req.CommentId)).Delete()
+				_, err = c.WithContext(ctx).Preload(c.User).Where(c.ID.Eq(*req.CommentId)).Delete()
 				if err != nil {
 					return err
 				}
 
 				v := tx.Video
-				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
+				_, err = v.WithContext(ctx).Preload(v.Author).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
 				if err != nil {
 					return err
 				}
@@ -70,12 +72,9 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 	})
 
 	if err != nil {
-		resp = &comment.CommentActionResponse{
-			StatusCode: -1, //TODO(heiyan): return more meaningful status code.
-		}
-		return resp, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
-	return resp, err
+	return resp, nil
 }
 
 // CommentList implements the CommentServiceImpl interface.
@@ -104,28 +103,23 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 	})
 
 	if err != nil {
-		return &comment.CommentListResponse{
-			StatusCode:  -1,
-			StatusMsg:   nil,
-			CommentList: nil,
-		}, err
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
-
-	return resp, err
+	return resp, nil
 }
 
 func Po2voComment(commentPO model.Comment) rpcmodel.Comment {
 	userVO := Po2voUser(commentPO.User)
 	return rpcmodel.Comment{
 		Id:         commentPO.ID,
-		User:       &userVO,
+		User:       userVO,
 		Content:    commentPO.Content,
 		CreateDate: time.Unix(commentPO.CreatedAt, 0).String(),
 	}
 }
 
-func Po2voUser(userPO model.User) rpcmodel.User {
-	return rpcmodel.User{
+func Po2voUser(userPO model.User) *rpcmodel.User {
+	return &rpcmodel.User{
 		Id:            userPO.ID,
 		Name:          userPO.Username,
 		FollowCount:   userPO.FollowingCount,

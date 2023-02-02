@@ -6,12 +6,16 @@ import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/comment"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/marmotedu/errors"
 )
 
 // CommentAction .
@@ -23,20 +27,14 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 	// bind and validate request.
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
 	// fetch user_id from token
 	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
@@ -51,31 +49,26 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 	// set up connection with comment server
 	cli, err := rpc.InitCommentClient()
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
 	}
 
 	respRPC, err := (*cli).CommentAction(ctx, reqRPC)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
-	}
-
-	if respRPC.StatusCode != 0 {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: respRPC.StatusCode,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
 	}
 
 	resp := &api.CommentActionResponse{
-		StatusCode: 0,
-		StatusMsg:  respRPC.StatusMsg,
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
 		Comment:    ConvertCommentModel(respRPC.Comment),
 	}
 
@@ -149,6 +142,9 @@ func ConvertUserModel(modelRPC *rpcmodel.User) *api.User {
 }
 
 func ConvertCommentModel(modelRPC *rpcmodel.Comment) *api.Comment {
+	if modelRPC == nil {
+		return nil
+	}
 	return &api.Comment{
 		Id:         modelRPC.Id,
 		User:       ConvertUserModel(modelRPC.User),
