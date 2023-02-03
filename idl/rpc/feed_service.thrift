@@ -4,7 +4,7 @@ include "rpcmodel.thrift"
 
 struct FeedRequest {
     1: optional i64 LatestTime; // 可选参数，限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间
-    2: optional i64 uid; // 可选参数，用户参数。当此字段设置时，需要返回用户视频的点赞信息
+    2: required i64 uid; // 用户参数。未设置时，为负数；当此字段设置时，需要返回用户视频的点赞信息
 }
 
 // 例如当前请求的 latest_time 为 9:00，那么返回的视频列表时间戳为 [8:55, 7:40, 6:30, 6:00]

@@ -10,7 +10,7 @@ import (
 
 	"github.com/apache/thrift/lib/go/thrift"
 
-	"github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/rpcmodel"
+	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 
@@ -31,6 +31,7 @@ func (p *FeedRequest) FastRead(buf []byte) (int, error) {
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetUid bool = false
 	_, l, err = bthrift.Binary.ReadStructBegin(buf)
 	offset += l
 	if err != nil {
@@ -68,6 +69,7 @@ func (p *FeedRequest) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
+				issetUid = true
 			} else {
 				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -95,6 +97,10 @@ func (p *FeedRequest) FastRead(buf []byte) (int, error) {
 		goto ReadStructEndError
 	}
 
+	if !issetUid {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
 	return offset, nil
 ReadStructBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -108,6 +114,8 @@ ReadFieldEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return offset, thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FeedRequest[fieldId]))
 }
 
 func (p *FeedRequest) FastReadField1(buf []byte) (int, error) {
@@ -130,7 +138,8 @@ func (p *FeedRequest) FastReadField2(buf []byte) (int, error) {
 		return offset, err
 	} else {
 		offset += l
-		p.Uid = &v
+
+		p.Uid = v
 
 	}
 	return offset, nil
@@ -178,12 +187,10 @@ func (p *FeedRequest) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWri
 
 func (p *FeedRequest) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	if p.IsSetUid() {
-		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "uid", thrift.I64, 2)
-		offset += bthrift.Binary.WriteI64(buf[offset:], *p.Uid)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "uid", thrift.I64, 2)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.Uid)
 
-		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	}
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
 }
 
@@ -200,12 +207,10 @@ func (p *FeedRequest) field1Length() int {
 
 func (p *FeedRequest) field2Length() int {
 	l := 0
-	if p.IsSetUid() {
-		l += bthrift.Binary.FieldBeginLength("uid", thrift.I64, 2)
-		l += bthrift.Binary.I64Length(*p.Uid)
+	l += bthrift.Binary.FieldBeginLength("uid", thrift.I64, 2)
+	l += bthrift.Binary.I64Length(p.Uid)
 
-		l += bthrift.Binary.FieldEndLength()
-	}
+	l += bthrift.Binary.FieldEndLength()
 	return l
 }
 

@@ -3,7 +3,7 @@
 package feedservice
 
 import (
-	feed "github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/feed"
+	feed "github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	server "github.com/cloudwego/kitex/server"
 )
 

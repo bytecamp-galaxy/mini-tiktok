@@ -4,6 +4,7 @@ package api
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
@@ -31,7 +32,18 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	// get the latest time.
 	// if the latest time hasn't been passed as param, it's 0 by default.
 	latestTime := req.GetLatestTime()
-	// TODO(vgalaxy): use token
+	uid := int64(-1)
+
+	// if token is passed
+	if req.GetToken() != api.FeedRequest_Token_DEFAULT {
+		// fetch user id from token
+		userId, ok := c.Get(jwt.IdentityKey)
+		if !ok {
+			pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
+			return
+		}
+		uid = userId.(int64)
+	}
 
 	// set up connection with feed server
 	cli, err := rpc.InitFeedClient()
@@ -42,8 +54,10 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &feed.FeedRequest{
+		Uid:        uid,
 		LatestTime: &latestTime,
 	}
+
 	respRpc, err := (*cli).GetFeed(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {

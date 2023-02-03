@@ -10,7 +10,7 @@ import (
 
 	"github.com/apache/thrift/lib/go/thrift"
 
-	"github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/rpcmodel"
+	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 

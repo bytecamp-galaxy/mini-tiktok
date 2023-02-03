@@ -4,7 +4,7 @@ package publishservice
 
 import (
 	"context"
-	publish "github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/publish"
+	publish "github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )

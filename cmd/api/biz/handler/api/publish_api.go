@@ -90,13 +90,49 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.PublishListRequest
+
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
-	resp := new(api.PublishListResponse)
+	uid := req.GetId()
+	// set up connection with publish server
+	cli, err := rpc.InitPublishClient()
+	if err != nil {
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
+		return
+	}
+
+	// call rpc service
+	reqRpc := &publish.PublishListRequest{
+		Id: uid,
+	}
+
+	respRpc, err := (*cli).PublishList(ctx, reqRpc)
+	if err != nil {
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
+	}
+
+	// convert model.Videos to feed.Videos
+	respVideos := make([]*api.Video, len(respRpc.VideoList))
+	for i, video := range respRpc.VideoList {
+		respVideos[i] = utils.VideoConverterAPI(video)
+	}
+	resp := &api.PublishListResponse{
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
+		VideoList:  respVideos,
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

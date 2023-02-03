@@ -3385,7 +3385,7 @@ func (p *PublishActionResponse) String() string {
 
 type PublishListRequest struct {
 	Token string `thrift:"Token,1,required" json:"Token,required" query:"token,required"`
-	Id    int64  `thrift:"Id,2,required" json:"Id,required" query:"id,required"`
+	Id    int64  `thrift:"Id,2,required" json:"Id,required" query:"user_id,required"`
 }
 
 func NewPublishListRequest() *PublishListRequest {

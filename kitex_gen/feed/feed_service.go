@@ -6,12 +6,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/bytecamp-galaxy/mini-tiktok/scripts/kitex_gen/rpcmodel"
+	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 )
 
 type FeedRequest struct {
 	LatestTime *int64 `thrift:"LatestTime,1,optional" frugal:"1,optional,i64" json:"LatestTime,omitempty"`
-	Uid        *int64 `thrift:"uid,2,optional" frugal:"2,optional,i64" json:"uid,omitempty"`
+	Uid        int64  `thrift:"uid,2,required" frugal:"2,required,i64" json:"uid"`
 }
 
 func NewFeedRequest() *FeedRequest {
@@ -31,18 +31,13 @@ func (p *FeedRequest) GetLatestTime() (v int64) {
 	return *p.LatestTime
 }
 
-var FeedRequest_Uid_DEFAULT int64
-
 func (p *FeedRequest) GetUid() (v int64) {
-	if !p.IsSetUid() {
-		return FeedRequest_Uid_DEFAULT
-	}
-	return *p.Uid
+	return p.Uid
 }
 func (p *FeedRequest) SetLatestTime(val *int64) {
 	p.LatestTime = val
 }
-func (p *FeedRequest) SetUid(val *int64) {
+func (p *FeedRequest) SetUid(val int64) {
 	p.Uid = val
 }
 
@@ -55,14 +50,11 @@ func (p *FeedRequest) IsSetLatestTime() bool {
 	return p.LatestTime != nil
 }
 
-func (p *FeedRequest) IsSetUid() bool {
-	return p.Uid != nil
-}
-
 func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetUid bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -93,6 +85,7 @@ func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetUid = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -112,6 +105,10 @@ func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetUid {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -126,6 +123,8 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FeedRequest[fieldId]))
 }
 
 func (p *FeedRequest) ReadField1(iprot thrift.TProtocol) error {
@@ -141,7 +140,7 @@ func (p *FeedRequest) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.Uid = &v
+		p.Uid = v
 	}
 	return nil
 }
@@ -199,16 +198,14 @@ WriteFieldEndError:
 }
 
 func (p *FeedRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetUid() {
-		if err = oprot.WriteFieldBegin("uid", thrift.I64, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI64(*p.Uid); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	if err = oprot.WriteFieldBegin("uid", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Uid); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -251,14 +248,9 @@ func (p *FeedRequest) Field1DeepEqual(src *int64) bool {
 	}
 	return true
 }
-func (p *FeedRequest) Field2DeepEqual(src *int64) bool {
+func (p *FeedRequest) Field2DeepEqual(src int64) bool {
 
-	if p.Uid == src {
-		return true
-	} else if p.Uid == nil || src == nil {
-		return false
-	}
-	if *p.Uid != *src {
+	if p.Uid != src {
 		return false
 	}
 	return true
