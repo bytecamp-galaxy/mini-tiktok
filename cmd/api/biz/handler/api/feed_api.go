@@ -135,6 +135,4 @@ func JwtImpl(ctx context.Context, c *app.RequestContext) {
 		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
 		return
 	}
-
-	c.Next(ctx)
 }
