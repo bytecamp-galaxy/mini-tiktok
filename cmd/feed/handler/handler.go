@@ -26,12 +26,15 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	// query videos in db
 	q := query.Q
 	v := q.Video
+	u := q.User
+
+	// find user, if not found, user is nil
+	user, _ := u.WithContext(ctx).Where(u.ID.Eq(req.GetUserId())).Take()
 
 	// find latest 30 videos
-	viper := conf.Init()
 	videos, err := v.WithContext(ctx).
 		Preload(v.Author).
-		Limit(viper.GetInt("feed-server.default-limit")).
+		Limit(conf.Init().GetInt("feed-server.default-limit")).
 		Order(v.CreatedAt.Desc()).
 		Where(v.CreatedAt.Lt(latestTime)).
 		Find()
@@ -49,6 +52,11 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	// convert model.Videos to feed.Videos
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
+		isFavorite := false
+		// TODO: 如果用户登录状态下刷视频，如何高效的获取这些用户对刷到的视频的点赞信息？
+		if user != nil && u.FavoriteVideos.WithContext(ctx).Where(v.ID.Eq(video.ID)).Model(user).Count() != 0 {
+			isFavorite = true
+		}
 		author := video.Author
 		u := &rpcmodel.User{
 			Id:            author.ID,
@@ -64,7 +72,7 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 			CoverUrl:      video.CoverUrl,
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
-			IsFavorite:    false, // TODO: 如果用户登录状态下刷视频，如何高效的获取这些用户对刷到的视频的点赞信息？
+			IsFavorite:    isFavorite,
 			Title:         video.Title,
 		}
 	}

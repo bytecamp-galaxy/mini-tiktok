@@ -811,7 +811,7 @@ func (p *CommentListRequest) Field1DeepEqual(src int64) bool {
 }
 
 type CommentListResponse struct {
-	CommentList []*rpcmodel.Comment `thrift:"CommentList,1" frugal:"1,default,list<rpcmodel.Comment>" json:"CommentList"`
+	CommentList []*rpcmodel.Comment `thrift:"CommentList,1,required" frugal:"1,required,list<rpcmodel.Comment>" json:"CommentList"`
 }
 
 func NewCommentListResponse() *CommentListResponse {
@@ -837,6 +837,7 @@ func (p *CommentListResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetCommentList bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -857,6 +858,7 @@ func (p *CommentListResponse) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetCommentList = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -876,6 +878,10 @@ func (p *CommentListResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetCommentList {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -890,6 +896,8 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_CommentListResponse[fieldId]))
 }
 
 func (p *CommentListResponse) ReadField1(iprot thrift.TProtocol) error {

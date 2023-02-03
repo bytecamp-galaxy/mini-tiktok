@@ -11,6 +11,7 @@ import (
 
 type FeedRequest struct {
 	LatestTime *int64 `thrift:"LatestTime,1,optional" frugal:"1,optional,i64" json:"LatestTime,omitempty"`
+	UserId     *int64 `thrift:"UserId,2,optional" frugal:"2,optional,i64" json:"UserId,omitempty"`
 }
 
 func NewFeedRequest() *FeedRequest {
@@ -29,16 +30,33 @@ func (p *FeedRequest) GetLatestTime() (v int64) {
 	}
 	return *p.LatestTime
 }
+
+var FeedRequest_UserId_DEFAULT int64
+
+func (p *FeedRequest) GetUserId() (v int64) {
+	if !p.IsSetUserId() {
+		return FeedRequest_UserId_DEFAULT
+	}
+	return *p.UserId
+}
 func (p *FeedRequest) SetLatestTime(val *int64) {
 	p.LatestTime = val
+}
+func (p *FeedRequest) SetUserId(val *int64) {
+	p.UserId = val
 }
 
 var fieldIDToName_FeedRequest = map[int16]string{
 	1: "LatestTime",
+	2: "UserId",
 }
 
 func (p *FeedRequest) IsSetLatestTime() bool {
 	return p.LatestTime != nil
+}
+
+func (p *FeedRequest) IsSetUserId() bool {
+	return p.UserId != nil
 }
 
 func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -63,6 +81,16 @@ func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 		case 1:
 			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -109,6 +137,15 @@ func (p *FeedRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *FeedRequest) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.UserId = &v
+	}
+	return nil
+}
+
 func (p *FeedRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("FeedRequest"); err != nil {
@@ -117,6 +154,10 @@ func (p *FeedRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -157,6 +198,25 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *FeedRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if p.IsSetUserId() {
+		if err = oprot.WriteFieldBegin("UserId", thrift.I64, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI64(*p.UserId); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
 func (p *FeedRequest) String() string {
 	if p == nil {
 		return "<nil>"
@@ -171,6 +231,9 @@ func (p *FeedRequest) DeepEqual(ano *FeedRequest) bool {
 		return false
 	}
 	if !p.Field1DeepEqual(ano.LatestTime) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.UserId) {
 		return false
 	}
 	return true
@@ -188,9 +251,21 @@ func (p *FeedRequest) Field1DeepEqual(src *int64) bool {
 	}
 	return true
 }
+func (p *FeedRequest) Field2DeepEqual(src *int64) bool {
+
+	if p.UserId == src {
+		return true
+	} else if p.UserId == nil || src == nil {
+		return false
+	}
+	if *p.UserId != *src {
+		return false
+	}
+	return true
+}
 
 type FeedResponse struct {
-	VideoList []*rpcmodel.Video `thrift:"VideoList,1" frugal:"1,default,list<rpcmodel.Video>" json:"VideoList"`
+	VideoList []*rpcmodel.Video `thrift:"VideoList,1,required" frugal:"1,required,list<rpcmodel.Video>" json:"VideoList"`
 	NextTime  *int64            `thrift:"NextTime,2,optional" frugal:"2,optional,i64" json:"NextTime,omitempty"`
 }
 
@@ -234,6 +309,7 @@ func (p *FeedResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetVideoList bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -254,6 +330,7 @@ func (p *FeedResponse) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetVideoList = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -283,6 +360,10 @@ func (p *FeedResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetVideoList {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -297,6 +378,8 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FeedResponse[fieldId]))
 }
 
 func (p *FeedResponse) ReadField1(iprot thrift.TProtocol) error {

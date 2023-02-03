@@ -15,7 +15,7 @@ struct FavoriteListRequest {
 }
 
 struct FavoriteListResponse {
-    1: list<rpcmodel.Video> VideoList;
+    1: required list<rpcmodel.Video> VideoList;
 }
 
 service FavoriteService {

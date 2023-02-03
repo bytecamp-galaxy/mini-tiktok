@@ -19,7 +19,7 @@ struct CommentListRequest {
 }
 
 struct CommentListResponse {
-    1: list<rpcmodel.Comment> CommentList;
+    1: required list<rpcmodel.Comment> CommentList;
 }
 
 service CommentService {

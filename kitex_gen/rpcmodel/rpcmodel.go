@@ -823,14 +823,14 @@ func (p *Comment) Field4DeepEqual(src string) bool {
 }
 
 type Video struct {
-	Id            int64  `thrift:"Id,1" frugal:"1,default,i64" json:"Id"`
-	Author        *User  `thrift:"author,2" frugal:"2,default,User" json:"author"`
-	PlayUrl       string `thrift:"PlayUrl,3" frugal:"3,default,string" json:"PlayUrl"`
-	CoverUrl      string `thrift:"CoverUrl,4" frugal:"4,default,string" json:"CoverUrl"`
-	FavoriteCount int64  `thrift:"FavoriteCount,5" frugal:"5,default,i64" json:"FavoriteCount"`
-	CommentCount  int64  `thrift:"CommentCount,6" frugal:"6,default,i64" json:"CommentCount"`
-	IsFavorite    bool   `thrift:"IsFavorite,7" frugal:"7,default,bool" json:"IsFavorite"`
-	Title         string `thrift:"Title,8" frugal:"8,default,string" json:"Title"`
+	Id            int64  `thrift:"Id,1,required" frugal:"1,required,i64" json:"Id"`
+	Author        *User  `thrift:"author,2,required" frugal:"2,required,User" json:"author"`
+	PlayUrl       string `thrift:"PlayUrl,3,required" frugal:"3,required,string" json:"PlayUrl"`
+	CoverUrl      string `thrift:"CoverUrl,4,required" frugal:"4,required,string" json:"CoverUrl"`
+	FavoriteCount int64  `thrift:"FavoriteCount,5,required" frugal:"5,required,i64" json:"FavoriteCount"`
+	CommentCount  int64  `thrift:"CommentCount,6,required" frugal:"6,required,i64" json:"CommentCount"`
+	IsFavorite    bool   `thrift:"IsFavorite,7,required" frugal:"7,required,bool" json:"IsFavorite"`
+	Title         string `thrift:"Title,8,required" frugal:"8,required,string" json:"Title"`
 }
 
 func NewVideo() *Video {
@@ -921,6 +921,14 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetId bool = false
+	var issetAuthor bool = false
+	var issetPlayUrl bool = false
+	var issetCoverUrl bool = false
+	var issetFavoriteCount bool = false
+	var issetCommentCount bool = false
+	var issetIsFavorite bool = false
+	var issetTitle bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -941,6 +949,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetId = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -951,6 +960,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetAuthor = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -961,6 +971,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetPlayUrl = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -971,6 +982,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetCoverUrl = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -981,6 +993,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetFavoriteCount = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -991,6 +1004,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetCommentCount = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -1001,6 +1015,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetIsFavorite = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -1011,6 +1026,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetTitle = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -1030,6 +1046,45 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetId {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetAuthor {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPlayUrl {
+		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCoverUrl {
+		fieldId = 4
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetFavoriteCount {
+		fieldId = 5
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCommentCount {
+		fieldId = 6
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetIsFavorite {
+		fieldId = 7
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetTitle {
+		fieldId = 8
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -1044,6 +1099,8 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_Video[fieldId]))
 }
 
 func (p *Video) ReadField1(iprot thrift.TProtocol) error {

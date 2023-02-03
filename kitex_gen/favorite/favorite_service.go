@@ -580,7 +580,7 @@ func (p *FavoriteListRequest) Field1DeepEqual(src int64) bool {
 }
 
 type FavoriteListResponse struct {
-	VideoList []*rpcmodel.Video `thrift:"VideoList,1" frugal:"1,default,list<rpcmodel.Video>" json:"VideoList"`
+	VideoList []*rpcmodel.Video `thrift:"VideoList,1,required" frugal:"1,required,list<rpcmodel.Video>" json:"VideoList"`
 }
 
 func NewFavoriteListResponse() *FavoriteListResponse {
@@ -606,6 +606,7 @@ func (p *FavoriteListResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetVideoList bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -626,6 +627,7 @@ func (p *FavoriteListResponse) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetVideoList = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -645,6 +647,10 @@ func (p *FavoriteListResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetVideoList {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -659,6 +665,8 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FavoriteListResponse[fieldId]))
 }
 
 func (p *FavoriteListResponse) ReadField1(iprot thrift.TProtocol) error {

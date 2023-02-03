@@ -3,29 +3,29 @@ namespace go user
 include "rpcmodel.thrift"
 
 struct UserRegisterRequest {
-    1: string Username;
-    2: string Password;
+    1: required string Username;
+    2: required string Password;
 }
 
 struct UserRegisterResponse {
-    1: i64 UserId;
+    1: required i64 UserId;
 }
 
 struct UserLoginRequest {
-    1: string Username;
-    2: string Password;
+    1: required string Username;
+    2: required string Password;
 }
 
 struct UserLoginResponse {
-    1: i64 UserId;
+    1: required i64 UserId;
 }
 
 struct UserQueryRequest {
-    1: i64 UserId;
+    1: required i64 UserId;
 }
 
 struct UserQueryResponse {
-    1: rpcmodel.User User;
+    1: required rpcmodel.User User;
 }
 
 service UserService {

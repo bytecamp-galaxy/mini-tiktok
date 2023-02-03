@@ -25,6 +25,7 @@ func doFavorite(ctx context.Context, uid int64, vid int64) error {
 			return err
 		}
 
+		// TODO(vgalaxy): avoid insert video again
 		err = tx.User.FavoriteVideos.WithContext(ctx).Model(u).Append(v)
 		if err != nil {
 			return err
