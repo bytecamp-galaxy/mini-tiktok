@@ -99,11 +99,15 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 
 // PublishList implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
-	uid := req.GetId()
+	uid := req.GetUserId()
 
 	// query videos in db
 	q := query.Q
 	v := q.Video
+	u := q.User
+
+	// find user, if not found, user is nil
+	user, _ := u.WithContext(ctx).Where(u.ID.Eq(uid)).Take()
 
 	videos, err := v.WithContext(ctx).Preload(v.Author).Order(v.CreatedAt.Desc()).Where(v.AuthorID.Eq(uid)).Find()
 	if err != nil {
@@ -112,7 +116,7 @@ func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.Publi
 
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = pack.VideoConverterORM(video)
+		respVideos[i] = pack.VideoConverterORM(ctx, q, video, user)
 	}
 
 	resp = &publish.PublishListResponse{

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -52,6 +53,9 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 
 	// convert model.Videos to rpcmodel.Videos
 	respVideos := make([]*rpcmodel.Video, len(videos))
+	for i, video := range videos {
+		respVideos[i] = pack.VideoConverterORM(ctx, q, video, user)
+	}
 	for i, video := range videos {
 		isFavorite := false
 		// TODO: 如果用户登录状态下刷视频，如何高效的获取这些用户对刷到的视频的点赞信息？

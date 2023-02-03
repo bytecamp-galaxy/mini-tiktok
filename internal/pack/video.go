@@ -1,9 +1,11 @@
 package pack
 
 import (
+	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 )
 
 // VideoConverterAPI convert *rpcmodel.Video to *api.Video
@@ -30,14 +32,19 @@ func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
 }
 
 // VideoConverterORM convert *model.Videos to *rpcmodel.Videos
-func VideoConverterORM(video *model.Video) *rpcmodel.Video {
+func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, user *model.User) *rpcmodel.Video {
+	isFavorite := false
+	// TODO: 如果用户登录状态下刷视频，如何高效的获取这些用户对刷到的视频的点赞信息？
+	if user != nil && q.User.FavoriteVideos.WithContext(ctx).Where(q.Video.ID.Eq(video.ID)).Model(user).Count() != 0 {
+		isFavorite = true
+	}
 	author := video.Author
 	u := &rpcmodel.User{
 		Id:            author.ID,
 		Name:          author.Username,
 		FollowCount:   author.FollowingCount,
 		FollowerCount: author.FollowerCount,
-		IsFollow:      false,
+		IsFollow:      false, // TODO
 	}
 	res := &rpcmodel.Video{
 		Id:            video.ID,
@@ -46,7 +53,7 @@ func VideoConverterORM(video *model.Video) *rpcmodel.Video {
 		CoverUrl:      video.CoverUrl,
 		FavoriteCount: video.FavoriteCount,
 		CommentCount:  video.CommentCount,
-		IsFavorite:    false,
+		IsFavorite:    isFavorite,
 		Title:         video.Title,
 	}
 	return res

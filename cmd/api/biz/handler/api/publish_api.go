@@ -111,7 +111,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &publish.PublishListRequest{
-		Id: uid,
+		UserId: uid,
 	}
 
 	respRpc, err := (*cli).PublishList(ctx, reqRpc)
