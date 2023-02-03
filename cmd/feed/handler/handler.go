@@ -17,6 +17,7 @@ type FeedServiceImpl struct{}
 // GetFeed implements the FeedServiceImpl interface. get 30 latest videos with db
 func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
 	latestTime := req.GetLatestTime()
+
 	// if there isn't latestTime, use current time
 	if latestTime == 0 {
 		curTime := time.Now().UnixMilli()
@@ -49,7 +50,7 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 		nextTime = videos[len(videos)-1].CreatedAt
 	}
 
-	// convert model.Videos to feed.Videos
+	// convert model.Videos to rpcmodel.Videos
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
 		isFavorite := false

@@ -11,7 +11,7 @@ import (
 
 type FeedRequest struct {
 	LatestTime *int64 `thrift:"LatestTime,1,optional" frugal:"1,optional,i64" json:"LatestTime,omitempty"`
-	UserId     *int64 `thrift:"UserId,2,optional" frugal:"2,optional,i64" json:"UserId,omitempty"`
+	UserId     int64  `thrift:"UserId,2,required" frugal:"2,required,i64" json:"UserId"`
 }
 
 func NewFeedRequest() *FeedRequest {
@@ -31,18 +31,13 @@ func (p *FeedRequest) GetLatestTime() (v int64) {
 	return *p.LatestTime
 }
 
-var FeedRequest_UserId_DEFAULT int64
-
 func (p *FeedRequest) GetUserId() (v int64) {
-	if !p.IsSetUserId() {
-		return FeedRequest_UserId_DEFAULT
-	}
-	return *p.UserId
+	return p.UserId
 }
 func (p *FeedRequest) SetLatestTime(val *int64) {
 	p.LatestTime = val
 }
-func (p *FeedRequest) SetUserId(val *int64) {
+func (p *FeedRequest) SetUserId(val int64) {
 	p.UserId = val
 }
 
@@ -55,14 +50,11 @@ func (p *FeedRequest) IsSetLatestTime() bool {
 	return p.LatestTime != nil
 }
 
-func (p *FeedRequest) IsSetUserId() bool {
-	return p.UserId != nil
-}
-
 func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetUserId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -93,6 +85,7 @@ func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetUserId = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -112,6 +105,10 @@ func (p *FeedRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetUserId {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -126,6 +123,8 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_FeedRequest[fieldId]))
 }
 
 func (p *FeedRequest) ReadField1(iprot thrift.TProtocol) error {
@@ -141,7 +140,7 @@ func (p *FeedRequest) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.UserId = &v
+		p.UserId = v
 	}
 	return nil
 }
@@ -199,16 +198,14 @@ WriteFieldEndError:
 }
 
 func (p *FeedRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetUserId() {
-		if err = oprot.WriteFieldBegin("UserId", thrift.I64, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI64(*p.UserId); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	if err = oprot.WriteFieldBegin("UserId", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UserId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -251,14 +248,9 @@ func (p *FeedRequest) Field1DeepEqual(src *int64) bool {
 	}
 	return true
 }
-func (p *FeedRequest) Field2DeepEqual(src *int64) bool {
+func (p *FeedRequest) Field2DeepEqual(src int64) bool {
 
-	if p.UserId == src {
-		return true
-	} else if p.UserId == nil || src == nil {
-		return false
-	}
-	if *p.UserId != *src {
+	if p.UserId != src {
 		return false
 	}
 	return true

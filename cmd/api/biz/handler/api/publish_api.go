@@ -8,6 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
+	pack2 "github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -33,21 +34,21 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	// get .mp4 data
 	file, err := fileHeader.Open()
 	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrOpenFormFile, err.Error()))
 		return
 	}
 	defer file.Close()
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrEncodingFailed, err.Error()))
 		return
 	}
 
 	// fetch user id from token
 	userId, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
@@ -82,6 +83,59 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	resp := &api.PublishActionResponse{
 		StatusCode: errno.ErrSuccess,
 		StatusMsg:  utils.String(pack.SuccessStatusMessage),
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// PublishList .
+// @router /douyin/publish/list/ [GET]
+func PublishList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.PublishListRequest
+
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
+		return
+	}
+
+	uid := req.GetId()
+	// set up connection with publish server
+	v := conf.Init()
+	cli, err := rpc.InitPublishClient(v.GetString("api-server.name"))
+	if err != nil {
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
+		return
+	}
+
+	// call rpc service
+	reqRpc := &publish.PublishListRequest{
+		Id: uid,
+	}
+
+	respRpc, err := (*cli).PublishList(ctx, reqRpc)
+	if err != nil {
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			// assume
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
+	}
+
+	// convert model.Videos to feed.Videos
+	respVideos := make([]*api.Video, len(respRpc.VideoList))
+	for i, video := range respRpc.VideoList {
+		respVideos[i] = pack2.VideoConverterAPI(video)
+	}
+	resp := &api.PublishListResponse{
+		StatusCode: errno.ErrSuccess,
+		StatusMsg:  utils.String(pack.SuccessStatusMessage),
+		VideoList:  respVideos,
 	}
 
 	c.JSON(consts.StatusOK, resp)

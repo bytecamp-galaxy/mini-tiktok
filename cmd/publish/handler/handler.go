@@ -3,8 +3,10 @@ package handler
 import (
 	"bytes"
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
+	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
@@ -39,13 +41,13 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	// 上传视频
 	err = minio.UploadFile(videoBucketName, fileName, reader, int64(len(videoData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取视频链接
 	playUrl, err := minio.GetFileUrl(videoBucketName, fileName, 0)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取封面
@@ -53,26 +55,26 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	coverPath := coverUid.String() + "." + "jpg"
 	coverData, err := utils.ReadFrameAsJpeg(playUrl.String())
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrEncodingFailed), err.Error())
 	}
 
 	// 上传封面
 	coverReader := bytes.NewReader(coverData)
 	err = minio.UploadFile(coverBucketName, coverPath, coverReader, int64(len(coverData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取封面链接
 	coverUrl, err := minio.GetFileUrl(coverBucketName, coverPath, 0)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取 user
 	author, err := getAuthorInfo(ctx, authorId)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRPCMutualCall), err.Error())
 	}
 
 	// 封装 video
@@ -92,6 +94,30 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 
 	// response to publish server
 	resp = &publish.PublishResponse{}
+	return resp, nil
+}
+
+// PublishList implements the PublishServiceImpl interface.
+func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
+	uid := req.GetId()
+
+	// query videos in db
+	q := query.Q
+	v := q.Video
+
+	videos, err := v.WithContext(ctx).Preload(v.Author).Order(v.CreatedAt.Desc()).Where(v.AuthorID.Eq(uid)).Find()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+
+	respVideos := make([]*rpcmodel.Video, len(videos))
+	for i, video := range videos {
+		respVideos[i] = pack.VideoConverterORM(video)
+	}
+
+	resp = &publish.PublishListResponse{
+		VideoList: respVideos,
+	}
 	return resp, nil
 }
 

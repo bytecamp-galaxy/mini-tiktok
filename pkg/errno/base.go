@@ -12,6 +12,9 @@ const (
 	// ErrTokenGeneration - 500: Error occurred while generating token.
 	ErrTokenGeneration
 
+	// ErrParseToken - 500: Error occurred while parsing sth from token.
+	ErrParseToken
+
 	// ErrBindAndValidation - 400: Error occurred while binding the request body to the struct or validation failed.
 	ErrBindAndValidation
 
@@ -35,4 +38,16 @@ const (
 
 	// ErrRPCLink - 500: RPC service link error.
 	ErrRPCLink
+
+	// ErrRPCMutualCall - 500: RPC mutual call error.
+	ErrRPCMutualCall
+
+	// ErrEncodingFailed - 500: Encoding failed.
+	ErrEncodingFailed
+
+	// ErrMinio - 500: Minio error.
+	ErrMinio
+
+	// ErrOpenFormFile - 500: Open request's form file error.
+	ErrOpenFormFile
 )

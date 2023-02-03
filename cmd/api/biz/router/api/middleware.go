@@ -74,7 +74,7 @@ func _feedMw() []app.HandlerFunc {
 
 func _getfeedMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
 
 func _publishMw() []app.HandlerFunc {
@@ -120,4 +120,14 @@ func _registerMw() []app.HandlerFunc {
 func _userregisterMw() []app.HandlerFunc {
 	// your code...
 	return nil
+}
+
+func _list1Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _publishlistMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
