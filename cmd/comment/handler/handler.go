@@ -27,13 +27,21 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					UserID:  req.UserId,
 					Content: *req.CommentText,
 				}
-				err = tx.Comment.WithContext(ctx).Preload(tx.Comment.User).Create(&c)
+				err = tx.Comment.WithContext(ctx).Create(&c)
 				if err != nil {
 					return err
 				}
 
 				v := tx.Video
-				_, err = v.WithContext(ctx).Preload(v.Author).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
+				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
+				if err != nil {
+					return err
+				}
+
+				u := tx.User
+				data, err := u.WithContext(ctx).
+					Where(u.ID.Eq(req.UserId)).
+					Take()
 				if err != nil {
 					return err
 				}
@@ -41,7 +49,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 				resp = &comment.CommentActionResponse{
 					Comment: &rpcmodel.Comment{
 						Id:         c.ID,
-						User:       Po2voUser(c.User),
+						User:       Po2voUser(*data),
 						Content:    c.Content,
 						CreateDate: time.Unix(c.CreatedAt, 0).String(),
 					},
@@ -50,13 +58,13 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 		case 2:
 			{
 				c := tx.Comment
-				_, err = c.WithContext(ctx).Preload(c.User).Where(c.ID.Eq(*req.CommentId)).Delete()
+				_, err = c.WithContext(ctx).Where(c.ID.Eq(*req.CommentId)).Delete()
 				if err != nil {
 					return err
 				}
 
 				v := tx.Video
-				_, err = v.WithContext(ctx).Preload(v.Author).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
+				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
 				if err != nil {
 					return err
 				}

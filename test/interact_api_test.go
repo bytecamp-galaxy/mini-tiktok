@@ -69,6 +69,7 @@ func TestComment(t *testing.T) {
 		JSON().Object()
 	addCommentResp.Value("status_code").Number().Equal(0)
 	addCommentResp.Value("comment").Object().Value("id").Number().Gt(0)
+	addCommentResp.Value("comment").Object().Value("user").Object().Value("id").Number().Gt(0)
 	commentId := int64(addCommentResp.Value("comment").Object().Value("id").Number().Raw())
 
 	commentListResp := e.GET("/douyin/comment/list/").
@@ -83,6 +84,7 @@ func TestComment(t *testing.T) {
 		comment := element.Object()
 		comment.ContainsKey("id")
 		comment.ContainsKey("user")
+		comment.Value("user").Object().Value("id").NotEqual(0)
 		comment.Value("content").String().NotEmpty()
 		comment.Value("create_date").String().NotEmpty()
 		if int64(comment.Value("id").Number().Raw()) == commentId {
