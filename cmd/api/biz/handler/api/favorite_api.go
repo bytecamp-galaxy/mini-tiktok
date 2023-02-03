@@ -80,17 +80,18 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	uid, ok := c.Get(jwt.IdentityKey)
+	_, ok := c.Get(jwt.IdentityKey)
 	if !ok {
 		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
 	// check user id
-	if uid != req.UserId {
-		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, "inconsistent user id"))
-		return
-	}
+	//if uid != req.UserId {
+	//	fmt.Println(uid, req.UserId)
+	//	pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, "inconsistent user id"))
+	//	return
+	//}
 
 	// set up connection with comment server
 	v := conf.Init()

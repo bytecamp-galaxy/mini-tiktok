@@ -17,7 +17,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/cloudwego/hertz/pkg/network/netpoll"
+	"github.com/cloudwego/hertz/pkg/network/standard"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/obs-opentelemetry/provider"
@@ -69,7 +69,8 @@ func main() {
 	tracer, cfg := tracing.NewServerTracer()
 	h := server.New(
 		server.WithHostPorts(serverAddr),
-		server.WithTransport(netpoll.NewTransporter),
+		server.WithStreamBody(true),
+		server.WithTransport(standard.NewTransporter),
 		server.WithExitWaitTime(time.Duration(v.GetInt("api-server.exit-wait-time"))*time.Second),
 		server.WithRegistry(r, &registry.Info{
 			ServiceName: v.GetString("api-server.name"),
