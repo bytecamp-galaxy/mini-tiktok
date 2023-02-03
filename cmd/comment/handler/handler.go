@@ -81,7 +81,10 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 	err = q.Transaction(func(tx *query.Query) error {
 		c := tx.Comment
 		var comments []*model.Comment
-		comments, err = c.WithContext(ctx).Where(c.VideoID.Eq(req.VideoId)).Find()
+		comments, err = c.WithContext(ctx).
+			Preload(c.User).
+			Where(c.VideoID.Eq(req.VideoId)).
+			Find()
 
 		if err != nil {
 			return err
