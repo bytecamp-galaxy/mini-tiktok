@@ -141,7 +141,7 @@ struct CommentListRequest {
 struct CommentListResponse {
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
-    3: list<Comment> CommentList (api.body="comment_list");
+    3: required list<Comment> CommentList (api.body="comment_list");
 }
 
 struct Comment {
@@ -178,10 +178,52 @@ struct FavoriteListRequest {
 struct FavoriteListResponse {
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
-    3: list<Video> VideoList (api.body="video_list");
+    3: required list<Video> VideoList (api.body="video_list");
 }
 
 service FavoriteApi {
     FavoriteActionResponse favoriteAction(1: FavoriteActionRequest req) (api.post="/douyin/favorite/action/"); // 点赞 / 取消点赞
     FavoriteListResponse favoriteList(1: FavoriteListRequest req) (api.get="/douyin/favorite/list/"); // 点赞视频列表
+}
+
+/*==================================================================
+                        Relation Service
+====================================================================*/
+struct RelationActionRequest {
+    1: required string Token (api.query="token"); // 鉴权
+    2: required i64 ToUserId (api.query="to_user_id");
+    3: required i32 ActionType (api.query="action_type", api.vd="$ == 1 || $ == 2");
+}
+
+struct RelationActionResponse {
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+}
+
+struct RelationFollowListRequest {
+    1: required string Token (api.query="token");
+    2: required i64 UserId (api.query="user_id");
+}
+
+struct RelationFollowListResponse {
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+    3: required list<User> UserList (api.body="user_list");
+}
+
+struct RelationFollowerListRequest {
+    1: required string Token (api.query="token");
+    2: required i64 UserId (api.query="user_id");
+}
+
+struct RelationFollowerListResponse {
+    1: required i32 StatusCode (api.body="status_code");
+    2: optional string StatusMsg (api.body="status_msg");
+    3: required list<User> UserList (api.body="user_list");
+}
+
+service RelationApi {
+    RelationActionResponse relationAction(1: RelationActionRequest req) (api.post="/douyin/relation/action/");
+    RelationFollowListResponse relationFollowList(1: RelationFollowListRequest req) (api.get="/douyin/relation/follow/list/");
+    RelationFollowerListResponse relationFollowerList(1: RelationFollowerListRequest req) (api.get="/douyin/relation/follower/list/");
 }

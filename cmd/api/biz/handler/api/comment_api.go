@@ -82,7 +82,7 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CommentListRequest
 
-	// step1: bind and validate request.
+	// bind and validate request.
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
@@ -111,13 +111,13 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	list := make([]*api.Comment, len(respRPC.CommentList))
-
 	for i, c := range respRPC.CommentList {
 		list[i] = convert.CommentConverterAPI(c)
 	}
 
 	resp := &api.CommentListResponse{
-		StatusCode:  0,
+		StatusCode:  errno.ErrSuccess,
+		StatusMsg:   utils.String(pack.SuccessStatusMessage),
 		CommentList: list,
 	}
 

@@ -135,3 +135,48 @@ func _publishlistMw() []app.HandlerFunc {
 	// your code...
 	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
 }
+
+func _relationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _action2Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _relation_ctionMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
+}
+
+func _followMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _list2Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _relationfollowlistMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
+}
+
+func _followerMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _list3Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _relationfollowerlistMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFunc()}
+}

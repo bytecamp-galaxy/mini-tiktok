@@ -13,6 +13,7 @@ COPY cmd cmd
 COPY kitex_gen kitex_gen
 COPY configs configs
 COPY pkg pkg
+COPY internal internal
 
 WORKDIR /root/cmd/user
 RUN chmod +x build.sh
