@@ -14,7 +14,8 @@ func newExpect(t *testing.T) *httpexpect.Expect {
 		BaseURL:  fmt.Sprintf("http://127.0.0.1:8080"), // TODO(vgalaxy): config
 		Reporter: httpexpect.NewAssertReporter(t),
 		Printers: []httpexpect.Printer{
-			httpexpect.NewDebugPrinter(t, false),
+			// httpexpect.NewDebugPrinter(t, false),
+			httpexpect.NewCompactPrinter(t),
 		},
 	})
 }

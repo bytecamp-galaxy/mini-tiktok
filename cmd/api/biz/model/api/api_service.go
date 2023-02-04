@@ -3384,8 +3384,8 @@ func (p *PublishActionResponse) String() string {
 }
 
 type PublishListRequest struct {
-	Token string `thrift:"Token,1,required" json:"Token,required" query:"token,required"`
-	Id    int64  `thrift:"Id,2,required" json:"Id,required" query:"user_id,required"`
+	Token  string `thrift:"Token,1,required" json:"Token,required" query:"token,required"`
+	UserId int64  `thrift:"UserId,2,required" json:"UserId,required" query:"user_id,required"`
 }
 
 func NewPublishListRequest() *PublishListRequest {
@@ -3396,13 +3396,13 @@ func (p *PublishListRequest) GetToken() (v string) {
 	return p.Token
 }
 
-func (p *PublishListRequest) GetId() (v int64) {
-	return p.Id
+func (p *PublishListRequest) GetUserId() (v int64) {
+	return p.UserId
 }
 
 var fieldIDToName_PublishListRequest = map[int16]string{
 	1: "Token",
-	2: "Id",
+	2: "UserId",
 }
 
 func (p *PublishListRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -3410,7 +3410,7 @@ func (p *PublishListRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetToken bool = false
-	var issetId bool = false
+	var issetUserId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -3442,7 +3442,7 @@ func (p *PublishListRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetId = true
+				issetUserId = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -3467,7 +3467,7 @@ func (p *PublishListRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetId {
+	if !issetUserId {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -3502,7 +3502,7 @@ func (p *PublishListRequest) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.Id = v
+		p.UserId = v
 	}
 	return nil
 }
@@ -3558,10 +3558,10 @@ WriteFieldEndError:
 }
 
 func (p *PublishListRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("Id", thrift.I64, 2); err != nil {
+	if err = oprot.WriteFieldBegin("UserId", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Id); err != nil {
+	if err := oprot.WriteI64(p.UserId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

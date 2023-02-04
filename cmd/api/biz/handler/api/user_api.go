@@ -148,19 +148,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// fetch user id from token
-	id, ok := c.Get(jwt.IdentityKey)
-	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
-		return
-	}
-
-	// check user id
-	if id != req.UserId {
-		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, "inconsistent user id"))
-		return
-	}
-
 	// set up connection with user server
 	v := conf.Init()
 	cli, err := rpc.InitUserClient(v.GetString("api-server.name"))

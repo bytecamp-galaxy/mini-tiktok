@@ -10,20 +10,20 @@ import (
 )
 
 func InitHLogger() {
-	hlog.SetLogger(hertzzap.NewLogger(hertzzap.WithCoreEnc(GetEncoder()),
-		hertzzap.WithCoreWs(GetLogWriter()),
-		hertzzap.WithCoreLevel(GetAtomicLevel()),
-		hertzzap.WithZapOptions(GetZapOptions()...)))
+	hlog.SetLogger(hertzzap.NewLogger(hertzzap.WithCoreEnc(getEncoder()),
+		hertzzap.WithCoreWs(getLogWriter()),
+		hertzzap.WithCoreLevel(getAtomicLevel()),
+		hertzzap.WithZapOptions(getZapOptions()...)))
 }
 
 func InitKLogger() {
-	klog.SetLogger(kitexzap.NewLogger(kitexzap.WithCoreEnc(GetEncoder()),
-		kitexzap.WithCoreWs(GetLogWriter()),
-		kitexzap.WithCoreLevel(GetAtomicLevel()),
-		kitexzap.WithZapOptions(GetZapOptions()...)))
+	klog.SetLogger(kitexzap.NewLogger(kitexzap.WithCoreEnc(getEncoder()),
+		kitexzap.WithCoreWs(getLogWriter()),
+		kitexzap.WithCoreLevel(getAtomicLevel()),
+		kitexzap.WithZapOptions(getZapOptions()...)))
 }
 
-func InitDBLogger() gormlogger.Interface {
-	logger := zapgorm2.New(GetLogger())
+func GetDBLogger() gormlogger.Interface {
+	logger := zapgorm2.New(getDBLogger())
 	return logger.LogMode(gormlogger.Info)
 }

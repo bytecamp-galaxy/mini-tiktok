@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func GetEncoder() zapcore.Encoder {
+func getEncoder() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
@@ -14,25 +14,30 @@ func GetEncoder() zapcore.Encoder {
 	return zapcore.NewConsoleEncoder(encoderConfig)
 }
 
-func GetZapOptions() []zap.Option {
+func getZapOptions() []zap.Option {
 	return []zap.Option{zap.AddCaller(), zap.AddCallerSkip(3)}
 }
 
-func GetLevel() zapcore.Level {
+func getLevel() zapcore.Level {
 	return zapcore.DebugLevel
 }
 
-func GetAtomicLevel() zap.AtomicLevel {
+func getAtomicLevel() zap.AtomicLevel {
 	level := zap.NewAtomicLevel()
-	level.SetLevel(GetLevel())
+	level.SetLevel(getLevel())
 	return level
 }
 
-func GetLogWriter() zapcore.WriteSyncer {
+func getLogWriter() zapcore.WriteSyncer {
 	return zapcore.AddSync(os.Stdout)
 }
 
-func GetLogger() *zap.Logger {
-	core := zapcore.NewCore(GetEncoder(), GetLogWriter(), GetLevel())
+func getDBLogger() *zap.Logger {
+	core := zapcore.NewCore(getEncoder(), getLogWriter(), getLevel())
 	return zap.New(core) // TODO(vgalaxy): add caller
+}
+
+func GetTestLogger() *zap.Logger {
+	core := zapcore.NewCore(getEncoder(), getLogWriter(), getLevel())
+	return zap.New(core, zap.AddCaller())
 }

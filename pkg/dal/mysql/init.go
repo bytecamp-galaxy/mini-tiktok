@@ -31,7 +31,7 @@ func Init(migrated bool) {
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
-		Logger:                 log.InitDBLogger(),
+		Logger:                 log.GetDBLogger(),
 	})
 
 	if err != nil {
@@ -41,6 +41,9 @@ func Init(migrated bool) {
 	if migrated {
 		// NOTE: concurrent `AutoMigrate` is not supported
 		// only `AutoMigrate` when api server setup
+		if err := DB.Migrator().DropTable(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
+			panic(err)
+		}
 		if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
 			panic(err)
 		}

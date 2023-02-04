@@ -101,7 +101,7 @@ struct PublishActionResponse {
 
 struct PublishListRequest {
     1: required string Token (api.query="token"); // 登录用户设置
-    2: required i64 Id (api.query="user_id"); // 用户 id
+    2: required i64 UserId (api.query="user_id"); // 用户 id
 }
 
 struct PublishListResponse {

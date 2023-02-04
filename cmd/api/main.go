@@ -82,16 +82,6 @@ func main() {
 	h.Use(
 		// tracer
 		tracing.ServerMiddleware(cfg),
-		// access log
-		func(c context.Context, ctx *app.RequestContext) {
-			start := time.Now()
-			ctx.Next(c)
-			end := time.Now()
-			latency := end.Sub(start).Microseconds
-			hlog.Infof("status=%d cost=%d method=%s full_path=%s client_ip=%s host=%s",
-				ctx.Response.StatusCode(), latency,
-				ctx.Request.Header.Method(), ctx.Request.URI().PathOriginal(), ctx.ClientIP(), ctx.Request.Host())
-		},
 		// recovery
 		recovery.Recovery(recovery.WithRecoveryHandler(
 			func(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
@@ -104,6 +94,15 @@ func main() {
 		)),
 		// gzip
 		gzip.Gzip(gzip.DefaultCompression),
+		// access log
+		func(c context.Context, ctx *app.RequestContext) {
+			start := time.Now()
+			ctx.Next(c)
+			end := time.Now()
+			hlog.Infof("status=%d cost=%s method=%s full_path=%s client_ip=%s host=%s",
+				ctx.Response.StatusCode(), end.Sub(start).String(),
+				ctx.Request.Header.Method(), ctx.Request.URI().PathOriginal(), ctx.ClientIP(), ctx.Request.Host())
+		},
 	)
 
 	// set NoRoute handler

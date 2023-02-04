@@ -100,7 +100,6 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	uid := req.GetId()
 	// set up connection with publish server
 	v := conf.Init()
 	cli, err := rpc.InitPublishClient(v.GetString("api-server.name"))
@@ -111,7 +110,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &publish.PublishListRequest{
-		UserId: uid,
+		UserId: req.GetUserId(),
 	}
 
 	respRpc, err := (*cli).PublishList(ctx, reqRpc)
