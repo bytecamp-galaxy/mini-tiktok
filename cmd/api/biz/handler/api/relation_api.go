@@ -39,9 +39,17 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	userId := id.(int64)
+	toUserId := req.ToUserId
+
+	if userId == toUserId {
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, "not allowed to follow yourself"))
+		return
+	}
+
 	reqRPC := &relation.RelationActionRequest{
-		UserId:     id.(int64),
-		ToUserId:   req.ToUserId,
+		UserId:     userId,
+		ToUserId:   toUserId,
 		ActionType: req.ActionType,
 	}
 

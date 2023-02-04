@@ -124,8 +124,6 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	// TODO: follow action
-
 	It("user A publish video", func() {
 		resp := e.POST("/douyin/publish/action/").
 			WithMultipart().
@@ -238,9 +236,9 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("cover_url").String().NotEmpty()
 
 		video.Value("title").String().Equal(videoTitleA)
-		video.Value("favorite_count").Number().Equal(1) // add one
+		video.Value("favorite_count").Number().Equal(1)
 		video.Value("comment_count").Number().Equal(0)
-		video.Value("is_favorite").Boolean().Equal(true) // note
+		video.Value("is_favorite").Boolean().Equal(true) // favorite
 	})
 
 	It("user B comment user A video", func() {
@@ -293,7 +291,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("title").String().Equal(videoTitleA)
 		video.Value("favorite_count").Number().Equal(1)
 		video.Value("comment_count").Number().Equal(1) // add one
-		video.Value("is_favorite").Boolean().Equal(false)
+		video.Value("is_favorite").Boolean().Equal(true)
 	})
 
 	It("user A query user A video comments", func() {
@@ -427,5 +425,427 @@ var _ = Describe("API TESTS", Ordered, func() {
 			JSON().Object()
 		resp.Value("status_code").Number().Equal(0)
 		resp.Value("video_list").Array().Empty() // empty
+	})
+
+	It("user B follow user A", func() {
+		resp := e.POST("/douyin/relation/action/").
+			WithQuery("token", tokenB).WithQuery("to_user_id", userIdA).WithQuery("action_type", 1).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+	})
+
+	It("user A query user A info", func() {
+		resp := e.GET("/douyin/user/").
+			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+
+		user := resp.Value("user").Object()
+		user.NotEmpty()
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1) // add one
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user B query user A info", func() {
+		resp := e.GET("/douyin/user/").
+			WithQuery("user_id", userIdA).WithQuery("token", tokenB).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+
+		user := resp.Value("user").Object()
+		user.NotEmpty()
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(true) // follow
+	})
+
+	It("user A query user B info", func() {
+		resp := e.GET("/douyin/user/").
+			WithQuery("user_id", userIdB).WithQuery("token", tokenA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+
+		user := resp.Value("user").Object()
+		user.NotEmpty()
+		user.Value("id").Number().Equal(userIdB)
+		user.Value("name").String().Equal(usernameB)
+		user.Value("follow_count").Number().Equal(1) // add one
+		user.Value("follower_count").Number().Equal(0)
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user B query user A published videos", func() {
+		resp := e.GET("/douyin/publish/list/").
+			WithQuery("user_id", userIdA).WithQuery("token", tokenB).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+
+		resp.Value("video_list").Array().Length().Equal(1)
+		video := resp.Value("video_list").Array().First().Object()
+		videoIdA = int64(video.Value("id").Number().Raw())
+
+		author := video.Value("author").Object()
+		author.Value("id").Number().Equal(userIdA)
+		author.Value("name").String().Equal(usernameA)
+		author.Value("follow_count").Number().Equal(0)
+		author.Value("follower_count").Number().Equal(1)
+		author.Value("is_follow").Boolean().Equal(true)
+
+		video.Value("play_url").String().NotEmpty()
+		video.Value("cover_url").String().NotEmpty()
+
+		video.Value("title").String().Equal(videoTitleA)
+		video.Value("favorite_count").Number().Equal(1)
+		video.Value("comment_count").Number().Equal(1)
+		video.Value("is_favorite").Boolean().Equal(true)
+	})
+
+	It("user A feed", func() {
+		resp := e.GET("/douyin/feed/").
+			WithQuery("token", tokenA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		nextTime := int64(resp.Value("next_time").Number().Raw()) // `next_time` required here
+
+		resp.Value("video_list").Array().Length().Equal(1)
+		video := resp.Value("video_list").Array().First().Object()
+		video.Value("id").Number().Equal(videoIdA)
+
+		author := video.Value("author").Object()
+		author.Value("id").Number().Equal(userIdA)
+		author.Value("name").String().Equal(usernameA)
+		author.Value("follow_count").Number().Equal(0)
+		author.Value("follower_count").Number().Equal(1) // add one
+		author.Value("is_follow").Boolean().Equal(false)
+
+		video.Value("play_url").String().NotEmpty()
+		video.Value("cover_url").String().NotEmpty()
+
+		video.Value("title").String().Equal(videoTitleA)
+		video.Value("favorite_count").Number().Equal(1)
+		video.Value("comment_count").Number().Equal(1)
+		video.Value("is_favorite").Boolean().Equal(false)
+
+		resp = e.GET("/douyin/feed/").
+			WithQuery("token", tokenA).WithQuery("latest_time", nextTime).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("video_list").Array().Empty() // empty
+	})
+
+	It("user B feed", func() {
+		resp := e.GET("/douyin/feed/").
+			WithQuery("token", tokenB).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		nextTime := int64(resp.Value("next_time").Number().Raw()) // `next_time` required here
+
+		resp.Value("video_list").Array().Length().Equal(1)
+		video := resp.Value("video_list").Array().First().Object()
+		video.Value("id").Number().Equal(videoIdA)
+
+		author := video.Value("author").Object()
+		author.Value("id").Number().Equal(userIdA)
+		author.Value("name").String().Equal(usernameA)
+		author.Value("follow_count").Number().Equal(0)
+		author.Value("follower_count").Number().Equal(1) // add one
+		author.Value("is_follow").Boolean().Equal(true)  // follow
+
+		video.Value("play_url").String().NotEmpty()
+		video.Value("cover_url").String().NotEmpty()
+
+		video.Value("title").String().Equal(videoTitleA)
+		video.Value("favorite_count").Number().Equal(1)
+		video.Value("comment_count").Number().Equal(1)
+		video.Value("is_favorite").Boolean().Equal(true) // favorite
+
+		resp = e.GET("/douyin/feed/").
+			WithQuery("token", tokenB).WithQuery("latest_time", nextTime).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("video_list").Array().Empty() // empty
+	})
+
+	It("visitor feed", func() {
+		resp := e.GET("/douyin/feed/").
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		nextTime := int64(resp.Value("next_time").Number().Raw()) // `next_time` required here
+
+		resp.Value("video_list").Array().Length().Equal(1)
+		video := resp.Value("video_list").Array().First().Object()
+		video.Value("id").Number().Equal(videoIdA)
+
+		author := video.Value("author").Object()
+		author.Value("id").Number().Equal(userIdA)
+		author.Value("name").String().Equal(usernameA)
+		author.Value("follow_count").Number().Equal(0)
+		author.Value("follower_count").Number().Equal(1) // add one
+		author.Value("is_follow").Boolean().Equal(false)
+
+		video.Value("play_url").String().NotEmpty()
+		video.Value("cover_url").String().NotEmpty()
+
+		video.Value("title").String().Equal(videoTitleA)
+		video.Value("favorite_count").Number().Equal(1)
+		video.Value("comment_count").Number().Equal(1)
+		video.Value("is_favorite").Boolean().Equal(false)
+
+		resp = e.GET("/douyin/feed/").
+			WithQuery("token", tokenB).WithQuery("latest_time", nextTime).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("video_list").Array().Empty() // empty
+	})
+
+	It("user B uncomment user A video", func() {
+		resp := e.POST("/douyin/comment/action/").
+			WithQuery("token", tokenB).
+			WithQuery("video_id", videoIdA).
+			WithQuery("action_type", 2).
+			WithQuery("comment_id", commentIdBA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("comment").Null()
+	})
+
+	It("visitor feed", func() {
+		resp := e.GET("/douyin/feed/").
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		nextTime := int64(resp.Value("next_time").Number().Raw()) // `next_time` required here
+
+		resp.Value("video_list").Array().Length().Equal(1)
+		video := resp.Value("video_list").Array().First().Object()
+		video.Value("id").Number().Equal(videoIdA)
+
+		author := video.Value("author").Object()
+		author.Value("id").Number().Equal(userIdA)
+		author.Value("name").String().Equal(usernameA)
+		author.Value("follow_count").Number().Equal(0)
+		author.Value("follower_count").Number().Equal(1) // add one
+		author.Value("is_follow").Boolean().Equal(false)
+
+		video.Value("play_url").String().NotEmpty()
+		video.Value("cover_url").String().NotEmpty()
+
+		video.Value("title").String().Equal(videoTitleA)
+		video.Value("favorite_count").Number().Equal(1)
+		video.Value("comment_count").Number().Equal(0) // sub one
+		video.Value("is_favorite").Boolean().Equal(false)
+
+		resp = e.GET("/douyin/feed/").
+			WithQuery("token", tokenB).WithQuery("latest_time", nextTime).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("video_list").Array().Empty() // empty
+	})
+
+	It("user A comment user A video", func() {
+		resp := e.POST("/douyin/comment/action/").
+			WithQuery("token", tokenA).
+			WithQuery("video_id", videoIdA).
+			WithQuery("action_type", 1).
+			WithQuery("comment_text", commentAA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+
+		comment := resp.Value("comment").Object()
+		commentIdAA = int64(comment.Value("id").Number().Raw())
+
+		comment.Value("content").String().Equal(commentAA)
+		comment.Value("create_date").String().NotEmpty()
+
+		user := comment.Value("user").Object()
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user A query user A video comments", func() {
+		resp := e.GET("/douyin/comment/list/").
+			WithQuery("token", tokenA).WithQuery("video_id", videoIdA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("comment_list").Array().Length().Equal(1)
+
+		comment := resp.Value("comment_list").Array().First().Object()
+		comment.Value("id").Number().Equal(commentIdAA)
+
+		comment.Value("content").String().Equal(commentAA)
+		comment.Value("create_date").String().NotEmpty()
+
+		user := comment.Value("user").Object()
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user B query user A video comments", func() {
+		resp := e.GET("/douyin/comment/list/").
+			WithQuery("token", tokenB).WithQuery("video_id", videoIdA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("comment_list").Array().Length().Equal(1)
+
+		comment := resp.Value("comment_list").Array().First().Object()
+		comment.Value("id").Number().Equal(commentIdAA)
+
+		comment.Value("content").String().Equal(commentAA)
+		comment.Value("create_date").String().NotEmpty()
+
+		user := comment.Value("user").Object()
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(true)
+	})
+
+	It("user A query user A follower list", func() {
+		resp := e.GET("/douyin/relation/follower/list/").
+			WithQuery("token", tokenA).WithQuery("user_id", userIdA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("user_list").Array().Length().Equal(1)
+		user := resp.Value("user_list").Array().First().Object()
+
+		user.Value("id").Number().Equal(userIdB)
+		user.Value("name").String().Equal(usernameB)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(0)
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user A query user B follow list", func() {
+		resp := e.GET("/douyin/relation/follow/list/").
+			WithQuery("token", tokenA).WithQuery("user_id", userIdB).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("user_list").Array().Length().Equal(1)
+		user := resp.Value("user_list").Array().First().Object()
+
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user B query user A follow list", func() {
+		resp := e.GET("/douyin/relation/follow/list/").
+			WithQuery("token", tokenB).WithQuery("user_id", userIdA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("user_list").Array().Empty()
+	})
+
+	It("user B query user B follow list", func() {
+		resp := e.GET("/douyin/relation/follow/list/").
+			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("user_list").Array().Length().Equal(1)
+		user := resp.Value("user_list").Array().First().Object()
+
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(0)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(true)
+	})
+
+	It("user A follow user B", func() {
+		resp := e.POST("/douyin/relation/action/").
+			WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+	})
+
+	It("user B query user A follow list", func() {
+		resp := e.GET("/douyin/relation/follow/list/").
+			WithQuery("token", tokenB).WithQuery("user_id", userIdA).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("user_list").Array().Length().Equal(1)
+		user := resp.Value("user_list").Array().First().Object()
+
+		user.Value("id").Number().Equal(userIdB)
+		user.Value("name").String().Equal(usernameB)
+		user.Value("follow_count").Number().Equal(1)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(false)
+	})
+
+	It("user B query user B follower list", func() {
+		resp := e.GET("/douyin/relation/follow/list/").
+			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("user_list").Array().Length().Equal(1)
+		user := resp.Value("user_list").Array().First().Object()
+
+		user.Value("id").Number().Equal(userIdA)
+		user.Value("name").String().Equal(usernameA)
+		user.Value("follow_count").Number().Equal(1)
+		user.Value("follower_count").Number().Equal(1)
+		user.Value("is_follow").Boolean().Equal(true)
 	})
 })

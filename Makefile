@@ -7,6 +7,7 @@ run:
 	go run ./cmd/publish &
 	go run ./cmd/user &
 	go run ./cmd/favorite &
+	go run ./cmd/relation &
 
 test:
 	go test ./test/base_api_test.go ./test/common.go -v
