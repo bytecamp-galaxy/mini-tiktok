@@ -22,6 +22,9 @@ func UserConverterAPI(user *rpcmodel.User) *api.User {
 
 // UserConverterORM convert *model.User to *rpcmodel.User
 func UserConverterORM(user *model.User) *rpcmodel.User {
+	if user == nil {
+		return nil
+	}
 	return &rpcmodel.User{
 		Id:            user.ID,
 		Name:          user.Username,

@@ -44,7 +44,7 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 	if user != nil && q.User.FavoriteVideos.WithContext(ctx).Where(q.Video.ID.Eq(video.ID)).Model(user).Count() != 0 {
 		isFavorite = true
 	}
-	author := video.Author
+	author := video.Author // preload required
 	u := &rpcmodel.User{
 		Id:            author.ID,
 		Name:          author.Username,

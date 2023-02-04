@@ -85,7 +85,7 @@ func (s *FavoriteServiceImpl) favoriteList(ctx context.Context, req *favorite.Fa
 	}
 
 	vs, err := query.User.FavoriteVideos.WithContext(ctx).Model(u).Find()
-	// TODO(vgalaxy): preload author
+	// TODO(vgalaxy): preload author automatically
 	if err != nil {
 		klog.CtxErrorf(ctx, err.Error())
 		return nil, err
@@ -93,6 +93,12 @@ func (s *FavoriteServiceImpl) favoriteList(ctx context.Context, req *favorite.Fa
 
 	videos := make([]*rpcmodel.Video, len(vs))
 	for i, v := range vs {
+		author, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(v.AuthorID)).Take()
+		if err != nil {
+			klog.CtxErrorf(ctx, err.Error())
+			return nil, err
+		}
+		v.Author = *author // preload author manually
 		videos[i] = convert.VideoConverterORM(ctx, query.Q, v, u)
 	}
 

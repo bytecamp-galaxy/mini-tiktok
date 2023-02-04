@@ -22,7 +22,10 @@ func CommentConverterAPI(comment *rpcmodel.Comment) *api.Comment {
 
 // CommentConverterORM convert *model.Comment to *rpcmodel.Comment
 func CommentConverterORM(comment *model.Comment) *rpcmodel.Comment {
-	user := UserConverterORM(&comment.User)
+	if comment == nil {
+		return nil
+	}
+	user := UserConverterORM(&comment.User) // preload required
 	return &rpcmodel.Comment{
 		Id:         comment.ID,
 		User:       user,
