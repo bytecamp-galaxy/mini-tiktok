@@ -8,7 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
-	pack2 "github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -74,7 +74,6 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -120,7 +119,6 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -129,7 +127,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	// convert model.Videos to feed.Videos
 	respVideos := make([]*api.Video, len(respRpc.VideoList))
 	for i, video := range respRpc.VideoList {
-		respVideos[i] = pack2.VideoConverterAPI(video)
+		respVideos[i] = convert.VideoConverterAPI(video)
 	}
 	resp := &api.PublishListResponse{
 		StatusCode: errno.ErrSuccess,

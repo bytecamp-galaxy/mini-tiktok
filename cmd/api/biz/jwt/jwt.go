@@ -2,9 +2,9 @@ package jwt
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/hertz-contrib/jwt"
 	"time"
 )
 

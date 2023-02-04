@@ -2,14 +2,15 @@ package handler
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/comment"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/kerrors"
-	"time"
 )
 
 // CommentServiceImpl implements the last service interface defined in the IDL.
@@ -22,12 +23,13 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 		switch req.ActionType {
 		case 1:
 			{
-				c := model.Comment{
+				id := snowflake.Generate()
+				err = tx.Comment.WithContext(ctx).Create(&model.Comment{
+					ID:      id,
 					VideoID: req.VideoId,
 					UserID:  req.UserId,
 					Content: *req.CommentText,
-				}
-				err = tx.Comment.WithContext(ctx).Create(&c)
+				})
 				if err != nil {
 					return err
 				}
@@ -38,21 +40,13 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return err
 				}
 
-				u := tx.User
-				data, err := u.WithContext(ctx).
-					Where(u.ID.Eq(req.UserId)).
-					Take()
+				c, err := tx.Comment.Preload(tx.Comment.User).WithContext(ctx).Where(tx.Comment.ID.Eq(id)).Take()
 				if err != nil {
 					return err
 				}
 
 				resp = &comment.CommentActionResponse{
-					Comment: &rpcmodel.Comment{
-						Id:         c.ID,
-						User:       Po2voUser(*data),
-						Content:    c.Content,
-						CreateDate: time.Unix(c.CreatedAt, 0).String(),
-					},
+					Comment: convert.CommentConverterORM(c),
 				}
 			}
 		case 2:
@@ -99,9 +93,8 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 		}
 
 		list := make([]*rpcmodel.Comment, len(comments))
-		for i, commentPO := range comments {
-			commentVO := Po2voComment(*commentPO)
-			list[i] = &commentVO
+		for i, data := range comments {
+			list[i] = convert.CommentConverterORM(data)
 		}
 		resp = &comment.CommentListResponse{
 			CommentList: list,
@@ -113,24 +106,4 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 	return resp, nil
-}
-
-func Po2voComment(commentPO model.Comment) rpcmodel.Comment {
-	userVO := Po2voUser(commentPO.User)
-	return rpcmodel.Comment{
-		Id:         commentPO.ID,
-		User:       userVO,
-		Content:    commentPO.Content,
-		CreateDate: time.Unix(commentPO.CreatedAt, 0).String(),
-	}
-}
-
-func Po2voUser(userPO model.User) *rpcmodel.User {
-	return &rpcmodel.User{
-		Id:            userPO.ID,
-		Name:          userPO.Username,
-		FollowCount:   userPO.FollowingCount,
-		FollowerCount: userPO.FollowerCount,
-		IsFollow:      false,
-	}
 }

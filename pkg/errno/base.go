@@ -12,7 +12,7 @@ const (
 	// ErrTokenGeneration - 500: Error occurred while generating token.
 	ErrTokenGeneration
 
-	// ErrParseToken - 500: Error occurred while parsing sth from token.
+	// ErrParseToken - 500: Error occurred while parsing from token.
 	ErrParseToken
 
 	// ErrBindAndValidation - 400: Error occurred while binding the request body to the struct or validation failed.

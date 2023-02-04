@@ -7,9 +7,9 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/comment"
-	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
@@ -35,7 +35,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 	// fetch user_id from token
 	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
@@ -62,7 +62,6 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -71,7 +70,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 	resp := &api.CommentActionResponse{
 		StatusCode: errno.ErrSuccess,
 		StatusMsg:  utils.String(pack.SuccessStatusMessage),
-		Comment:    ConvertCommentModel(respRPC.Comment),
+		Comment:    convert.CommentConverterAPI(respRPC.Comment), // maybe nil
 	}
 
 	c.JSON(consts.StatusOK, resp)
@@ -86,10 +85,7 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	// step1: bind and validate request.
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrBindAndValidation, err.Error()))
 		return
 	}
 
@@ -97,26 +93,27 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	v := conf.Init()
 	cli, err := rpc.InitCommentClient(v.GetString("api-server.name"))
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.UserRegisterResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		pack.Error(c, errors.WithCode(errno.ErrClientRPCInit, err.Error()))
 		return
 	}
 
 	reqRPC := comment.CommentListRequest{VideoId: req.VideoId}
 	respRPC, err := (*cli).CommentList(ctx, &reqRPC)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &api.CommentActionResponse{
-			StatusCode: 1,
-			StatusMsg:  utils.String(err.Error()),
-		})
+		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
+			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
+			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			return
+		} else {
+			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
+			return
+		}
 	}
 
 	list := make([]*api.Comment, len(respRPC.CommentList))
 
 	for i, c := range respRPC.CommentList {
-		list[i] = ConvertCommentModel(c)
+		list[i] = convert.CommentConverterAPI(c)
 	}
 
 	resp := &api.CommentListResponse{
@@ -125,26 +122,4 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	c.JSON(consts.StatusOK, resp)
-}
-
-func ConvertUserModel(modelRPC *rpcmodel.User) *api.User {
-	return &api.User{
-		Id:            modelRPC.Id,
-		Name:          modelRPC.Name,
-		FollowCount:   &modelRPC.FollowCount,
-		FollowerCount: &modelRPC.FollowerCount,
-		IsFollow:      modelRPC.IsFollow,
-	}
-}
-
-func ConvertCommentModel(modelRPC *rpcmodel.Comment) *api.Comment {
-	if modelRPC == nil {
-		return nil
-	}
-	return &api.Comment{
-		Id:         modelRPC.Id,
-		User:       ConvertUserModel(modelRPC.User),
-		Content:    modelRPC.Content,
-		CreateDate: modelRPC.CreateDate,
-	}
 }

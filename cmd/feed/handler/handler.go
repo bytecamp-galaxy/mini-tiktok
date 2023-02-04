@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -27,9 +27,8 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	}
 
 	// query videos in db
-	q := query.Q
-	v := q.Video
-	u := q.User
+	v := query.Video
+	u := query.User
 
 	// find user, if not found, user is nil
 	user, _ := u.WithContext(ctx).Where(u.ID.Eq(uid)).Take()
@@ -55,7 +54,7 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	// convert model.Videos to rpcmodel.Videos
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = pack.VideoConverterORM(ctx, q, video, user)
+		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, user)
 	}
 
 	resp = &feed.FeedResponse{

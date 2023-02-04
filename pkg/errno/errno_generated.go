@@ -11,7 +11,7 @@ func Init() {
 	register(ErrUnknown, 500, "Internal server error")
 	register(ErrTokenInvalid, 401, "Token invalid")
 	register(ErrTokenGeneration, 500, "Error occurred while generating token")
-	register(ErrParseToken, 500, "Error occurred while parsing sth from token")
+	register(ErrParseToken, 500, "Error occurred while parsing from token")
 	register(ErrBindAndValidation, 400, "Error occurred while binding the request body to the struct or validation failed")
 	register(ErrDatabase, 500, "Database error")
 	register(ErrPasswordInvalid, 401, "Password invalid")

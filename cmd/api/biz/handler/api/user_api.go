@@ -7,6 +7,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -57,7 +58,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -113,7 +113,6 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -168,7 +167,6 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -178,13 +176,7 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 	resp := &api.UserQueryResponse{
 		StatusCode: errno.ErrSuccess,
 		StatusMsg:  utils.String(pack.SuccessStatusMessage),
-		User: &api.User{
-			Id:            respRpc.User.Id,
-			Name:          respRpc.User.Name,
-			FollowCount:   utils.Int64(respRpc.User.FollowerCount),
-			FollowerCount: utils.Int64(respRpc.User.FollowerCount),
-			IsFollow:      false, // TODO(vgalaxy)
-		},
+		User:       convert.UserConverterAPI(respRpc.User),
 	}
 
 	c.JSON(consts.StatusOK, resp)

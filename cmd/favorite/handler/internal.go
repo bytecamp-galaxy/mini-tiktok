@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/favorite"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/mysql"
@@ -77,14 +78,14 @@ func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
 }
 
 func (s *FavoriteServiceImpl) favoriteList(ctx context.Context, req *favorite.FavoriteListRequest) ([]*rpcmodel.Video, error) {
-	q := query.Q
-	u, err := q.User.WithContext(ctx).Where(q.User.ID.Eq(req.UserId)).Take()
+	u, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(req.UserId)).Take()
 	if err != nil {
 		klog.CtxErrorf(ctx, err.Error())
 		return nil, err
 	}
 
-	vs, err := q.User.FavoriteVideos.WithContext(ctx).Model(u).Find()
+	vs, err := query.User.FavoriteVideos.WithContext(ctx).Model(u).Find()
+	// TODO(vgalaxy): preload author
 	if err != nil {
 		klog.CtxErrorf(ctx, err.Error())
 		return nil, err
@@ -92,29 +93,7 @@ func (s *FavoriteServiceImpl) favoriteList(ctx context.Context, req *favorite.Fa
 
 	videos := make([]*rpcmodel.Video, len(vs))
 	for i, v := range vs {
-		// TODO(vgalaxy): optimize join
-		u, err := q.User.WithContext(ctx).Where(q.User.ID.Eq(v.AuthorID)).Take()
-		if err != nil {
-			klog.CtxErrorf(ctx, err.Error())
-			return nil, err
-		}
-		author := &rpcmodel.User{
-			Id:            u.ID,
-			Name:          u.Username,
-			FollowCount:   u.FollowingCount,
-			FollowerCount: u.FollowerCount,
-			IsFollow:      false, // TODO
-		}
-		videos[i] = &rpcmodel.Video{
-			Id:            v.ID,
-			Author:        author,
-			PlayUrl:       v.PlayUrl,
-			CoverUrl:      v.CoverUrl,
-			FavoriteCount: v.FavoriteCount,
-			CommentCount:  v.CommentCount,
-			IsFavorite:    true,
-			Title:         v.Title,
-		}
+		videos[i] = convert.VideoConverterORM(ctx, query.Q, v, u)
 	}
 
 	return videos, err

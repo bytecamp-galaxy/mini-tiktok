@@ -3,6 +3,7 @@
 package Api
 
 import (
+	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -74,7 +75,10 @@ func _feedMw() []app.HandlerFunc {
 
 func _getfeedMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{jwt.Middleware.MiddlewareFuncOptional(
+		func(c context.Context, ctx *app.RequestContext) bool {
+			return ctx.Query("token") != ""
+		})}
 }
 
 func _publishMw() []app.HandlerFunc {

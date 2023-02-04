@@ -24,7 +24,7 @@ mini-tiktok 系统支持的错误码列表如下：
 | ErrUnknown | 100001 | 500 | Internal server error |
 | ErrTokenInvalid | 100002 | 401 | Token invalid |
 | ErrTokenGeneration | 100003 | 500 | Error occurred while generating token |
-| ErrParseToken | 100004 | 500 | Error occurred while parsing sth from token |
+| ErrParseToken | 100004 | 500 | Error occurred while parsing from token |
 | ErrBindAndValidation | 100005 | 400 | Error occurred while binding the request body to the struct or validation failed |
 | ErrDatabase | 100006 | 500 | Database error |
 | ErrPasswordInvalid | 100007 | 401 | Password invalid |

@@ -392,4 +392,40 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("status_code").Number().Equal(0)
 		resp.Value("video_list").Array().Empty() // empty
 	})
+
+	It("visitor feed", func() {
+		resp := e.GET("/douyin/feed/").
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		nextTime := int64(resp.Value("next_time").Number().Raw()) // `next_time` required here
+
+		resp.Value("video_list").Array().Length().Equal(1)
+		video := resp.Value("video_list").Array().First().Object()
+		video.Value("id").Number().Equal(videoIdA)
+
+		author := video.Value("author").Object()
+		author.Value("id").Number().Equal(userIdA)
+		author.Value("name").String().Equal(usernameA)
+		author.Value("follow_count").Number().Equal(0)
+		author.Value("follower_count").Number().Equal(0)
+		author.Value("is_follow").Boolean().Equal(false)
+
+		video.Value("play_url").String().NotEmpty()
+		video.Value("cover_url").String().NotEmpty()
+
+		video.Value("title").String().Equal(videoTitleA)
+		video.Value("favorite_count").Number().Equal(1)
+		video.Value("comment_count").Number().Equal(1)
+		video.Value("is_favorite").Boolean().Equal(false)
+
+		resp = e.GET("/douyin/feed/").
+			WithQuery("token", tokenB).WithQuery("latest_time", nextTime).
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		resp.Value("status_code").Number().Equal(0)
+		resp.Value("video_list").Array().Empty() // empty
+	})
 })

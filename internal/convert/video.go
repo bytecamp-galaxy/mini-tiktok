@@ -1,4 +1,4 @@
-package pack
+package convert
 
 import (
 	"context"
@@ -10,6 +10,9 @@ import (
 
 // VideoConverterAPI convert *rpcmodel.Video to *api.Video
 func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
+	if video == nil {
+		return nil
+	}
 	author := video.Author
 	u := &api.User{
 		Id:            author.Id,
@@ -33,6 +36,9 @@ func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
 
 // VideoConverterORM convert *model.Videos to *rpcmodel.Videos
 func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, user *model.User) *rpcmodel.Video {
+	if video == nil {
+		return nil
+	}
 	isFavorite := false
 	// TODO(vgalaxy): batch process
 	if user != nil && q.User.FavoriteVideos.WithContext(ctx).Where(q.Video.ID.Eq(video.ID)).Model(user).Count() != 0 {

@@ -3,11 +3,9 @@ package handler
 import (
 	"bytes"
 	"context"
-	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
-	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
-	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
@@ -71,10 +69,11 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
-	// 获取 user
-	author, err := getAuthorInfo(ctx, authorId)
+	// 获取 author
+	u := query.User
+	author, err := query.User.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Take()
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrRPCMutualCall), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	// 封装 video
@@ -102,9 +101,8 @@ func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.Publi
 	uid := req.GetUserId()
 
 	// query videos in db
-	q := query.Q
-	v := q.Video
-	u := q.User
+	v := query.Video
+	u := query.User
 
 	// find user, if not found, user is nil
 	user, _ := u.WithContext(ctx).Where(u.ID.Eq(uid)).Take()
@@ -116,40 +114,11 @@ func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.Publi
 
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = pack.VideoConverterORM(ctx, q, video, user)
+		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, user)
 	}
 
 	resp = &publish.PublishListResponse{
 		VideoList: respVideos,
 	}
 	return resp, nil
-}
-
-func getAuthorInfo(ctx context.Context, uid int64) (data *model.User, err error) {
-	// set up connection with user server
-	v := conf.Init()
-	cli, err := rpc.InitUserClient(v.GetString("publish-server.name"))
-	if err != nil {
-		return nil, err
-	}
-
-	// call rpc service
-	reqRpc := &user.UserQueryRequest{
-		UserId: uid,
-	}
-
-	respRpc, err := (*cli).UserQuery(ctx, reqRpc)
-	if err != nil {
-		// TODO(vgalaxy): use BizStatusErrorIface
-		return nil, err
-	}
-
-	authorData := respRpc.User
-	author := &model.User{
-		ID:             authorData.Id,
-		Username:       authorData.Name,
-		FollowerCount:  authorData.FollowerCount,
-		FollowingCount: authorData.FollowCount,
-	}
-	return author, err
 }

@@ -4,11 +4,10 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
-	pack2 "github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -39,7 +38,6 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	// if token is passed
 	if req.GetToken() != api.FeedRequest_Token_DEFAULT {
-		JwtImpl(ctx, c)
 		// fetch user id from token
 		userId, ok := c.Get(jwt.IdentityKey)
 		if !ok {
@@ -70,7 +68,6 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -79,7 +76,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	// convert model.Videos to feed.Videos
 	respVideos := make([]*api.Video, len(respRpc.VideoList))
 	for i, video := range respRpc.VideoList {
-		respVideos[i] = pack2.VideoConverterAPI(video)
+		respVideos[i] = convert.VideoConverterAPI(video)
 	}
 
 	// response to client
@@ -91,48 +88,4 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	}
 
 	c.JSON(consts.StatusOK, resp)
-}
-
-func JwtImpl(ctx context.Context, c *app.RequestContext) {
-	claims, err := jwt.Middleware.GetClaimsFromJWT(ctx, c)
-	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-		return
-	}
-
-	switch v := claims["exp"].(type) {
-	case nil:
-		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-		return
-	case float64:
-		if int64(v) < jwt.Middleware.TimeFunc().Unix() {
-			pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-			return
-		}
-	case json.Number:
-		n, err := v.Int64()
-		if err != nil {
-			pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-			return
-		}
-		if n < jwt.Middleware.TimeFunc().Unix() {
-			pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-			return
-		}
-	default:
-		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-		return
-	}
-
-	c.Set("JWT_PAYLOAD", claims)
-	identity := jwt.Middleware.IdentityHandler(ctx, c)
-
-	if identity != nil {
-		c.Set(jwt.Middleware.IdentityKey, identity)
-	}
-
-	if !jwt.Middleware.Authorizator(identity, ctx, c) {
-		pack.Error(c, errors.WithCode(errno.ErrTokenInvalid, pack.BrokenInvariantStatusMessage))
-		return
-	}
 }

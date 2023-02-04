@@ -7,6 +7,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/favorite"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -31,7 +32,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 
 	uid, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrUnknown, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
 		return
 	}
 
@@ -55,7 +56,6 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
@@ -99,33 +99,14 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
 			return
 		} else {
-			// assume
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
 			return
 		}
 	}
 
 	list := make([]*api.Video, len(respRPC.VideoList))
-
 	for i, video := range respRPC.VideoList {
-		author := video.Author
-		u := &api.User{
-			Id:            author.Id,
-			Name:          author.Name,
-			FollowCount:   &author.FollowCount,
-			FollowerCount: &author.FollowerCount,
-			IsFollow:      author.IsFollow,
-		}
-		list[i] = &api.Video{
-			Id:            video.Id,
-			Author:        u,
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
-			IsFavorite:    video.IsFavorite,
-			Title:         video.Title,
-		}
+		list[i] = convert.VideoConverterAPI(video)
 	}
 
 	resp := &api.FavoriteListResponse{
