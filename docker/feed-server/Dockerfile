@@ -19,10 +19,9 @@ RUN cd configs \
     && rm global.yaml \
     && mv docker.yaml global.yaml
 
-WORKDIR /root/cmd/api
+WORKDIR /root/cmd/feed
 RUN chmod +x build.sh
 RUN ./build.sh
 
-
 WORKDIR /root
-ENTRYPOINT ["/root/cmd/api/output/api"]
+ENTRYPOINT ["/root/cmd/feed/output/feed"]
