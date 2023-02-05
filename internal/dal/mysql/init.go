@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"fmt"
+	model2 "github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -42,10 +42,10 @@ func Init(migrated bool) {
 		// NOTE: concurrent `AutoMigrate` is not supported
 		// only `AutoMigrate` when api server setup
 		// drop table for the convenience of test
-		if err := DB.Migrator().DropTable(&model.User{}, &model.Video{}, &model.Comment{}, &model.FollowRelation{}, &model.FavoriteRelation{}); err != nil {
+		if err := DB.Migrator().DropTable(&model2.User{}, &model2.Video{}, &model2.Comment{}, &model2.FollowRelation{}, &model2.FavoriteRelation{}); err != nil {
 			panic(err)
 		}
-		if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.FollowRelation{}, &model.FavoriteRelation{}); err != nil {
+		if err := DB.AutoMigrate(&model2.User{}, &model2.Video{}, &model2.Comment{}, &model2.FollowRelation{}, &model2.FavoriteRelation{}); err != nil {
 			panic(err)
 		}
 	}

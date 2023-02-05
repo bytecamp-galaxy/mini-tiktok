@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 )
 
 func newVideo(db *gorm.DB, opts ...gen.DOOption) video {

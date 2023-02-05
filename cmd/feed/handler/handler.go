@@ -3,10 +3,10 @@ package handler
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"time"

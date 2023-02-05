@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"

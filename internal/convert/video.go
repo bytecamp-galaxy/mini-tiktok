@@ -3,9 +3,9 @@ package convert
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 )
 
 // VideoConverterAPI convert *rpcmodel.Video to *api.Video
