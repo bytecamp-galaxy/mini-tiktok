@@ -39,31 +39,21 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 	if video == nil {
 		return nil
 	}
-	isFavorite := false
-	isFollow := false
+	relFavorite := false
+	relFollow := false
 	if view != nil {
-		count, _ := q.FavoriteRelation.WithContext(ctx).
-			Where(q.FavoriteRelation.UserID.Eq(view.ID), q.FavoriteRelation.VideoID.Eq(video.ID)).
-			Count()
-		if count != 0 {
-			isFavorite = true
-		}
+		relFavorite, _ = isFavorite(ctx, q, view.ID, video.ID)
 	}
 	author := video.Author // preload required
 	if view != nil {
-		count, _ := q.FollowRelation.WithContext(ctx).
-			Where(q.FollowRelation.UserID.Eq(view.ID), q.FollowRelation.ToUserID.Eq(author.ID)).
-			Count()
-		if count != 0 {
-			isFollow = true
-		}
+		relFollow, _ = isFollow(ctx, q, view.ID, author.ID)
 	}
 	u := &rpcmodel.User{
 		Id:            author.ID,
 		Name:          author.Username,
 		FollowCount:   author.FollowingCount,
 		FollowerCount: author.FollowerCount,
-		IsFollow:      isFollow,
+		IsFollow:      relFollow,
 	}
 	res := &rpcmodel.Video{
 		Id:            video.ID,
@@ -72,7 +62,7 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 		CoverUrl:      video.CoverUrl,
 		FavoriteCount: video.FavoriteCount,
 		CommentCount:  video.CommentCount,
-		IsFavorite:    isFavorite,
+		IsFavorite:    relFavorite,
 		Title:         video.Title,
 	}
 	return res

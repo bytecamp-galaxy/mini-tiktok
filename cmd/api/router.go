@@ -5,7 +5,7 @@ package main
 import (
 	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler"
-	message2 "github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler/message"
+	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler/message"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/pprof"
@@ -19,9 +19,9 @@ func customizedRegister(r *server.Hertz) {
 	pprof.Register(r)
 
 	// message service
-	hub := message2.NewHub()
+	hub := message.NewHub()
 	go hub.Run()
 	r.GET("/ws", func(c context.Context, ctx *app.RequestContext) {
-		message2.ServeWs(ctx, hub)
+		message.ServeWs(ctx, hub)
 	})
 }

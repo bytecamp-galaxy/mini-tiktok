@@ -27,20 +27,15 @@ func UserConverterORM(ctx context.Context, q *query.Query, user *model.User, vie
 	if user == nil {
 		return nil
 	}
-	isFollow := false
+	relFollow := false
 	if view != nil {
-		count, _ := q.FollowRelation.WithContext(ctx).
-			Where(q.FollowRelation.UserID.Eq(view.ID), q.FollowRelation.ToUserID.Eq(user.ID)).
-			Count()
-		if count != 0 {
-			isFollow = true
-		}
+		relFollow, _ = isFollow(ctx, q, user.ID, view.ID)
 	}
 	return &rpcmodel.User{
 		Id:            user.ID,
 		Name:          user.Username,
 		FollowCount:   user.FollowingCount,
 		FollowerCount: user.FollowerCount,
-		IsFollow:      isFollow,
+		IsFollow:      relFollow,
 	}
 }

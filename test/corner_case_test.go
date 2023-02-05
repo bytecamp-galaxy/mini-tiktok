@@ -366,225 +366,225 @@ func TestCornerCase(t *testing.T) {
 			resp.Value("status_code").Number().Equal(0)
 		})
 
-		//describe("query favorite effect", func() {
-		//	describe("user A query user A published videos", func() {
-		//		resp := e.GET("/douyin/publish/list/").
-		//			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//
-		//		resp.Value("video_list").Array().Length().Equal(1)
-		//		video := resp.Value("video_list").Array().First().Object()
-		//		videoIdA = int64(video.Value("id").Number().Raw())
-		//
-		//		author := video.Value("author").Object()
-		//		author.Value("id").Number().Equal(userIdA)
-		//		author.Value("name").String().Equal(usernameA)
-		//		author.Value("follow_count").Number().Equal(0)
-		//		author.Value("follower_count").Number().Equal(0)
-		//		author.Value("is_follow").Boolean().Equal(false)
-		//
-		//		video.Value("play_url").String().NotEmpty()
-		//		video.Value("cover_url").String().NotEmpty()
-		//
-		//		video.Value("title").String().Equal(videoTitleA)
-		//		video.Value("favorite_count").Number().Equal(1) // add one
-		//		video.Value("comment_count").Number().Equal(0)
-		//		video.Value("is_favorite").Boolean().Equal(false)
-		//	})
-		//
-		//	describe("user B query user B favorite videos", func() {
-		//		resp := e.GET("/douyin/favorite/list/").
-		//			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//
-		//		resp.Value("video_list").Array().Length().Equal(1)
-		//		video := resp.Value("video_list").Array().First().Object()
-		//		video.Value("id").Number().Equal(videoIdA)
-		//
-		//		author := video.Value("author").Object()
-		//		author.Value("id").Number().Equal(userIdA)
-		//		author.Value("name").String().Equal(usernameA)
-		//		author.Value("follow_count").Number().Equal(0)
-		//		author.Value("follower_count").Number().Equal(0)
-		//		author.Value("is_follow").Boolean().Equal(false)
-		//
-		//		video.Value("play_url").String().NotEmpty()
-		//		video.Value("cover_url").String().NotEmpty()
-		//
-		//		video.Value("title").String().Equal(videoTitleA)
-		//		video.Value("favorite_count").Number().Equal(1)
-		//		video.Value("comment_count").Number().Equal(0)
-		//		video.Value("is_favorite").Boolean().Equal(true) // favorite
-		//	})
-		//})
-		//
-		//describe("user B favorite user A video again", func() {
-		//	e.POST("/douyin/favorite/action/").
-		//		WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 1).
-		//		Expect().
-		//		Status(http.StatusInternalServerError). // ErrDatabase
-		//		JSON().Object()
-		//})
-		//
-		//describe("query again, should make no effect", func() {
-		//	describe("user A query user A published videos", func() {
-		//		resp := e.GET("/douyin/publish/list/").
-		//			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//
-		//		resp.Value("video_list").Array().Length().Equal(1)
-		//		video := resp.Value("video_list").Array().First().Object()
-		//		videoIdA = int64(video.Value("id").Number().Raw())
-		//
-		//		author := video.Value("author").Object()
-		//		author.Value("id").Number().Equal(userIdA)
-		//		author.Value("name").String().Equal(usernameA)
-		//		author.Value("follow_count").Number().Equal(0)
-		//		author.Value("follower_count").Number().Equal(0)
-		//		author.Value("is_follow").Boolean().Equal(false)
-		//
-		//		video.Value("play_url").String().NotEmpty()
-		//		video.Value("cover_url").String().NotEmpty()
-		//
-		//		video.Value("title").String().Equal(videoTitleA)
-		//		video.Value("favorite_count").Number().Equal(1) // add one
-		//		video.Value("comment_count").Number().Equal(0)
-		//		video.Value("is_favorite").Boolean().Equal(false)
-		//	})
-		//
-		//	describe("user B query user B favorite videos", func() {
-		//		resp := e.GET("/douyin/favorite/list/").
-		//			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//
-		//		resp.Value("video_list").Array().Length().Equal(1)
-		//		video := resp.Value("video_list").Array().First().Object()
-		//		video.Value("id").Number().Equal(videoIdA)
-		//
-		//		author := video.Value("author").Object()
-		//		author.Value("id").Number().Equal(userIdA)
-		//		author.Value("name").String().Equal(usernameA)
-		//		author.Value("follow_count").Number().Equal(0)
-		//		author.Value("follower_count").Number().Equal(0)
-		//		author.Value("is_follow").Boolean().Equal(false)
-		//
-		//		video.Value("play_url").String().NotEmpty()
-		//		video.Value("cover_url").String().NotEmpty()
-		//
-		//		video.Value("title").String().Equal(videoTitleA)
-		//		video.Value("favorite_count").Number().Equal(1)
-		//		video.Value("comment_count").Number().Equal(0)
-		//		video.Value("is_favorite").Boolean().Equal(true) // favorite
-		//	})
-		//})
-		//
-		//describe("user B unfavorite user A video", func() {
-		//	resp := e.POST("/douyin/favorite/action/").
-		//		WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 2).
-		//		Expect().
-		//		Status(http.StatusOK).
-		//		JSON().Object()
-		//	resp.Value("status_code").Number().Equal(0)
-		//})
-		//
-		//describe("query unfavorite effect", func() {
-		//	describe("user A query user A published videos", func() {
-		//		resp := e.GET("/douyin/publish/list/").
-		//			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//
-		//		resp.Value("video_list").Array().Length().Equal(1)
-		//		video := resp.Value("video_list").Array().First().Object()
-		//		videoIdA = int64(video.Value("id").Number().Raw())
-		//
-		//		author := video.Value("author").Object()
-		//		author.Value("id").Number().Equal(userIdA)
-		//		author.Value("name").String().Equal(usernameA)
-		//		author.Value("follow_count").Number().Equal(0)
-		//		author.Value("follower_count").Number().Equal(0)
-		//		author.Value("is_follow").Boolean().Equal(false)
-		//
-		//		video.Value("play_url").String().NotEmpty()
-		//		video.Value("cover_url").String().NotEmpty()
-		//
-		//		video.Value("title").String().Equal(videoTitleA)
-		//		video.Value("favorite_count").Number().Equal(0)
-		//		video.Value("comment_count").Number().Equal(0)
-		//		video.Value("is_favorite").Boolean().Equal(false)
-		//	})
-		//
-		//	describe("user B query user B favorite videos", func() {
-		//		resp := e.GET("/douyin/favorite/list/").
-		//			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//		resp.Value("video_list").Array().Length().Equal(0)
-		//	})
-		//})
-		//
-		//describe("user B unfavorite user A video again", func() {
-		//	e.POST("/douyin/favorite/action/").
-		//		WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 2).
-		//		Expect().
-		//		Status(http.StatusInternalServerError). // ErrDatabase
-		//		JSON().Object()
-		//})
-		//
-		//describe("query again, should make no effect", func() {
-		//	describe("user A query user A published videos", func() {
-		//		resp := e.GET("/douyin/publish/list/").
-		//			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//
-		//		resp.Value("video_list").Array().Length().Equal(1)
-		//		video := resp.Value("video_list").Array().First().Object()
-		//		videoIdA = int64(video.Value("id").Number().Raw())
-		//
-		//		author := video.Value("author").Object()
-		//		author.Value("id").Number().Equal(userIdA)
-		//		author.Value("name").String().Equal(usernameA)
-		//		author.Value("follow_count").Number().Equal(0)
-		//		author.Value("follower_count").Number().Equal(0)
-		//		author.Value("is_follow").Boolean().Equal(false)
-		//
-		//		video.Value("play_url").String().NotEmpty()
-		//		video.Value("cover_url").String().NotEmpty()
-		//
-		//		video.Value("title").String().Equal(videoTitleA)
-		//		video.Value("favorite_count").Number().Equal(0)
-		//		video.Value("comment_count").Number().Equal(0)
-		//		video.Value("is_favorite").Boolean().Equal(false)
-		//	})
-		//
-		//	describe("user B query user B favorite videos", func() {
-		//		resp := e.GET("/douyin/favorite/list/").
-		//			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
-		//			Expect().
-		//			Status(http.StatusOK).
-		//			JSON().Object()
-		//		resp.Value("status_code").Number().Equal(0)
-		//		resp.Value("video_list").Array().Length().Equal(0)
-		//	})
-		//})
+		describe("query favorite effect", func() {
+			describe("user A query user A published videos", func() {
+				resp := e.GET("/douyin/publish/list/").
+					WithQuery("user_id", userIdA).WithQuery("token", tokenA).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+
+				resp.Value("video_list").Array().Length().Equal(1)
+				video := resp.Value("video_list").Array().First().Object()
+				videoIdA = int64(video.Value("id").Number().Raw())
+
+				author := video.Value("author").Object()
+				author.Value("id").Number().Equal(userIdA)
+				author.Value("name").String().Equal(usernameA)
+				author.Value("follow_count").Number().Equal(0)
+				author.Value("follower_count").Number().Equal(0)
+				author.Value("is_follow").Boolean().Equal(false)
+
+				video.Value("play_url").String().NotEmpty()
+				video.Value("cover_url").String().NotEmpty()
+
+				video.Value("title").String().Equal(videoTitleA)
+				video.Value("favorite_count").Number().Equal(1) // add one
+				video.Value("comment_count").Number().Equal(0)
+				video.Value("is_favorite").Boolean().Equal(false)
+			})
+
+			describe("user B query user B favorite videos", func() {
+				resp := e.GET("/douyin/favorite/list/").
+					WithQuery("token", tokenB).WithQuery("user_id", userIdB).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+
+				resp.Value("video_list").Array().Length().Equal(1)
+				video := resp.Value("video_list").Array().First().Object()
+				video.Value("id").Number().Equal(videoIdA)
+
+				author := video.Value("author").Object()
+				author.Value("id").Number().Equal(userIdA)
+				author.Value("name").String().Equal(usernameA)
+				author.Value("follow_count").Number().Equal(0)
+				author.Value("follower_count").Number().Equal(0)
+				author.Value("is_follow").Boolean().Equal(false)
+
+				video.Value("play_url").String().NotEmpty()
+				video.Value("cover_url").String().NotEmpty()
+
+				video.Value("title").String().Equal(videoTitleA)
+				video.Value("favorite_count").Number().Equal(1)
+				video.Value("comment_count").Number().Equal(0)
+				video.Value("is_favorite").Boolean().Equal(true) // favorite
+			})
+		})
+
+		describe("user B favorite user A video again", func() {
+			e.POST("/douyin/favorite/action/").
+				WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 1).
+				Expect().
+				Status(http.StatusInternalServerError). // ErrDatabase
+				JSON().Object()
+		})
+
+		describe("query again, should make no effect", func() {
+			describe("user A query user A published videos", func() {
+				resp := e.GET("/douyin/publish/list/").
+					WithQuery("user_id", userIdA).WithQuery("token", tokenA).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+
+				resp.Value("video_list").Array().Length().Equal(1)
+				video := resp.Value("video_list").Array().First().Object()
+				videoIdA = int64(video.Value("id").Number().Raw())
+
+				author := video.Value("author").Object()
+				author.Value("id").Number().Equal(userIdA)
+				author.Value("name").String().Equal(usernameA)
+				author.Value("follow_count").Number().Equal(0)
+				author.Value("follower_count").Number().Equal(0)
+				author.Value("is_follow").Boolean().Equal(false)
+
+				video.Value("play_url").String().NotEmpty()
+				video.Value("cover_url").String().NotEmpty()
+
+				video.Value("title").String().Equal(videoTitleA)
+				video.Value("favorite_count").Number().Equal(1) // add one
+				video.Value("comment_count").Number().Equal(0)
+				video.Value("is_favorite").Boolean().Equal(false)
+			})
+
+			describe("user B query user B favorite videos", func() {
+				resp := e.GET("/douyin/favorite/list/").
+					WithQuery("token", tokenB).WithQuery("user_id", userIdB).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+
+				resp.Value("video_list").Array().Length().Equal(1)
+				video := resp.Value("video_list").Array().First().Object()
+				video.Value("id").Number().Equal(videoIdA)
+
+				author := video.Value("author").Object()
+				author.Value("id").Number().Equal(userIdA)
+				author.Value("name").String().Equal(usernameA)
+				author.Value("follow_count").Number().Equal(0)
+				author.Value("follower_count").Number().Equal(0)
+				author.Value("is_follow").Boolean().Equal(false)
+
+				video.Value("play_url").String().NotEmpty()
+				video.Value("cover_url").String().NotEmpty()
+
+				video.Value("title").String().Equal(videoTitleA)
+				video.Value("favorite_count").Number().Equal(1)
+				video.Value("comment_count").Number().Equal(0)
+				video.Value("is_favorite").Boolean().Equal(true) // favorite
+			})
+		})
+
+		describe("user B unfavorite user A video", func() {
+			resp := e.POST("/douyin/favorite/action/").
+				WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 2).
+				Expect().
+				Status(http.StatusOK).
+				JSON().Object()
+			resp.Value("status_code").Number().Equal(0)
+		})
+
+		describe("query unfavorite effect", func() {
+			describe("user A query user A published videos", func() {
+				resp := e.GET("/douyin/publish/list/").
+					WithQuery("user_id", userIdA).WithQuery("token", tokenA).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+
+				resp.Value("video_list").Array().Length().Equal(1)
+				video := resp.Value("video_list").Array().First().Object()
+				videoIdA = int64(video.Value("id").Number().Raw())
+
+				author := video.Value("author").Object()
+				author.Value("id").Number().Equal(userIdA)
+				author.Value("name").String().Equal(usernameA)
+				author.Value("follow_count").Number().Equal(0)
+				author.Value("follower_count").Number().Equal(0)
+				author.Value("is_follow").Boolean().Equal(false)
+
+				video.Value("play_url").String().NotEmpty()
+				video.Value("cover_url").String().NotEmpty()
+
+				video.Value("title").String().Equal(videoTitleA)
+				video.Value("favorite_count").Number().Equal(0)
+				video.Value("comment_count").Number().Equal(0)
+				video.Value("is_favorite").Boolean().Equal(false)
+			})
+
+			describe("user B query user B favorite videos", func() {
+				resp := e.GET("/douyin/favorite/list/").
+					WithQuery("token", tokenB).WithQuery("user_id", userIdB).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+				resp.Value("video_list").Array().Length().Equal(0)
+			})
+		})
+
+		describe("user B unfavorite user A video again", func() {
+			e.POST("/douyin/favorite/action/").
+				WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 2).
+				Expect().
+				Status(http.StatusInternalServerError). // ErrDatabase
+				JSON().Object()
+		})
+
+		describe("query again, should make no effect", func() {
+			describe("user A query user A published videos", func() {
+				resp := e.GET("/douyin/publish/list/").
+					WithQuery("user_id", userIdA).WithQuery("token", tokenA).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+
+				resp.Value("video_list").Array().Length().Equal(1)
+				video := resp.Value("video_list").Array().First().Object()
+				videoIdA = int64(video.Value("id").Number().Raw())
+
+				author := video.Value("author").Object()
+				author.Value("id").Number().Equal(userIdA)
+				author.Value("name").String().Equal(usernameA)
+				author.Value("follow_count").Number().Equal(0)
+				author.Value("follower_count").Number().Equal(0)
+				author.Value("is_follow").Boolean().Equal(false)
+
+				video.Value("play_url").String().NotEmpty()
+				video.Value("cover_url").String().NotEmpty()
+
+				video.Value("title").String().Equal(videoTitleA)
+				video.Value("favorite_count").Number().Equal(0)
+				video.Value("comment_count").Number().Equal(0)
+				video.Value("is_favorite").Boolean().Equal(false)
+			})
+
+			describe("user B query user B favorite videos", func() {
+				resp := e.GET("/douyin/favorite/list/").
+					WithQuery("token", tokenB).WithQuery("user_id", userIdB).
+					Expect().
+					Status(http.StatusOK).
+					JSON().Object()
+				resp.Value("status_code").Number().Equal(0)
+				resp.Value("video_list").Array().Length().Equal(0)
+			})
+		})
 	})
 }
