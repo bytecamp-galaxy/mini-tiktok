@@ -41,12 +41,19 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 	}
 	isFavorite := false
 	isFollow := false
-	if view != nil && q.User.FavoriteVideos.WithContext(ctx).Where(q.Video.ID.Eq(video.ID)).Model(view).Count() != 0 {
-		isFavorite = true
+	if view != nil {
+		count, _ := q.FavoriteRelation.WithContext(ctx).
+			Where(q.FavoriteRelation.UserID.Eq(view.ID), q.FavoriteRelation.VideoID.Eq(video.ID)).
+			Count()
+		if count != 0 {
+			isFavorite = true
+		}
 	}
 	author := video.Author // preload required
 	if view != nil {
-		count, _ := q.Relation.WithContext(ctx).Where(q.Relation.UserID.Eq(view.ID), q.Relation.ToUserID.Eq(author.ID)).Count()
+		count, _ := q.FollowRelation.WithContext(ctx).
+			Where(q.FollowRelation.UserID.Eq(view.ID), q.FollowRelation.ToUserID.Eq(author.ID)).
+			Count()
 		if count != 0 {
 			isFollow = true
 		}

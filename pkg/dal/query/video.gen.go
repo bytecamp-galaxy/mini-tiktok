@@ -39,19 +39,6 @@ func newVideo(db *gorm.DB, opts ...gen.DOOption) video {
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("Author", "model.User"),
-		FavoriteVideos: struct {
-			field.RelationField
-			Author struct {
-				field.RelationField
-			}
-		}{
-			RelationField: field.NewRelation("Author.FavoriteVideos", "model.Video"),
-			Author: struct {
-				field.RelationField
-			}{
-				RelationField: field.NewRelation("Author.FavoriteVideos.Author", "model.User"),
-			},
-		},
 	}
 
 	_video.fillFieldMap()
@@ -138,13 +125,6 @@ type videoBelongsToAuthor struct {
 	db *gorm.DB
 
 	field.RelationField
-
-	FavoriteVideos struct {
-		field.RelationField
-		Author struct {
-			field.RelationField
-		}
-	}
 }
 
 func (a videoBelongsToAuthor) Where(conds ...field.Expr) *videoBelongsToAuthor {

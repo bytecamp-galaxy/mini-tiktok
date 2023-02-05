@@ -29,7 +29,9 @@ func UserConverterORM(ctx context.Context, q *query.Query, user *model.User, vie
 	}
 	isFollow := false
 	if view != nil {
-		count, _ := q.Relation.WithContext(ctx).Where(q.Relation.UserID.Eq(view.ID), q.Relation.ToUserID.Eq(user.ID)).Count()
+		count, _ := q.FollowRelation.WithContext(ctx).
+			Where(q.FollowRelation.UserID.Eq(view.ID), q.FollowRelation.ToUserID.Eq(user.ID)).
+			Count()
 		if count != 0 {
 			isFollow = true
 		}

@@ -52,9 +52,12 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 		case 2:
 			{
 				c := tx.Comment
-				_, err = c.WithContext(ctx).Where(c.ID.Eq(*req.CommentId)).Delete()
+				result, err := c.WithContext(ctx).Where(c.ID.Eq(*req.CommentId)).Delete()
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+				}
+				if result.RowsAffected == 0 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "nonexistent comment")
 				}
 
 				v := tx.Video

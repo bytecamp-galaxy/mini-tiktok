@@ -32,24 +32,6 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Password = field.NewString(tableName, "password")
 	_user.FollowingCount = field.NewInt64(tableName, "following_count")
 	_user.FollowerCount = field.NewInt64(tableName, "follower_count")
-	_user.FavoriteVideos = userManyToManyFavoriteVideos{
-		db: db.Session(&gorm.Session{}),
-
-		RelationField: field.NewRelation("FavoriteVideos", "model.Video"),
-		Author: struct {
-			field.RelationField
-			FavoriteVideos struct {
-				field.RelationField
-			}
-		}{
-			RelationField: field.NewRelation("FavoriteVideos.Author", "model.User"),
-			FavoriteVideos: struct {
-				field.RelationField
-			}{
-				RelationField: field.NewRelation("FavoriteVideos.Author.FavoriteVideos", "model.Video"),
-			},
-		},
-	}
 
 	_user.fillFieldMap()
 
@@ -65,7 +47,6 @@ type user struct {
 	Password       field.String
 	FollowingCount field.Int64
 	FollowerCount  field.Int64
-	FavoriteVideos userManyToManyFavoriteVideos
 
 	fieldMap map[string]field.Expr
 }
@@ -103,13 +84,12 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 6)
+	u.fieldMap = make(map[string]field.Expr, 5)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["username"] = u.Username
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["following_count"] = u.FollowingCount
 	u.fieldMap["follower_count"] = u.FollowerCount
-
 }
 
 func (u user) clone(db *gorm.DB) user {
@@ -120,79 +100,6 @@ func (u user) clone(db *gorm.DB) user {
 func (u user) replaceDB(db *gorm.DB) user {
 	u.userDo.ReplaceDB(db)
 	return u
-}
-
-type userManyToManyFavoriteVideos struct {
-	db *gorm.DB
-
-	field.RelationField
-
-	Author struct {
-		field.RelationField
-		FavoriteVideos struct {
-			field.RelationField
-		}
-	}
-}
-
-func (a userManyToManyFavoriteVideos) Where(conds ...field.Expr) *userManyToManyFavoriteVideos {
-	if len(conds) == 0 {
-		return &a
-	}
-
-	exprs := make([]clause.Expression, 0, len(conds))
-	for _, cond := range conds {
-		exprs = append(exprs, cond.BeCond().(clause.Expression))
-	}
-	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
-	return &a
-}
-
-func (a userManyToManyFavoriteVideos) WithContext(ctx context.Context) *userManyToManyFavoriteVideos {
-	a.db = a.db.WithContext(ctx)
-	return &a
-}
-
-func (a userManyToManyFavoriteVideos) Model(m *model.User) *userManyToManyFavoriteVideosTx {
-	return &userManyToManyFavoriteVideosTx{a.db.Model(m).Association(a.Name())}
-}
-
-type userManyToManyFavoriteVideosTx struct{ tx *gorm.Association }
-
-func (a userManyToManyFavoriteVideosTx) Find() (result []*model.Video, err error) {
-	return result, a.tx.Find(&result)
-}
-
-func (a userManyToManyFavoriteVideosTx) Append(values ...*model.Video) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Append(targetValues...)
-}
-
-func (a userManyToManyFavoriteVideosTx) Replace(values ...*model.Video) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Replace(targetValues...)
-}
-
-func (a userManyToManyFavoriteVideosTx) Delete(values ...*model.Video) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Delete(targetValues...)
-}
-
-func (a userManyToManyFavoriteVideosTx) Clear() error {
-	return a.tx.Clear()
-}
-
-func (a userManyToManyFavoriteVideosTx) Count() int64 {
-	return a.tx.Count()
 }
 
 type userDo struct{ gen.DO }

@@ -24,7 +24,7 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 		case 1:
 			{
 				id := snowflake.Generate()
-				err := tx.Relation.WithContext(ctx).Create(&model.Relation{
+				err := tx.FollowRelation.WithContext(ctx).Create(&model.FollowRelation{
 					ID:       id,
 					UserID:   req.UserId,
 					ToUserID: req.ToUserId,
@@ -45,10 +45,13 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 			}
 		case 2:
 			{
-				r := tx.Relation
-				_, err := r.WithContext(ctx).Where(r.UserID.Eq(req.UserId), r.ToUserID.Eq(req.ToUserId)).Delete()
+				r := tx.FollowRelation
+				result, err := r.WithContext(ctx).Where(r.UserID.Eq(req.UserId), r.ToUserID.Eq(req.ToUserId)).Delete()
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+				}
+				if result.RowsAffected == 0 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "nonexistent relation")
 				}
 
 				u := tx.User
@@ -75,7 +78,7 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 
 // RelationFollowList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) RelationFollowList(ctx context.Context, req *relation.RelationFollowListRequest) (resp *relation.RelationFollowListResponse, err error) {
-	r := query.Relation
+	r := query.FollowRelation
 	u := query.User
 
 	relList, err := r.WithContext(ctx).Preload(r.ToUser).Where(r.UserID.Eq(req.UserId)).Find()
@@ -100,7 +103,7 @@ func (s *RelationServiceImpl) RelationFollowList(ctx context.Context, req *relat
 
 // RelationFollowerList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) RelationFollowerList(ctx context.Context, req *relation.RelationFollowerListRequest) (resp *relation.RelationFollowerListResponse, err error) {
-	r := query.Relation
+	r := query.FollowRelation
 	u := query.User
 
 	relList, err := r.WithContext(ctx).Preload(r.User).Where(r.ToUserID.Eq(req.UserId)).Find()

@@ -18,6 +18,6 @@ func main() {
 	// Generate struct `User` based on table `users`
 	// g.GenerateModel("users")
 
-	g.ApplyBasic(model.User{}, model.Video{}, model.Comment{}, model.Relation{})
+	g.ApplyBasic(model.User{}, model.Video{}, model.Comment{}, model.FollowRelation{}, model.FavoriteRelation{})
 	g.Execute()
 }

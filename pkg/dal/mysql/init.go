@@ -41,10 +41,11 @@ func Init(migrated bool) {
 	if migrated {
 		// NOTE: concurrent `AutoMigrate` is not supported
 		// only `AutoMigrate` when api server setup
-		if err := DB.Migrator().DropTable(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
+		// drop table for the convenience of test
+		if err := DB.Migrator().DropTable(&model.User{}, &model.Video{}, &model.Comment{}, &model.FollowRelation{}, &model.FavoriteRelation{}); err != nil {
 			panic(err)
 		}
-		if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Relation{}); err != nil {
+		if err := DB.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.FollowRelation{}, &model.FavoriteRelation{}); err != nil {
 			panic(err)
 		}
 	}

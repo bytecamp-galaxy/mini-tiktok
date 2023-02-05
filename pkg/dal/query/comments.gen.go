@@ -28,6 +28,7 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 	tableName := _comment.commentDo.TableName()
 	_comment.ALL = field.NewAsterisk(tableName)
 	_comment.ID = field.NewInt64(tableName, "id")
+	_comment.CreatedAt = field.NewInt64(tableName, "created_at")
 	_comment.VideoID = field.NewInt64(tableName, "video_id")
 	_comment.UserID = field.NewInt64(tableName, "user_id")
 	_comment.Content = field.NewString(tableName, "content")
@@ -37,16 +38,8 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 		RelationField: field.NewRelation("Video", "model.Video"),
 		Author: struct {
 			field.RelationField
-			FavoriteVideos struct {
-				field.RelationField
-			}
 		}{
 			RelationField: field.NewRelation("Video.Author", "model.User"),
-			FavoriteVideos: struct {
-				field.RelationField
-			}{
-				RelationField: field.NewRelation("Video.Author.FavoriteVideos", "model.Video"),
-			},
 		},
 	}
 
@@ -64,12 +57,13 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 type comment struct {
 	commentDo
 
-	ALL     field.Asterisk
-	ID      field.Int64
-	VideoID field.Int64
-	UserID  field.Int64
-	Content field.String
-	Video   commentBelongsToVideo
+	ALL       field.Asterisk
+	ID        field.Int64
+	CreatedAt field.Int64
+	VideoID   field.Int64
+	UserID    field.Int64
+	Content   field.String
+	Video     commentBelongsToVideo
 
 	User commentBelongsToUser
 
@@ -89,6 +83,7 @@ func (c comment) As(alias string) *comment {
 func (c *comment) updateTableName(table string) *comment {
 	c.ALL = field.NewAsterisk(table)
 	c.ID = field.NewInt64(table, "id")
+	c.CreatedAt = field.NewInt64(table, "created_at")
 	c.VideoID = field.NewInt64(table, "video_id")
 	c.UserID = field.NewInt64(table, "user_id")
 	c.Content = field.NewString(table, "content")
@@ -108,8 +103,9 @@ func (c *comment) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *comment) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 6)
+	c.fieldMap = make(map[string]field.Expr, 7)
 	c.fieldMap["id"] = c.ID
+	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["video_id"] = c.VideoID
 	c.fieldMap["user_id"] = c.UserID
 	c.fieldMap["content"] = c.Content
@@ -133,9 +129,6 @@ type commentBelongsToVideo struct {
 
 	Author struct {
 		field.RelationField
-		FavoriteVideos struct {
-			field.RelationField
-		}
 	}
 }
 

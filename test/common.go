@@ -18,3 +18,22 @@ func newExpect(t *testing.T) *httpexpect.Expect {
 		},
 	})
 }
+
+var (
+	depth = 1
+)
+
+const (
+	indentation = 2
+	flag        = "*"
+)
+
+func describe(text string, fn func()) {
+	for i := 0; i < depth; i++ {
+		fmt.Print(flag)
+	}
+	fmt.Printf(" %s\n", text)
+	depth += indentation
+	fn()
+	depth -= indentation
+}
