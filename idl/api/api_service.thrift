@@ -4,8 +4,8 @@ namespace go api
                         User Service
 ====================================================================*/
 struct UserRegisterRequest {
-    1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32)");
-    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32)");
+    1: required string Username (api.query="username", api.vd="(len($) > 8 && len($) < 32)");
+    2: required string Password (api.query="password", api.vd="(len($) > 8 && len($) < 32)");
 }
 
 struct UserRegisterResponse {
@@ -16,8 +16,8 @@ struct UserRegisterResponse {
 }
 
 struct UserLoginRequest {
-    1: required string Username (api.query="username", api.vd="(len($) > 0 && len($) < 32)");
-    2: required string Password (api.query="password", api.vd="(len($) > 0 && len($) < 32)");
+    1: required string Username (api.query="username", api.vd="(len($) > 8 && len($) < 32)");
+    2: required string Password (api.query="password", api.vd="(len($) > 8 && len($) < 32)");
 }
 
 struct UserLoginResponse {

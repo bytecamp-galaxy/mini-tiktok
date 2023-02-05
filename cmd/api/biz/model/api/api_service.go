@@ -16,8 +16,8 @@ import (
 ====================================================================
 */
 type UserRegisterRequest struct {
-	Username string `thrift:"Username,1,required" json:"Username,required" query:"username,required" vd:"(len($) > 0 && len($) < 32)"`
-	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 0 && len($) < 32)"`
+	Username string `thrift:"Username,1,required" json:"Username,required" query:"username,required" vd:"(len($) > 8 && len($) < 32)"`
+	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 8 && len($) < 32)"`
 }
 
 func NewUserRegisterRequest() *UserRegisterRequest {
@@ -522,8 +522,8 @@ func (p *UserRegisterResponse) String() string {
 }
 
 type UserLoginRequest struct {
-	Username string `thrift:"Username,1,required" json:"Username,required" query:"username,required" vd:"(len($) > 0 && len($) < 32)"`
-	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 0 && len($) < 32)"`
+	Username string `thrift:"Username,1,required" json:"Username,required" query:"username,required" vd:"(len($) > 8 && len($) < 32)"`
+	Password string `thrift:"Password,2,required" json:"Password,required" query:"password,required" vd:"(len($) > 8 && len($) < 32)"`
 }
 
 func NewUserLoginRequest() *UserLoginRequest {
