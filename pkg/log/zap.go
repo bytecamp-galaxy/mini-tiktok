@@ -36,8 +36,3 @@ func getDBLogger() *zap.Logger {
 	core := zapcore.NewCore(getEncoder(), getLogWriter(), getLevel())
 	return zap.New(core) // TODO(vgalaxy): add caller
 }
-
-func GetTestLogger() *zap.Logger {
-	core := zapcore.NewCore(getEncoder(), getLogWriter(), getLevel())
-	return zap.New(core, zap.AddCaller())
-}

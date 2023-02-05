@@ -10,8 +10,7 @@ run:
 	go run ./cmd/relation &
 
 test:
-	go test ./test/base_api_test.go ./test/common.go -v
-	go test ./test/interact_api_test.go ./test/common.go -v
+	go test ./test/api_test.go ./test/common.go -v
 
 kill:
 	# `$` will be escaped

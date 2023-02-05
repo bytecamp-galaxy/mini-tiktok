@@ -1,31 +1,20 @@
 package test
 
 import (
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
-	"github.com/gavv/httpexpect/v2"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	"go.uber.org/zap"
 	"net/http"
 	"testing"
 )
 
-var logger *zap.Logger
-var e *httpexpect.Expect
-
 func TestAPI(t *testing.T) {
-	logger = log.GetTestLogger()
-	e = newExpect(t)
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "API TESTS")
-}
+	e := newExpect(t)
+	l := zap.NewExample()
 
-// TODO(vgalaxy): use gomega expect, now test always success
-var _ = Describe("API TESTS", Ordered, func() {
-	It("ping", func() {
-		e.GET("/ping").Expect().Status(http.StatusOK).JSON().Object().Value("message").Equal("pong")
-	})
+	describe := func(text string, fn func()) {
+		l.Info(text)
+		fn()
+	}
 
 	usernameA := utils.RandStringBytesMaskImprSrcUnsafe(15)
 	passwordA := utils.RandStringBytesMaskImprSrcUnsafe(15)
@@ -54,7 +43,11 @@ var _ = Describe("API TESTS", Ordered, func() {
 	utils.Use(usernameA, usernameB, passwordA, passwordB, videoTitleA, videoTitleB, commentAA, commentAB, commentBA, commentBB)
 	utils.Use(tokenA, tokenB, userIdA, userIdB, videoIdA, videoIdB, commentIdAA, commentIdAB, commentIdBA, commentIdBB)
 
-	It("user A register", func() {
+	describe("ping", func() {
+		e.GET("/ping").Expect().Status(http.StatusOK).JSON().Object().Value("message").Equal("pong")
+	})
+
+	describe("user A register", func() {
 		resp := e.POST("/douyin/user/register/").
 			WithQuery("username", usernameA).WithQuery("password", passwordA).
 			Expect().
@@ -66,7 +59,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		userIdA = int64(resp.Value("user_id").Number().Raw())
 	})
 
-	It("user B register", func() {
+	describe("user B register", func() {
 		resp := e.POST("/douyin/user/register/").
 			WithQuery("username", usernameB).WithQuery("password", passwordB).
 			Expect().
@@ -78,7 +71,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		userIdB = int64(resp.Value("user_id").Number().Raw())
 	})
 
-	It("user A login", func() {
+	describe("user A login", func() {
 		resp := e.POST("/douyin/user/login/").
 			WithQuery("username", usernameA).WithQuery("password", passwordA).
 			Expect().
@@ -90,7 +83,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		tokenA = resp.Value("token").String().Raw()
 	})
 
-	It("user A query user A info", func() {
+	describe("user A query user A info", func() {
 		resp := e.GET("/douyin/user/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
 			Expect().
@@ -107,7 +100,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user A query user B info", func() {
+	describe("user A query user B info", func() {
 		resp := e.GET("/douyin/user/").
 			WithQuery("user_id", userIdB).WithQuery("token", tokenA).
 			Expect().
@@ -124,7 +117,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user A publish video", func() {
+	describe("user A publish video", func() {
 		resp := e.POST("/douyin/publish/action/").
 			WithMultipart().
 			WithFile("data", "../assets/test.mp4").
@@ -138,7 +131,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		// time.Sleep(5 * time.Second)
 	})
 
-	It("user A query user A published videos", func() {
+	describe("user A query user A published videos", func() {
 		resp := e.GET("/douyin/publish/list/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
 			Expect().
@@ -166,7 +159,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("is_favorite").Boolean().Equal(false)
 	})
 
-	It("user A query user B published videos", func() {
+	describe("user A query user B published videos", func() {
 		resp := e.GET("/douyin/publish/list/").
 			WithQuery("user_id", userIdB).WithQuery("token", tokenA).
 			Expect().
@@ -176,7 +169,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Length().Equal(0)
 	})
 
-	It("user B favorite user A video", func() {
+	describe("user B favorite user A video", func() {
 		resp := e.POST("/douyin/favorite/action/").
 			WithQuery("token", tokenB).WithQuery("video_id", videoIdA).WithQuery("action_type", 1).
 			Expect().
@@ -185,7 +178,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("status_code").Number().Equal(0)
 	})
 
-	It("user A query user A published videos", func() {
+	describe("user A query user A published videos", func() {
 		resp := e.GET("/douyin/publish/list/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
 			Expect().
@@ -213,7 +206,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("is_favorite").Boolean().Equal(false)
 	})
 
-	It("user B query user B favorite videos", func() {
+	describe("user B query user B favorite videos", func() {
 		resp := e.GET("/douyin/favorite/list/").
 			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
 			Expect().
@@ -241,7 +234,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("is_favorite").Boolean().Equal(true) // favorite
 	})
 
-	It("user B comment user A video", func() {
+	describe("user B comment user A video", func() {
 		resp := e.POST("/douyin/comment/action/").
 			WithQuery("token", tokenB).
 			WithQuery("video_id", videoIdA).
@@ -266,7 +259,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user B query user A published videos", func() {
+	describe("user B query user A published videos", func() {
 		resp := e.GET("/douyin/publish/list/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenB).
 			Expect().
@@ -294,7 +287,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("is_favorite").Boolean().Equal(true)
 	})
 
-	It("user A query user A video comments", func() {
+	describe("user A query user A video comments", func() {
 		resp := e.GET("/douyin/comment/list/").
 			WithQuery("token", tokenA).WithQuery("video_id", videoIdA).
 			Expect().
@@ -317,7 +310,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user A feed", func() {
+	describe("user A feed", func() {
 		resp := e.GET("/douyin/feed/").
 			WithQuery("token", tokenA).
 			Expect().
@@ -354,7 +347,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("user B feed", func() {
+	describe("user B feed", func() {
 		resp := e.GET("/douyin/feed/").
 			WithQuery("token", tokenB).
 			Expect().
@@ -391,7 +384,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("visitor feed", func() {
+	describe("visitor feed", func() {
 		resp := e.GET("/douyin/feed/").
 			Expect().
 			Status(http.StatusOK).
@@ -427,7 +420,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("user B follow user A", func() {
+	describe("user B follow user A", func() {
 		resp := e.POST("/douyin/relation/action/").
 			WithQuery("token", tokenB).WithQuery("to_user_id", userIdA).WithQuery("action_type", 1).
 			Expect().
@@ -436,7 +429,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("status_code").Number().Equal(0)
 	})
 
-	It("user A query user A info", func() {
+	describe("user A query user A info", func() {
 		resp := e.GET("/douyin/user/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenA).
 			Expect().
@@ -453,7 +446,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user B query user A info", func() {
+	describe("user B query user A info", func() {
 		resp := e.GET("/douyin/user/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenB).
 			Expect().
@@ -470,7 +463,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(true) // follow
 	})
 
-	It("user A query user B info", func() {
+	describe("user A query user B info", func() {
 		resp := e.GET("/douyin/user/").
 			WithQuery("user_id", userIdB).WithQuery("token", tokenA).
 			Expect().
@@ -487,7 +480,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user B query user A published videos", func() {
+	describe("user B query user A published videos", func() {
 		resp := e.GET("/douyin/publish/list/").
 			WithQuery("user_id", userIdA).WithQuery("token", tokenB).
 			Expect().
@@ -515,7 +508,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		video.Value("is_favorite").Boolean().Equal(true)
 	})
 
-	It("user A feed", func() {
+	describe("user A feed", func() {
 		resp := e.GET("/douyin/feed/").
 			WithQuery("token", tokenA).
 			Expect().
@@ -552,7 +545,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("user B feed", func() {
+	describe("user B feed", func() {
 		resp := e.GET("/douyin/feed/").
 			WithQuery("token", tokenB).
 			Expect().
@@ -589,7 +582,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("visitor feed", func() {
+	describe("visitor feed", func() {
 		resp := e.GET("/douyin/feed/").
 			Expect().
 			Status(http.StatusOK).
@@ -625,7 +618,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("user B uncomment user A video", func() {
+	describe("user B uncomment user A video", func() {
 		resp := e.POST("/douyin/comment/action/").
 			WithQuery("token", tokenB).
 			WithQuery("video_id", videoIdA).
@@ -638,7 +631,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.NotContainsKey("comment") // json:"comment_list,required"`
 	})
 
-	It("visitor feed", func() {
+	describe("visitor feed", func() {
 		resp := e.GET("/douyin/feed/").
 			Expect().
 			Status(http.StatusOK).
@@ -674,7 +667,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("video_list").Array().Empty() // empty
 	})
 
-	It("user A comment user A video", func() {
+	describe("user A comment user A video", func() {
 		resp := e.POST("/douyin/comment/action/").
 			WithQuery("token", tokenA).
 			WithQuery("video_id", videoIdA).
@@ -699,7 +692,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user A query user A video comments", func() {
+	describe("user A query user A video comments", func() {
 		resp := e.GET("/douyin/comment/list/").
 			WithQuery("token", tokenA).WithQuery("video_id", videoIdA).
 			Expect().
@@ -722,7 +715,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user B query user A video comments", func() {
+	describe("user B query user A video comments", func() {
 		resp := e.GET("/douyin/comment/list/").
 			WithQuery("token", tokenB).WithQuery("video_id", videoIdA).
 			Expect().
@@ -745,7 +738,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(true)
 	})
 
-	It("user A query user A follower list", func() {
+	describe("user A query user A follower list", func() {
 		resp := e.GET("/douyin/relation/follower/list/").
 			WithQuery("token", tokenA).WithQuery("user_id", userIdA).
 			Expect().
@@ -762,7 +755,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user A query user B follow list", func() {
+	describe("user A query user B follow list", func() {
 		resp := e.GET("/douyin/relation/follow/list/").
 			WithQuery("token", tokenA).WithQuery("user_id", userIdB).
 			Expect().
@@ -779,7 +772,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user B query user A follow list", func() {
+	describe("user B query user A follow list", func() {
 		resp := e.GET("/douyin/relation/follow/list/").
 			WithQuery("token", tokenB).WithQuery("user_id", userIdA).
 			Expect().
@@ -789,7 +782,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("user_list").Array().Empty()
 	})
 
-	It("user B query user B follow list", func() {
+	describe("user B query user B follow list", func() {
 		resp := e.GET("/douyin/relation/follow/list/").
 			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
 			Expect().
@@ -806,7 +799,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(true)
 	})
 
-	It("user A follow user B", func() {
+	describe("user A follow user B", func() {
 		resp := e.POST("/douyin/relation/action/").
 			WithQuery("token", tokenA).WithQuery("to_user_id", userIdB).WithQuery("action_type", 1).
 			Expect().
@@ -815,7 +808,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		resp.Value("status_code").Number().Equal(0)
 	})
 
-	It("user B query user A follow list", func() {
+	describe("user B query user A follow list", func() {
 		resp := e.GET("/douyin/relation/follow/list/").
 			WithQuery("token", tokenB).WithQuery("user_id", userIdA).
 			Expect().
@@ -832,7 +825,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("is_follow").Boolean().Equal(false)
 	})
 
-	It("user B query user B follower list", func() {
+	describe("user B query user B follower list", func() {
 		resp := e.GET("/douyin/relation/follow/list/").
 			WithQuery("token", tokenB).WithQuery("user_id", userIdB).
 			Expect().
@@ -848,4 +841,4 @@ var _ = Describe("API TESTS", Ordered, func() {
 		user.Value("follower_count").Number().Equal(1)
 		user.Value("is_follow").Boolean().Equal(true)
 	})
-})
+}
