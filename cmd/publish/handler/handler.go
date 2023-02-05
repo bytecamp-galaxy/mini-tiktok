@@ -98,23 +98,24 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 
 // PublishList implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
-	uid := req.GetUserId()
-
 	// query videos in db
 	v := query.Video
 	u := query.User
 
-	// find user, if not found, user is nil
-	user, _ := u.WithContext(ctx).Where(u.ID.Eq(uid)).Take()
+	// find user view
+	view, err := u.WithContext(ctx).Where(u.ID.Eq(req.UserViewId)).Take()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
 
-	videos, err := v.WithContext(ctx).Preload(v.Author).Order(v.CreatedAt.Desc()).Where(v.AuthorID.Eq(uid)).Find()
+	videos, err := v.WithContext(ctx).Preload(v.Author).Order(v.CreatedAt.Desc()).Where(v.AuthorID.Eq(req.UserId)).Find()
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, user)
+		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, view)
 	}
 
 	resp = &publish.PublishListResponse{

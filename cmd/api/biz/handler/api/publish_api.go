@@ -48,7 +48,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	// fetch user id from token
 	userId, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
 		return
 	}
 
@@ -70,8 +70,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	_, err = (*cli).PublishVideo(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
@@ -99,6 +98,13 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// fetch user view id from token
+	userViewId, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
+		return
+	}
+
 	// set up connection with publish server
 	v := conf.Init()
 	cli, err := rpc.InitPublishClient(v.GetString("api-server.name"))
@@ -109,14 +115,14 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &publish.PublishListRequest{
-		UserId: req.GetUserId(),
+		UserId:     req.GetUserId(),
+		UserViewId: userViewId.(int64),
 	}
 
 	respRpc, err := (*cli).PublishList(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))

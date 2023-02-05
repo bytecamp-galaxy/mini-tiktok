@@ -358,6 +358,7 @@ func (p *RelationFollowListRequest) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetUserId bool = false
+	var issetUserViewId bool = false
 	_, l, err = bthrift.Binary.ReadStructBegin(buf)
 	offset += l
 	if err != nil {
@@ -389,6 +390,21 @@ func (p *RelationFollowListRequest) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetUserViewId = true
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -411,6 +427,11 @@ func (p *RelationFollowListRequest) FastRead(buf []byte) (int, error) {
 
 	if !issetUserId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUserViewId {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -444,6 +465,20 @@ func (p *RelationFollowListRequest) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *RelationFollowListRequest) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.UserViewId = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *RelationFollowListRequest) FastWrite(buf []byte) int {
 	return 0
@@ -454,6 +489,7 @@ func (p *RelationFollowListRequest) FastWriteNocopy(buf []byte, binaryWriter bth
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "RelationFollowListRequest")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -465,6 +501,7 @@ func (p *RelationFollowListRequest) BLength() int {
 	l += bthrift.Binary.StructBeginLength("RelationFollowListRequest")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -480,10 +517,28 @@ func (p *RelationFollowListRequest) fastWriteField1(buf []byte, binaryWriter bth
 	return offset
 }
 
+func (p *RelationFollowListRequest) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "UserViewId", thrift.I64, 2)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.UserViewId)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *RelationFollowListRequest) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("UserId", thrift.I64, 1)
 	l += bthrift.Binary.I64Length(p.UserId)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *RelationFollowListRequest) field2Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("UserViewId", thrift.I64, 2)
+	l += bthrift.Binary.I64Length(p.UserViewId)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -657,6 +712,7 @@ func (p *RelationFollowerListRequest) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetUserId bool = false
+	var issetUserViewId bool = false
 	_, l, err = bthrift.Binary.ReadStructBegin(buf)
 	offset += l
 	if err != nil {
@@ -688,6 +744,21 @@ func (p *RelationFollowerListRequest) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetUserViewId = true
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -710,6 +781,11 @@ func (p *RelationFollowerListRequest) FastRead(buf []byte) (int, error) {
 
 	if !issetUserId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUserViewId {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -743,6 +819,20 @@ func (p *RelationFollowerListRequest) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *RelationFollowerListRequest) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.UserViewId = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *RelationFollowerListRequest) FastWrite(buf []byte) int {
 	return 0
@@ -753,6 +843,7 @@ func (p *RelationFollowerListRequest) FastWriteNocopy(buf []byte, binaryWriter b
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "RelationFollowerListRequest")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -764,6 +855,7 @@ func (p *RelationFollowerListRequest) BLength() int {
 	l += bthrift.Binary.StructBeginLength("RelationFollowerListRequest")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -779,10 +871,28 @@ func (p *RelationFollowerListRequest) fastWriteField1(buf []byte, binaryWriter b
 	return offset
 }
 
+func (p *RelationFollowerListRequest) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "UserViewId", thrift.I64, 2)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.UserViewId)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *RelationFollowerListRequest) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("UserId", thrift.I64, 1)
 	l += bthrift.Binary.I64Length(p.UserId)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *RelationFollowerListRequest) field2Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("UserViewId", thrift.I64, 2)
+	l += bthrift.Binary.I64Length(p.UserViewId)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

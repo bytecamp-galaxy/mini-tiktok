@@ -35,22 +35,28 @@ func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
 }
 
 // VideoConverterORM convert *model.Videos to *rpcmodel.Videos
-func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, user *model.User) *rpcmodel.Video {
+func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, view *model.User) *rpcmodel.Video {
 	if video == nil {
 		return nil
 	}
 	isFavorite := false
-	// TODO(vgalaxy): batch process
-	if user != nil && q.User.FavoriteVideos.WithContext(ctx).Where(q.Video.ID.Eq(video.ID)).Model(user).Count() != 0 {
+	isFollow := false
+	if view != nil && q.User.FavoriteVideos.WithContext(ctx).Where(q.Video.ID.Eq(video.ID)).Model(view).Count() != 0 {
 		isFavorite = true
 	}
 	author := video.Author // preload required
+	if view != nil {
+		count, _ := q.Relation.WithContext(ctx).Where(q.Relation.UserID.Eq(view.ID), q.Relation.ToUserID.Eq(author.ID)).Count()
+		if count != 0 {
+			isFollow = true
+		}
+	}
 	u := &rpcmodel.User{
 		Id:            author.ID,
 		Name:          author.Username,
 		FollowCount:   author.FollowingCount,
 		FollowerCount: author.FollowerCount,
-		IsFollow:      false, // TODO
+		IsFollow:      isFollow,
 	}
 	res := &rpcmodel.Video{
 		Id:            video.ID,

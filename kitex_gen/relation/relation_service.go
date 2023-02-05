@@ -408,7 +408,8 @@ func (p *RelationActionResponse) DeepEqual(ano *RelationActionResponse) bool {
 }
 
 type RelationFollowListRequest struct {
-	UserId int64 `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	UserId     int64 `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	UserViewId int64 `thrift:"UserViewId,2,required" frugal:"2,required,i64" json:"UserViewId"`
 }
 
 func NewRelationFollowListRequest() *RelationFollowListRequest {
@@ -422,12 +423,20 @@ func (p *RelationFollowListRequest) InitDefault() {
 func (p *RelationFollowListRequest) GetUserId() (v int64) {
 	return p.UserId
 }
+
+func (p *RelationFollowListRequest) GetUserViewId() (v int64) {
+	return p.UserViewId
+}
 func (p *RelationFollowListRequest) SetUserId(val int64) {
 	p.UserId = val
+}
+func (p *RelationFollowListRequest) SetUserViewId(val int64) {
+	p.UserViewId = val
 }
 
 var fieldIDToName_RelationFollowListRequest = map[int16]string{
 	1: "UserId",
+	2: "UserViewId",
 }
 
 func (p *RelationFollowListRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -435,6 +444,7 @@ func (p *RelationFollowListRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetUserId bool = false
+	var issetUserViewId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -461,6 +471,17 @@ func (p *RelationFollowListRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUserViewId = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -477,6 +498,11 @@ func (p *RelationFollowListRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetUserId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUserViewId {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -506,6 +532,15 @@ func (p *RelationFollowListRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *RelationFollowListRequest) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.UserViewId = v
+	}
+	return nil
+}
+
 func (p *RelationFollowListRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("RelationFollowListRequest"); err != nil {
@@ -514,6 +549,10 @@ func (p *RelationFollowListRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -552,6 +591,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *RelationFollowListRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("UserViewId", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UserViewId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
 func (p *RelationFollowListRequest) String() string {
 	if p == nil {
 		return "<nil>"
@@ -568,12 +624,22 @@ func (p *RelationFollowListRequest) DeepEqual(ano *RelationFollowListRequest) bo
 	if !p.Field1DeepEqual(ano.UserId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.UserViewId) {
+		return false
+	}
 	return true
 }
 
 func (p *RelationFollowListRequest) Field1DeepEqual(src int64) bool {
 
 	if p.UserId != src {
+		return false
+	}
+	return true
+}
+func (p *RelationFollowListRequest) Field2DeepEqual(src int64) bool {
+
+	if p.UserViewId != src {
 		return false
 	}
 	return true
@@ -777,7 +843,8 @@ func (p *RelationFollowListResponse) Field1DeepEqual(src []*rpcmodel.User) bool 
 }
 
 type RelationFollowerListRequest struct {
-	UserId int64 `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	UserId     int64 `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	UserViewId int64 `thrift:"UserViewId,2,required" frugal:"2,required,i64" json:"UserViewId"`
 }
 
 func NewRelationFollowerListRequest() *RelationFollowerListRequest {
@@ -791,12 +858,20 @@ func (p *RelationFollowerListRequest) InitDefault() {
 func (p *RelationFollowerListRequest) GetUserId() (v int64) {
 	return p.UserId
 }
+
+func (p *RelationFollowerListRequest) GetUserViewId() (v int64) {
+	return p.UserViewId
+}
 func (p *RelationFollowerListRequest) SetUserId(val int64) {
 	p.UserId = val
+}
+func (p *RelationFollowerListRequest) SetUserViewId(val int64) {
+	p.UserViewId = val
 }
 
 var fieldIDToName_RelationFollowerListRequest = map[int16]string{
 	1: "UserId",
+	2: "UserViewId",
 }
 
 func (p *RelationFollowerListRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -804,6 +879,7 @@ func (p *RelationFollowerListRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetUserId bool = false
+	var issetUserViewId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -830,6 +906,17 @@ func (p *RelationFollowerListRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUserViewId = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -846,6 +933,11 @@ func (p *RelationFollowerListRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetUserId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUserViewId {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -875,6 +967,15 @@ func (p *RelationFollowerListRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *RelationFollowerListRequest) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.UserViewId = v
+	}
+	return nil
+}
+
 func (p *RelationFollowerListRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("RelationFollowerListRequest"); err != nil {
@@ -883,6 +984,10 @@ func (p *RelationFollowerListRequest) Write(oprot thrift.TProtocol) (err error) 
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -921,6 +1026,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *RelationFollowerListRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("UserViewId", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UserViewId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
 func (p *RelationFollowerListRequest) String() string {
 	if p == nil {
 		return "<nil>"
@@ -937,12 +1059,22 @@ func (p *RelationFollowerListRequest) DeepEqual(ano *RelationFollowerListRequest
 	if !p.Field1DeepEqual(ano.UserId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.UserViewId) {
+		return false
+	}
 	return true
 }
 
 func (p *RelationFollowerListRequest) Field1DeepEqual(src int64) bool {
 
 	if p.UserId != src {
+		return false
+	}
+	return true
+}
+func (p *RelationFollowerListRequest) Field2DeepEqual(src int64) bool {
+
+	if p.UserViewId != src {
 		return false
 	}
 	return true

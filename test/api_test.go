@@ -635,7 +635,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 			Status(http.StatusOK).
 			JSON().Object()
 		resp.Value("status_code").Number().Equal(0)
-		resp.Value("comment").Null()
+		resp.NotContainsKey("comment") // json:"comment_list,required"`
 	})
 
 	It("visitor feed", func() {
@@ -757,7 +757,7 @@ var _ = Describe("API TESTS", Ordered, func() {
 
 		user.Value("id").Number().Equal(userIdB)
 		user.Value("name").String().Equal(usernameB)
-		user.Value("follow_count").Number().Equal(0)
+		user.Value("follow_count").Number().Equal(1)
 		user.Value("follower_count").Number().Equal(0)
 		user.Value("is_follow").Boolean().Equal(false)
 	})

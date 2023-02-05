@@ -22,6 +22,7 @@ struct UserLoginResponse {
 
 struct UserQueryRequest {
     1: required i64 UserId;
+    2: required i64 UserViewId;
 }
 
 struct UserQueryResponse {

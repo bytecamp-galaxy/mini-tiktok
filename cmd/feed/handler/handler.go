@@ -18,7 +18,7 @@ type FeedServiceImpl struct{}
 // GetFeed implements the FeedServiceImpl interface. get 30 latest videos with db
 func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
 	latestTime := req.GetLatestTime()
-	uid := req.GetUserId()
+	uid := req.GetUserViewId()
 
 	// if there isn't latestTime, use current time
 	if latestTime == 0 {
@@ -30,8 +30,8 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	v := query.Video
 	u := query.User
 
-	// find user, if not found, user is nil
-	user, _ := u.WithContext(ctx).Where(u.ID.Eq(uid)).Take()
+	// find user view, maybe nil
+	view, _ := u.WithContext(ctx).Where(u.ID.Eq(uid)).Take()
 
 	// find latest 30 videos
 	videos, err := v.WithContext(ctx).
@@ -54,7 +54,7 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	// convert model.Videos to rpcmodel.Videos
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, user)
+		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, view) // view maybe nil
 	}
 
 	resp = &feed.FeedResponse{

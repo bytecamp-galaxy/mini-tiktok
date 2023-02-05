@@ -639,7 +639,8 @@ func (p *CommentActionResponse) Field1DeepEqual(src *rpcmodel.Comment) bool {
 }
 
 type CommentListRequest struct {
-	VideoId int64 `thrift:"VideoId,1,required" frugal:"1,required,i64" json:"VideoId"`
+	VideoId    int64 `thrift:"VideoId,1,required" frugal:"1,required,i64" json:"VideoId"`
+	UserViewId int64 `thrift:"UserViewId,2,required" frugal:"2,required,i64" json:"UserViewId"`
 }
 
 func NewCommentListRequest() *CommentListRequest {
@@ -653,12 +654,20 @@ func (p *CommentListRequest) InitDefault() {
 func (p *CommentListRequest) GetVideoId() (v int64) {
 	return p.VideoId
 }
+
+func (p *CommentListRequest) GetUserViewId() (v int64) {
+	return p.UserViewId
+}
 func (p *CommentListRequest) SetVideoId(val int64) {
 	p.VideoId = val
+}
+func (p *CommentListRequest) SetUserViewId(val int64) {
+	p.UserViewId = val
 }
 
 var fieldIDToName_CommentListRequest = map[int16]string{
 	1: "VideoId",
+	2: "UserViewId",
 }
 
 func (p *CommentListRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -666,6 +675,7 @@ func (p *CommentListRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetVideoId bool = false
+	var issetUserViewId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -692,6 +702,17 @@ func (p *CommentListRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUserViewId = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -708,6 +729,11 @@ func (p *CommentListRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetVideoId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUserViewId {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -737,6 +763,15 @@ func (p *CommentListRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *CommentListRequest) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.UserViewId = v
+	}
+	return nil
+}
+
 func (p *CommentListRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("CommentListRequest"); err != nil {
@@ -745,6 +780,10 @@ func (p *CommentListRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -783,6 +822,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *CommentListRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("UserViewId", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UserViewId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
 func (p *CommentListRequest) String() string {
 	if p == nil {
 		return "<nil>"
@@ -799,12 +855,22 @@ func (p *CommentListRequest) DeepEqual(ano *CommentListRequest) bool {
 	if !p.Field1DeepEqual(ano.VideoId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.UserViewId) {
+		return false
+	}
 	return true
 }
 
 func (p *CommentListRequest) Field1DeepEqual(src int64) bool {
 
 	if p.VideoId != src {
+		return false
+	}
+	return true
+}
+func (p *CommentListRequest) Field2DeepEqual(src int64) bool {
+
+	if p.UserViewId != src {
 		return false
 	}
 	return true

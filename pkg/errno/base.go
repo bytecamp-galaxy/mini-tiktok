@@ -6,11 +6,8 @@ const (
 	// ErrUnknown - 500: Internal server error.
 	ErrUnknown int = iota + 100001
 
-	// ErrTokenInvalid - 401: Token invalid.
-	ErrTokenInvalid
-
-	// ErrTokenGeneration - 500: Error occurred while generating token.
-	ErrTokenGeneration
+	// ErrGenerateToken - 500: Error occurred while generating token.
+	ErrGenerateToken
 
 	// ErrParseToken - 500: Error occurred while parsing from token.
 	ErrParseToken
@@ -33,14 +30,8 @@ const (
 	// ErrClientRPCInit - 500: RPC client initialization error.
 	ErrClientRPCInit
 
-	// ErrRPCProcess - 500: RPC service process error.
-	ErrRPCProcess
-
 	// ErrRPCLink - 500: RPC service link error.
 	ErrRPCLink
-
-	// ErrRPCMutualCall - 500: RPC mutual call error.
-	ErrRPCMutualCall
 
 	// ErrEncodingFailed - 500: Encoding failed.
 	ErrEncodingFailed

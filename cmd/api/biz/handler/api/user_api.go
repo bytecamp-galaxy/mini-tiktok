@@ -54,8 +54,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	respRpc, err := (*cli).UserRegister(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
@@ -66,7 +65,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	// generate token
 	token, _, err := jwt.Middleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrTokenGeneration, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrGenerateToken, err.Error()))
 		return
 	}
 
@@ -109,8 +108,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	respRpc, err := (*cli).UserLogin(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
@@ -121,7 +119,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	// generate token
 	token, _, err := jwt.Middleware.TokenGenerator(respRpc.UserId)
 	if err != nil {
-		pack.Error(c, errors.WithCode(errno.ErrTokenGeneration, err.Error()))
+		pack.Error(c, errors.WithCode(errno.ErrGenerateToken, err.Error()))
 		return
 	}
 
@@ -147,6 +145,13 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// fetch user view id from token
+	userViewId, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
+		return
+	}
+
 	// set up connection with user server
 	v := conf.Init()
 	cli, err := rpc.InitUserClient(v.GetString("api-server.name"))
@@ -157,14 +162,14 @@ func UserQuery(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &user.UserQueryRequest{
-		UserId: req.UserId,
+		UserId:     req.UserId,
+		UserViewId: userViewId.(int64),
 	}
 
 	respRpc, err := (*cli).UserQuery(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))

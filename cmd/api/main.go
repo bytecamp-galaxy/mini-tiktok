@@ -101,7 +101,7 @@ func main() {
 			end := time.Now()
 			hlog.Infof("status=%d cost=%s method=%s full_path=%s client_ip=%s host=%s",
 				ctx.Response.StatusCode(), end.Sub(start).String(),
-				ctx.Request.Header.Method(), ctx.Request.URI().PathOriginal(), ctx.ClientIP(), ctx.Request.Host())
+				ctx.Request.Header.Method(), ctx.Request.URI().String(), ctx.ClientIP(), ctx.Request.Host())
 		},
 	)
 

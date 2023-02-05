@@ -16,6 +16,7 @@ struct CommentActionResponse {
 
 struct CommentListRequest {
     1: required i64 VideoId;
+    2: required i64 UserViewId;
 }
 
 struct CommentListResponse {

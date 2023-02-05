@@ -1,9 +1,11 @@
 package convert
 
 import (
+	"context"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/dal/query"
 	"time"
 )
 
@@ -21,11 +23,11 @@ func CommentConverterAPI(comment *rpcmodel.Comment) *api.Comment {
 }
 
 // CommentConverterORM convert *model.Comment to *rpcmodel.Comment
-func CommentConverterORM(comment *model.Comment) *rpcmodel.Comment {
+func CommentConverterORM(ctx context.Context, q *query.Query, comment *model.Comment, view *model.User) *rpcmodel.Comment {
 	if comment == nil {
 		return nil
 	}
-	user := UserConverterORM(&comment.User) // preload required
+	user := UserConverterORM(ctx, q, &comment.User, view) // preload required
 	return &rpcmodel.Comment{
 		Id:         comment.ID,
 		User:       user,

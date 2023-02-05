@@ -32,10 +32,10 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// fetch user_id from token
+	// fetch user id from token
 	id, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
 		return
 	}
 
@@ -64,8 +64,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	_, err = (*cli).RelationAction(ctx, reqRPC)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
@@ -93,8 +92,16 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// fetch user view id from token
+	userViewId, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
+		return
+	}
+
 	reqRPC := &relation.RelationFollowListRequest{
-		UserId: req.UserId,
+		UserId:     req.UserId,
+		UserViewId: userViewId.(int64),
 	}
 
 	// set up connection with relation server
@@ -108,8 +115,7 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	respRPC, err := (*cli).RelationFollowList(ctx, reqRPC)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
@@ -143,8 +149,16 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// fetch user view id from token
+	userViewId, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
+		return
+	}
+
 	reqRPC := &relation.RelationFollowerListRequest{
-		UserId: req.UserId,
+		UserId:     req.UserId,
+		UserViewId: userViewId.(int64),
 	}
 
 	// set up connection with relation server
@@ -158,8 +172,7 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	respRPC, err := (*cli).RelationFollowerList(ctx, reqRPC)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))

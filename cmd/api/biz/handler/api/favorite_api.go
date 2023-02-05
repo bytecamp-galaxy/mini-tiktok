@@ -32,7 +32,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 
 	uid, ok := c.Get(jwt.IdentityKey)
 	if !ok {
-		pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
 		return
 	}
 
@@ -52,8 +52,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	_, err = (*cli).FavoriteAction(ctx, reqRPC)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))
@@ -80,6 +79,12 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	userViewId, ok := c.Get(jwt.IdentityKey)
+	if !ok {
+		pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
+		return
+	}
+
 	// set up connection with comment server
 	v := conf.Init()
 	cli, err := rpc.InitFavoriteClient(v.GetString("api-server.name"))
@@ -89,14 +94,14 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	reqRPC := favorite.FavoriteListRequest{
-		UserId: req.UserId,
+		UserId:     req.UserId,
+		UserViewId: userViewId.(int64),
 	}
 
 	respRPC, err := (*cli).FavoriteList(ctx, &reqRPC)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))

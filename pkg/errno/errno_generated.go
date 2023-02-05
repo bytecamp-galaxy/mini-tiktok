@@ -9,8 +9,7 @@ package errno
 // Init register error codes defines in this source code to `github.com/marmotedu/errors`
 func Init() {
 	register(ErrUnknown, 500, "Internal server error")
-	register(ErrTokenInvalid, 401, "Token invalid")
-	register(ErrTokenGeneration, 500, "Error occurred while generating token")
+	register(ErrGenerateToken, 500, "Error occurred while generating token")
 	register(ErrParseToken, 500, "Error occurred while parsing from token")
 	register(ErrBindAndValidation, 400, "Error occurred while binding the request body to the struct or validation failed")
 	register(ErrDatabase, 500, "Database error")
@@ -18,9 +17,7 @@ func Init() {
 	register(ErrPasswordIncorrect, 401, "Password incorrect")
 	register(ErrPasswordHash, 500, "Error occurred while hashing password")
 	register(ErrClientRPCInit, 500, "RPC client initialization error")
-	register(ErrRPCProcess, 500, "RPC service process error")
 	register(ErrRPCLink, 500, "RPC service link error")
-	register(ErrRPCMutualCall, 500, "RPC mutual call error")
 	register(ErrEncodingFailed, 500, "Encoding failed")
 	register(ErrMinio, 500, "Minio error")
 	register(ErrOpenFormFile, 500, "Open request's form file error")

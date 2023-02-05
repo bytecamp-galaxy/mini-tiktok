@@ -12,6 +12,7 @@ struct FavoriteActionResponse {}
 
 struct FavoriteListRequest {
     1: required i64 UserId;
+    2: required i64 UserViewId;
 }
 
 struct FavoriteListResponse {

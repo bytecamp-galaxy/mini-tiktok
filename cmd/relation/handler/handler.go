@@ -30,17 +30,17 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 					ToUserID: req.ToUserId,
 				})
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				u := tx.User
 				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.FollowingCount, u.FollowingCount.Add(1))
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.ToUserId)).Update(u.FollowerCount, u.FollowerCount.Add(1))
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 			}
 		case 2:
@@ -48,27 +48,27 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 				r := tx.Relation
 				_, err := r.WithContext(ctx).Where(r.UserID.Eq(req.UserId), r.ToUserID.Eq(req.ToUserId)).Delete()
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				u := tx.User
 				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.FollowingCount, u.FollowingCount.Sub(1))
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.ToUserId)).Update(u.FollowerCount, u.FollowerCount.Sub(1))
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 			}
 		default:
-			return kerrors.NewBizStatusError(int32(errno.ErrUnknown), "request argument violates convention")
+			return kerrors.NewBizStatusError(int32(errno.ErrUnknown), "unknown action type")
 		}
 		return nil
 	})
 
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+		return nil, err
 	}
 	return &relation.RelationActionResponse{}, nil
 }
@@ -76,11 +76,20 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 // RelationFollowList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) RelationFollowList(ctx context.Context, req *relation.RelationFollowListRequest) (resp *relation.RelationFollowListResponse, err error) {
 	r := query.Relation
+	u := query.User
+
 	relList, err := r.WithContext(ctx).Preload(r.ToUser).Where(r.UserID.Eq(req.UserId)).Find()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+	view, err := u.WithContext(ctx).Where(u.ID.Eq(req.UserViewId)).Take()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
 
 	userList := make([]*rpcmodel.User, len(relList))
 	for i, rel := range relList {
-		userList[i] = convert.UserConverterORM(&rel.ToUser) // `is_follow` always true
+		userList[i] = convert.UserConverterORM(ctx, query.Q, &rel.ToUser, view) // `is_follow` always true
 	}
 
 	resp = &relation.RelationFollowListResponse{
@@ -92,11 +101,20 @@ func (s *RelationServiceImpl) RelationFollowList(ctx context.Context, req *relat
 // RelationFollowerList implements the RelationServiceImpl interface.
 func (s *RelationServiceImpl) RelationFollowerList(ctx context.Context, req *relation.RelationFollowerListRequest) (resp *relation.RelationFollowerListResponse, err error) {
 	r := query.Relation
-	relList, err := r.WithContext(ctx).Preload(r.User).Where(r.UserID.Eq(req.UserId)).Find()
+	u := query.User
+
+	relList, err := r.WithContext(ctx).Preload(r.User).Where(r.ToUserID.Eq(req.UserId)).Find()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+	view, err := u.WithContext(ctx).Where(u.ID.Eq(req.UserViewId)).Take()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
 
 	userList := make([]*rpcmodel.User, len(relList))
 	for i, rel := range relList {
-		userList[i] = convert.UserConverterORM(&rel.User) // `is_follow` uncertain
+		userList[i] = convert.UserConverterORM(ctx, query.Q, &rel.User, view) // `is_follow` uncertain
 	}
 
 	resp = &relation.RelationFollowerListResponse{

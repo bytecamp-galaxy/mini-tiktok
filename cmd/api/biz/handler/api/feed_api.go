@@ -38,10 +38,10 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	// if token is passed
 	if req.GetToken() != api.FeedRequest_Token_DEFAULT {
-		// fetch user id from token
+		// fetch user view id from token
 		userId, ok := c.Get(jwt.IdentityKey)
 		if !ok {
-			pack.Error(c, errors.WithCode(errno.ErrParseToken, pack.BrokenInvariantStatusMessage))
+			pack.Error(c, errors.WithCode(errno.ErrParseToken, ""))
 			return
 		}
 		uid = userId.(int64)
@@ -57,15 +57,14 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 
 	// call rpc service
 	reqRpc := &feed.FeedRequest{
-		UserId:     uid,
+		UserViewId: uid,
 		LatestTime: &latestTime,
 	}
 
 	respRpc, err := (*cli).GetFeed(ctx, reqRpc)
 	if err != nil {
 		if bizErr, ok := kerrors.FromBizStatusError(err); ok {
-			e := errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage())
-			pack.Error(c, errors.WrapC(e, errno.ErrRPCProcess, ""))
+			pack.Error(c, errors.WithCode(int(bizErr.BizStatusCode()), bizErr.BizMessage()))
 			return
 		} else {
 			pack.Error(c, errors.WithCode(errno.ErrRPCLink, err.Error()))

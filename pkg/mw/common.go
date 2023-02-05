@@ -16,14 +16,14 @@ func CommonMiddleware(next endpoint.Endpoint) endpoint.Endpoint {
 		ri := rpcinfo.GetRPCInfo(ctx)
 		// get real request
 		// TODO(vgalaxy): handle large request body
-		// klog.Infof("real request: %+v\n", req)
+		klog.Infof("real request: %+.64v", req)
 		// get remote service information
-		klog.Infof("remote service name: %s, remote method: %s\n", ri.To().ServiceName(), ri.To().Method())
+		klog.Infof("remote service name: %s, remote method: %s", ri.To().ServiceName(), ri.To().Method())
 		if err = next(ctx, req, resp); err != nil {
 			return err
 		}
 		// get real response
-		klog.Infof("real response: %+v\n", resp)
+		klog.Infof("real response: %+v", resp)
 		return nil
 	}
 }

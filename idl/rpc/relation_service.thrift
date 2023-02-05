@@ -12,6 +12,7 @@ struct RelationActionResponse {}
 
 struct RelationFollowListRequest {
     1: required i64 UserId;
+    2: required i64 UserViewId;
 }
 
 struct RelationFollowListResponse {
@@ -20,6 +21,7 @@ struct RelationFollowListResponse {
 
 struct RelationFollowerListRequest {
     1: required i64 UserId;
+    2: required i64 UserViewId;
 }
 
 struct RelationFollowerListResponse {

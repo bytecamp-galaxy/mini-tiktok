@@ -831,7 +831,8 @@ func (p *UserLoginResponse) Field1DeepEqual(src int64) bool {
 }
 
 type UserQueryRequest struct {
-	UserId int64 `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	UserId     int64 `thrift:"UserId,1,required" frugal:"1,required,i64" json:"UserId"`
+	UserViewId int64 `thrift:"UserViewId,2,required" frugal:"2,required,i64" json:"UserViewId"`
 }
 
 func NewUserQueryRequest() *UserQueryRequest {
@@ -845,12 +846,20 @@ func (p *UserQueryRequest) InitDefault() {
 func (p *UserQueryRequest) GetUserId() (v int64) {
 	return p.UserId
 }
+
+func (p *UserQueryRequest) GetUserViewId() (v int64) {
+	return p.UserViewId
+}
 func (p *UserQueryRequest) SetUserId(val int64) {
 	p.UserId = val
+}
+func (p *UserQueryRequest) SetUserViewId(val int64) {
+	p.UserViewId = val
 }
 
 var fieldIDToName_UserQueryRequest = map[int16]string{
 	1: "UserId",
+	2: "UserViewId",
 }
 
 func (p *UserQueryRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -858,6 +867,7 @@ func (p *UserQueryRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetUserId bool = false
+	var issetUserViewId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -884,6 +894,17 @@ func (p *UserQueryRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUserViewId = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -900,6 +921,11 @@ func (p *UserQueryRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetUserId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUserViewId {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -929,6 +955,15 @@ func (p *UserQueryRequest) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *UserQueryRequest) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.UserViewId = v
+	}
+	return nil
+}
+
 func (p *UserQueryRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("UserQueryRequest"); err != nil {
@@ -937,6 +972,10 @@ func (p *UserQueryRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -975,6 +1014,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *UserQueryRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("UserViewId", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UserViewId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
 func (p *UserQueryRequest) String() string {
 	if p == nil {
 		return "<nil>"
@@ -991,12 +1047,22 @@ func (p *UserQueryRequest) DeepEqual(ano *UserQueryRequest) bool {
 	if !p.Field1DeepEqual(ano.UserId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.UserViewId) {
+		return false
+	}
 	return true
 }
 
 func (p *UserQueryRequest) Field1DeepEqual(src int64) bool {
 
 	if p.UserId != src {
+		return false
+	}
+	return true
+}
+func (p *UserQueryRequest) Field2DeepEqual(src int64) bool {
+
+	if p.UserViewId != src {
 		return false
 	}
 	return true

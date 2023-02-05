@@ -31,22 +31,22 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					Content: *req.CommentText,
 				})
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				v := tx.Video
 				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				c, err := tx.Comment.Preload(tx.Comment.User).WithContext(ctx).Where(tx.Comment.ID.Eq(id)).Take()
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				resp = &comment.CommentActionResponse{
-					Comment: convert.CommentConverterORM(c),
+					Comment: convert.CommentConverterORM(ctx, q, c, nil), // 不允许自己关注自己
 				}
 			}
 		case 2:
@@ -54,26 +54,27 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 				c := tx.Comment
 				_, err = c.WithContext(ctx).Where(c.ID.Eq(*req.CommentId)).Delete()
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				v := tx.Video
 				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
 				if err != nil {
-					return err
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
 				resp = &comment.CommentActionResponse{}
 			}
 		default:
-			return kerrors.NewBizStatusError(int32(errno.ErrUnknown), "request argument violates convention")
+			return kerrors.NewBizStatusError(int32(errno.ErrUnknown), "unknown action type")
 		}
 		return nil
 	})
 
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+		return nil, err
 	}
+
 	return resp, nil
 }
 
@@ -81,29 +82,31 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
 	q := query.Use(mysql.DB)
 	err = q.Transaction(func(tx *query.Query) error {
-		c := tx.Comment
-		var comments []*model.Comment
-		comments, err = c.WithContext(ctx).
-			Preload(c.User).
-			Where(c.VideoID.Eq(req.VideoId)).
+		comments, err := tx.Comment.WithContext(ctx).
+			Preload(tx.Comment.User).
+			Where(tx.Comment.VideoID.Eq(req.VideoId)).
 			Find()
-
 		if err != nil {
-			return err
+			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+		}
+
+		view, err := tx.User.WithContext(ctx).Where(tx.User.ID.Eq(req.UserViewId)).Take()
+		if err != nil {
+			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 		}
 
 		list := make([]*rpcmodel.Comment, len(comments))
-		for i, data := range comments {
-			list[i] = convert.CommentConverterORM(data)
+		for i, c := range comments {
+			list[i] = convert.CommentConverterORM(ctx, q, c, view)
 		}
 		resp = &comment.CommentListResponse{
 			CommentList: list,
 		}
-		return err
+		return nil
 	})
 
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+		return nil, err
 	}
 	return resp, nil
 }

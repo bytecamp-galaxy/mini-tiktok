@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/marmotedu/errors"
 )
 
 const (
-	SuccessStatusMessage         = "success"
-	BrokenInvariantStatusMessage = "broken invariant"
+	SuccessStatusMessage = "success"
 )
 
 type Response struct {
@@ -18,10 +18,12 @@ type Response struct {
 }
 
 func Error(c *app.RequestContext, err error) {
+	// Output full error stack details, useful for debugging.
+	hlog.Errorf("%+v", err)
 	e := errors.ParseCoder(err)
 	c.JSON(e.HTTPStatus(), &Response{
 		StatusCode: e.Code(),
-		StatusMsg:  utils.String(fmt.Sprintf("%#+v", err)),
-		// output full error stack details, useful for debugging with JSON formatted output
+		// Returns the user-safe error string mapped to the error code or the error message if none is specified.
+		StatusMsg: utils.String(fmt.Sprintf("%s", err)),
 	})
 }

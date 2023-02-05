@@ -141,7 +141,7 @@ struct CommentListRequest {
 struct CommentListResponse {
     1: required i32 StatusCode (api.body="status_code");
     2: optional string StatusMsg (api.body="status_msg");
-    3: required list<Comment> CommentList (api.body="comment_list");
+    3: required list<Comment> CommentList (api.body="comment_list"); // json:"comment_list,required"`
 }
 
 struct Comment {

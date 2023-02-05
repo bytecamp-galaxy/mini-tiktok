@@ -18,7 +18,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 		{
 			e := doFavorite(ctx, req.UserId, req.VideoId)
 			if e != nil {
-				return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+				return nil, e
 			}
 			return resp, nil
 		}
@@ -26,12 +26,12 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 		{
 			e := doUnfavorite(ctx, req.UserId, req.VideoId)
 			if e != nil {
-				return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+				return nil, e
 			}
 			return resp, nil
 		}
 	default:
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), "request argument violates convention")
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), "unknown action type")
 	}
 }
 
@@ -39,7 +39,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest) (resp *favorite.FavoriteListResponse, err error) {
 	videos, err := s.favoriteList(ctx, req)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrUnknown), err.Error())
+		return nil, err
 	}
 	resp = &favorite.FavoriteListResponse{
 		VideoList: videos,

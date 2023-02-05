@@ -64,14 +64,17 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 // UserQuery implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequest) (resp *user.UserQueryResponse, err error) {
 	// query user in db
-	u := query.User
-	data, err := query.User.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Take()
+	u, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(req.UserId)).Take()
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+	view, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(req.UserViewId)).Take()
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	resp = &user.UserQueryResponse{
-		User: convert.UserConverterORM(data),
+		User: convert.UserConverterORM(ctx, query.Q, u, view),
 	}
 	return resp, nil
 }

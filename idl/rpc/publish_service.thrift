@@ -12,6 +12,7 @@ struct PublishResponse {}
 
 struct PublishListRequest {
     1: required i64 UserId; // 用户 id
+    2: required i64 UserViewId;
 }
 
 struct PublishListResponse {
