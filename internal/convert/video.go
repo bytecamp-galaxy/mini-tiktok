@@ -8,7 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 )
 
-// VideoConverterAPI convert *rpcmodel.Video to *api.Video
+// VideoConverterAPI convert *rpcmodel.Video to *api.Video, can only be called by api servers
 func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
 	if video == nil {
 		return nil
@@ -34,20 +34,26 @@ func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
 	return res
 }
 
-// VideoConverterORM convert *model.Videos to *rpcmodel.Videos
-func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, view *model.User) *rpcmodel.Video {
+// VideoConverterORM convert *model.Videos to *rpcmodel.Videos, can only be called by rpc servers
+func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, view *model.User) (res *rpcmodel.Video, err error) {
 	if video == nil {
-		return nil
+		return nil, nil
 	}
+
 	relFavorite := false
 	relFollow := false
-	if view != nil {
-		relFavorite, _ = isFavorite(ctx, q, view.ID, video.ID)
-	}
 	author := video.Author // preload required
 	if view != nil {
-		relFollow, _ = isFollow(ctx, q, view.ID, author.ID)
+		relFavorite, err = isFavorite(ctx, q, view.ID, video.ID)
+		if err != nil {
+			return nil, err
+		}
+		relFollow, err = isFollow(ctx, q, view.ID, author.ID)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	u := &rpcmodel.User{
 		Id:            author.ID,
 		Name:          author.Username,
@@ -55,7 +61,7 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 		FollowerCount: author.FollowerCount,
 		IsFollow:      relFollow,
 	}
-	res := &rpcmodel.Video{
+	res = &rpcmodel.Video{
 		Id:            video.ID,
 		Author:        u,
 		PlayUrl:       video.PlayUrl,
@@ -65,5 +71,5 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 		IsFavorite:    relFavorite,
 		Title:         video.Title,
 	}
-	return res
+	return res, nil
 }

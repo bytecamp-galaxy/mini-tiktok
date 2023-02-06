@@ -54,7 +54,10 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, req *feed.FeedRequest) (r
 	// convert model.Videos to rpcmodel.Videos
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, view) // view maybe nil
+		respVideos[i], err = convert.VideoConverterORM(ctx, query.Q, video, view) // view maybe nil
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp = &feed.FeedResponse{

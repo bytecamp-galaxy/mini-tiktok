@@ -18,6 +18,9 @@ const (
 	// ErrDatabase - 500: Database error.
 	ErrDatabase
 
+	// ErrRedis - 500: Redis error.
+	ErrRedis
+
 	// ErrPasswordInvalid - 401: Password invalid.
 	ErrPasswordInvalid
 

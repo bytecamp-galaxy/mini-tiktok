@@ -26,12 +26,13 @@ mini-tiktok 系统支持的错误码列表如下：
 | ErrParseToken | 100003 | 500 | Error occurred while parsing from token |
 | ErrBindAndValidation | 100004 | 400 | Error occurred while binding the request body to the struct or validation failed |
 | ErrDatabase | 100005 | 500 | Database error |
-| ErrPasswordInvalid | 100006 | 401 | Password invalid |
-| ErrPasswordIncorrect | 100007 | 401 | Password incorrect |
-| ErrPasswordHash | 100008 | 500 | Error occurred while hashing password |
-| ErrClientRPCInit | 100009 | 500 | RPC client initialization error |
-| ErrRPCLink | 100010 | 500 | RPC service link error |
-| ErrEncodingFailed | 100011 | 500 | Encoding failed |
-| ErrMinio | 100012 | 500 | Minio error |
-| ErrOpenFormFile | 100013 | 500 | Open request's form file error |
+| ErrRedis | 100006 | 500 | Redis error |
+| ErrPasswordInvalid | 100007 | 401 | Password invalid |
+| ErrPasswordIncorrect | 100008 | 401 | Password incorrect |
+| ErrPasswordHash | 100009 | 500 | Error occurred while hashing password |
+| ErrClientRPCInit | 100010 | 500 | RPC client initialization error |
+| ErrRPCLink | 100011 | 500 | RPC service link error |
+| ErrEncodingFailed | 100012 | 500 | Encoding failed |
+| ErrMinio | 100013 | 500 | Minio error |
+| ErrOpenFormFile | 100014 | 500 | Open request's form file error |
 

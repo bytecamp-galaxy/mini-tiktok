@@ -35,9 +35,12 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 				}
 
 				v := tx.Video
-				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
+				result, err := v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Add(1))
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+				}
+				if result.RowsAffected != 1 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
 				}
 
 				c, err := tx.Comment.Preload(tx.Comment.User).WithContext(ctx).Where(tx.Comment.ID.Eq(id)).Take()
@@ -45,8 +48,13 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
+				res, err := convert.CommentConverterORM(ctx, q, c, nil) // 不允许自己关注自己
+				if err != nil {
+					return err
+				}
+
 				resp = &comment.CommentActionResponse{
-					Comment: convert.CommentConverterORM(ctx, q, c, nil), // 不允许自己关注自己
+					Comment: res,
 				}
 			}
 		case 2:
@@ -57,13 +65,16 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 				if result.RowsAffected == 0 {
-					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "nonexistent comment")
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database delete error, nonexistent comment")
 				}
 
 				v := tx.Video
-				_, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
+				result, err = v.WithContext(ctx).Where(v.ID.Eq(req.VideoId)).Update(v.CommentCount, v.CommentCount.Sub(1))
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+				}
+				if result.RowsAffected != 1 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
 				}
 
 				resp = &comment.CommentActionResponse{}
@@ -100,7 +111,10 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 
 		list := make([]*rpcmodel.Comment, len(comments))
 		for i, c := range comments {
-			list[i] = convert.CommentConverterORM(ctx, q, c, view)
+			list[i], err = convert.CommentConverterORM(ctx, q, c, view)
+			if err != nil {
+				return err
+			}
 		}
 		resp = &comment.CommentListResponse{
 			CommentList: list,

@@ -115,7 +115,10 @@ func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.Publi
 
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i] = convert.VideoConverterORM(ctx, query.Q, video, view)
+		respVideos[i], err = convert.VideoConverterORM(ctx, query.Q, video, view)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp = &publish.PublishListResponse{

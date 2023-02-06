@@ -13,6 +13,7 @@ func Init() {
 	register(ErrParseToken, 500, "Error occurred while parsing from token")
 	register(ErrBindAndValidation, 400, "Error occurred while binding the request body to the struct or validation failed")
 	register(ErrDatabase, 500, "Database error")
+	register(ErrRedis, 500, "Redis error")
 	register(ErrPasswordInvalid, 401, "Password invalid")
 	register(ErrPasswordIncorrect, 401, "Password incorrect")
 	register(ErrPasswordHash, 500, "Error occurred while hashing password")

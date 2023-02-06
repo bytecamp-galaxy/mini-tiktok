@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// CommentConverterAPI convert *rpcmodel.Comment to *api.Comment
+// CommentConverterAPI convert *rpcmodel.Comment to *api.Comment, can only be called by api servers
 func CommentConverterAPI(comment *rpcmodel.Comment) *api.Comment {
 	if comment == nil {
 		return nil
@@ -22,16 +22,19 @@ func CommentConverterAPI(comment *rpcmodel.Comment) *api.Comment {
 	}
 }
 
-// CommentConverterORM convert *model.Comment to *rpcmodel.Comment
-func CommentConverterORM(ctx context.Context, q *query.Query, comment *model.Comment, view *model.User) *rpcmodel.Comment {
+// CommentConverterORM convert *model.Comment to *rpcmodel.Comment, can only be called by rpc servers
+func CommentConverterORM(ctx context.Context, q *query.Query, comment *model.Comment, view *model.User) (res *rpcmodel.Comment, err error) {
 	if comment == nil {
-		return nil
+		return nil, nil
 	}
-	user := UserConverterORM(ctx, q, &comment.User, view) // preload required
+	user, err := UserConverterORM(ctx, q, &comment.User, view) // preload required
+	if err != nil {
+		return nil, err
+	}
 	return &rpcmodel.Comment{
 		Id:         comment.ID,
 		User:       user,
 		Content:    comment.Content,
 		CreateDate: time.Unix(comment.CreatedAt, 0).String(),
-	}
+	}, nil
 }

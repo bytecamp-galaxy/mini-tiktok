@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/publish/handler"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish/publishservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
@@ -23,6 +24,9 @@ import (
 func main() {
 	// init db
 	dal.Init(false)
+
+	// init redis
+	redis.Init()
 
 	// init log
 	log.InitKLogger()

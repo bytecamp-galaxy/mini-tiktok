@@ -6,6 +6,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/relation"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
@@ -23,6 +24,7 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 		switch req.ActionType {
 		case 1:
 			{
+				// 添加关注数据
 				id := snowflake.Generate()
 				err := tx.FollowRelation.WithContext(ctx).Create(&model.FollowRelation{
 					ID:       id,
@@ -33,18 +35,44 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
+				// 修改 FollowingCount 和 FollowerCount
 				u := tx.User
-				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.FollowingCount, u.FollowingCount.Add(1))
+				result, err := u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.FollowingCount, u.FollowingCount.Add(1))
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
-				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.ToUserId)).Update(u.FollowerCount, u.FollowerCount.Add(1))
+				if result.RowsAffected != 1 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
+				}
+
+				result, err = u.WithContext(ctx).Where(u.ID.Eq(req.ToUserId)).Update(u.FollowerCount, u.FollowerCount.Add(1))
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+				}
+				if result.RowsAffected != 1 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
+				}
+
+				// update redis if exists
+				exist, err := redis.FollowKeyExist(ctx, req.UserId)
+				if err != nil {
+					return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+				}
+				if exist {
+					count, err := redis.FollowKeyAdd(ctx, req.UserId, req.ToUserId)
+					if err != nil {
+						return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+					}
+					if count != 1 {
+						return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis sadd error")
+					}
+				} else {
+					// do nothing
 				}
 			}
 		case 2:
 			{
+				// 删除关注数据
 				r := tx.FollowRelation
 				result, err := r.WithContext(ctx).Where(r.UserID.Eq(req.UserId), r.ToUserID.Eq(req.ToUserId)).Delete()
 				if err != nil {
@@ -54,14 +82,39 @@ func (s *RelationServiceImpl) RelationAction(ctx context.Context, req *relation.
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "nonexistent relation")
 				}
 
+				// 修改 FollowingCount 和 FollowerCount
 				u := tx.User
-				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.FollowingCount, u.FollowingCount.Sub(1))
+				result, err = u.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Update(u.FollowingCount, u.FollowingCount.Sub(1))
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
-				_, err = u.WithContext(ctx).Where(u.ID.Eq(req.ToUserId)).Update(u.FollowerCount, u.FollowerCount.Sub(1))
+				if result.RowsAffected != 1 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
+				}
+
+				result, err = u.WithContext(ctx).Where(u.ID.Eq(req.ToUserId)).Update(u.FollowerCount, u.FollowerCount.Sub(1))
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+				}
+				if result.RowsAffected != 1 {
+					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
+				}
+
+				// update redis if exists
+				exist, err := redis.FollowKeyExist(ctx, req.UserId)
+				if err != nil {
+					return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+				}
+				if exist {
+					count, err := redis.FollowKeyRem(ctx, req.UserId, req.ToUserId)
+					if err != nil {
+						return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+					}
+					if count != 1 {
+						return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis srem error")
+					}
+				} else {
+					// do nothing
 				}
 			}
 		default:
@@ -92,7 +145,10 @@ func (s *RelationServiceImpl) RelationFollowList(ctx context.Context, req *relat
 
 	userList := make([]*rpcmodel.User, len(relList))
 	for i, rel := range relList {
-		userList[i] = convert.UserConverterORM(ctx, query.Q, &rel.ToUser, view) // `is_follow` always true
+		userList[i], err = convert.UserConverterORM(ctx, query.Q, &rel.ToUser, view) // `is_follow` always true
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp = &relation.RelationFollowListResponse{
@@ -117,7 +173,10 @@ func (s *RelationServiceImpl) RelationFollowerList(ctx context.Context, req *rel
 
 	userList := make([]*rpcmodel.User, len(relList))
 	for i, rel := range relList {
-		userList[i] = convert.UserConverterORM(ctx, query.Q, &rel.User, view) // `is_follow` uncertain
+		userList[i], err = convert.UserConverterORM(ctx, query.Q, &rel.User, view) // `is_follow` uncertain
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp = &relation.RelationFollowerListResponse{

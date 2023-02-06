@@ -73,8 +73,13 @@ func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequ
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
+	res, err := convert.UserConverterORM(ctx, query.Q, u, view)
+	if err != nil {
+		return nil, err
+	}
+
 	resp = &user.UserQueryResponse{
-		User: convert.UserConverterORM(ctx, query.Q, u, view),
+		User: res,
 	}
 	return resp, nil
 }
