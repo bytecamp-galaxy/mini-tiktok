@@ -5,6 +5,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
@@ -63,17 +64,17 @@ func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequ
 
 // UserQuery implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserQuery(ctx context.Context, req *user.UserQueryRequest) (resp *user.UserQueryResponse, err error) {
-	// query user in db
-	u, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(req.UserId)).Take()
+	// check user
+	u, err := pack.QueryUser(ctx, req.UserId)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+		return nil, err
 	}
-	view, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(req.UserViewId)).Take()
+	_, err = pack.QueryUser(ctx, req.UserViewId)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+		return nil, err
 	}
 
-	res, err := convert.UserConverterORM(ctx, query.Q, u, view)
+	res, err := convert.UserConverterORM(ctx, query.Q, u, req.UserViewId)
 	if err != nil {
 		return nil, err
 	}

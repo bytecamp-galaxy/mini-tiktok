@@ -2,13 +2,10 @@ package handler
 
 import (
 	"context"
-	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
-	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/favorite"
-	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/kerrors"
@@ -41,7 +38,7 @@ func doFavorite(ctx context.Context, uid int64, vid int64) error {
 			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
 		}
 
-		// update redis if exists
+		// update redis favourite info if exists
 		existed, err := redis.FavouriteKeyExist(ctx, uid)
 		if err != nil {
 			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
@@ -54,8 +51,6 @@ func doFavorite(ctx context.Context, uid int64, vid int64) error {
 			if count != 1 {
 				return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis sadd error")
 			}
-		} else {
-			// do nothing
 		}
 
 		return nil
@@ -88,7 +83,7 @@ func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
 			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
 		}
 
-		// update redis if exists
+		// update redis favourite info if exists
 		existed, err := redis.FavouriteKeyExist(ctx, uid)
 		if err != nil {
 			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
@@ -101,34 +96,10 @@ func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
 			if count != 1 {
 				return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis srem error")
 			}
-		} else {
-			// do nothing
 		}
+
 		return nil
 	})
 
 	return err
-}
-
-func (s *FavoriteServiceImpl) favoriteList(ctx context.Context, req *favorite.FavoriteListRequest) ([]*rpcmodel.Video, error) {
-	view, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(req.UserViewId)).Take()
-	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
-	}
-
-	fr := query.FavoriteRelation
-	rs, err := fr.WithContext(ctx).Preload(fr.Video).Preload(fr.Video.Author).Where(fr.UserID.Eq(req.UserId)).Find()
-	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
-	}
-
-	videos := make([]*rpcmodel.Video, len(rs))
-	for i, r := range rs {
-		videos[i], err = convert.VideoConverterORM(ctx, query.Q, &r.Video, view)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return videos, nil
 }

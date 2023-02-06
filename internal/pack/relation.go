@@ -1,4 +1,4 @@
-package convert
+package pack
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"github.com/cloudwego/kitex/pkg/kerrors"
 )
 
-// isFollow user (view) follow user
-func isFollow(ctx context.Context, q *query.Query, userViewId int64, userId int64) (bool, error) {
+// IsFollow user (view) follow user
+func IsFollow(ctx context.Context, q *query.Query, userViewId int64, userId int64) (bool, error) {
 	existed, err := redis.FollowKeyExist(ctx, userViewId)
 	if err != nil {
 		return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
@@ -22,7 +22,7 @@ func isFollow(ctx context.Context, q *query.Query, userViewId int64, userId int6
 			return false, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 		}
 		ids := make([]interface{}, len(rs)+1)
-		ids[0] = -1 // invalid id
+		ids[0] = redis.InvalidUserId
 		for i, r := range rs {
 			ids[i] = r.ToUserID
 		}
@@ -45,8 +45,8 @@ func isFollow(ctx context.Context, q *query.Query, userViewId int64, userId int6
 	return res, nil
 }
 
-// isFavorite user (view) favorite video
-func isFavorite(ctx context.Context, q *query.Query, userViewId int64, videoId int64) (bool, error) {
+// IsFavorite user (view) favorite video
+func IsFavorite(ctx context.Context, q *query.Query, userViewId int64, videoId int64) (bool, error) {
 	existed, err := redis.FavouriteKeyExist(ctx, userViewId)
 	if err != nil {
 		return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
@@ -59,7 +59,7 @@ func isFavorite(ctx context.Context, q *query.Query, userViewId int64, videoId i
 			return false, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 		}
 		ids := make([]interface{}, len(rs)+1)
-		ids[0] = -1 // invalid id
+		ids[0] = redis.InvalidUserId
 		for i, r := range rs {
 			ids[i] = r.VideoID
 		}

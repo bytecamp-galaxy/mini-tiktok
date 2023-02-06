@@ -75,7 +75,6 @@ func GetFileUrl(bucketName string, fileName string, expires time.Duration) (*url
 		klog.Errorf("get url of file %s from bucket %s failed, %s", fileName, bucketName, err)
 		return nil, err
 	}
-	// TODO: url 可能要做截取
 	return presignedUrl, nil
 }
 

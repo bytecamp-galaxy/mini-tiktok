@@ -11,8 +11,8 @@ var (
 	minioClient *minio.Client
 )
 
-// Minio 对象存储初始化
-func init() {
+// Init only called by publish service
+func Init() {
 	v := conf.Init()
 	endpoint := fmt.Sprintf("%s:%d", v.GetString("minio.host"), v.GetInt("minio.port"))
 

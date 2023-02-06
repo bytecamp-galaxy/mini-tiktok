@@ -22,14 +22,14 @@ import (
 )
 
 func main() {
+	// init log
+	log.InitKLogger()
+
 	// init db
 	dal.Init(false)
 
 	// init redis
 	redis.Init()
-
-	// init log
-	log.InitKLogger()
 
 	// init snowflake id generator
 	snowflake.Init()

@@ -5,6 +5,8 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 )
 
@@ -35,7 +37,7 @@ func VideoConverterAPI(video *rpcmodel.Video) *api.Video {
 }
 
 // VideoConverterORM convert *model.Videos to *rpcmodel.Videos, can only be called by rpc servers
-func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, view *model.User) (res *rpcmodel.Video, err error) {
+func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, userViewId int64) (res *rpcmodel.Video, err error) {
 	if video == nil {
 		return nil, nil
 	}
@@ -43,12 +45,12 @@ func VideoConverterORM(ctx context.Context, q *query.Query, video *model.Video, 
 	relFavorite := false
 	relFollow := false
 	author := video.Author // preload required
-	if view != nil {
-		relFavorite, err = isFavorite(ctx, q, view.ID, video.ID)
+	if userViewId != redis.InvalidUserId {
+		relFavorite, err = pack.IsFavorite(ctx, q, userViewId, video.ID)
 		if err != nil {
 			return nil, err
 		}
-		relFollow, err = isFollow(ctx, q, view.ID, author.ID)
+		relFollow, err = pack.IsFollow(ctx, q, userViewId, author.ID)
 		if err != nil {
 			return nil, err
 		}

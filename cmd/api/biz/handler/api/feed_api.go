@@ -8,6 +8,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
+	id "github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/rpc"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/feed"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -34,7 +35,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	// get the latest time.
 	// if the latest time hasn't been passed as param, it's 0 by default.
 	latestTime := req.GetLatestTime()
-	uid := int64(-1)
+	uid := id.InvalidUserId
 
 	// if token is passed
 	if req.GetToken() != api.FeedRequest_Token_DEFAULT {

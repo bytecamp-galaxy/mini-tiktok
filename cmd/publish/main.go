@@ -9,6 +9,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish/publishservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/minio"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/limit"
@@ -22,14 +23,17 @@ import (
 )
 
 func main() {
+	// init log
+	log.InitKLogger()
+
+	// init minio
+	minio.Init()
+
 	// init db
 	dal.Init(false)
 
 	// init redis
 	redis.Init()
-
-	// init log
-	log.InitKLogger()
 
 	// init snowflake id generator
 	snowflake.Init()

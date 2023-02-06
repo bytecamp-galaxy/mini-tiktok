@@ -23,11 +23,11 @@ func CommentConverterAPI(comment *rpcmodel.Comment) *api.Comment {
 }
 
 // CommentConverterORM convert *model.Comment to *rpcmodel.Comment, can only be called by rpc servers
-func CommentConverterORM(ctx context.Context, q *query.Query, comment *model.Comment, view *model.User) (res *rpcmodel.Comment, err error) {
+func CommentConverterORM(ctx context.Context, q *query.Query, comment *model.Comment, userViewId int64) (res *rpcmodel.Comment, err error) {
 	if comment == nil {
 		return nil, nil
 	}
-	user, err := UserConverterORM(ctx, q, &comment.User, view) // preload required
+	user, err := UserConverterORM(ctx, q, &comment.User, userViewId) // preload required
 	if err != nil {
 		return nil, err
 	}

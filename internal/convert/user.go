@@ -5,6 +5,8 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/model/api"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 )
 
@@ -23,13 +25,13 @@ func UserConverterAPI(user *rpcmodel.User) *api.User {
 }
 
 // UserConverterORM convert *model.User to *rpcmodel.User, can only be called by rpc servers
-func UserConverterORM(ctx context.Context, q *query.Query, user *model.User, view *model.User) (res *rpcmodel.User, err error) {
+func UserConverterORM(ctx context.Context, q *query.Query, user *model.User, userViewId int64) (res *rpcmodel.User, err error) {
 	if user == nil {
 		return nil, nil
 	}
 	relFollow := false
-	if view != nil {
-		relFollow, err = isFollow(ctx, q, view.ID, user.ID)
+	if userViewId != redis.InvalidUserId {
+		relFollow, err = pack.IsFollow(ctx, q, userViewId, user.ID)
 		if err != nil {
 			return nil, err
 		}

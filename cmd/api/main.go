@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
@@ -28,8 +29,18 @@ import (
 )
 
 func main() {
+	// init log
+	log.InitHLogger()
+
 	// init db
 	dal.Init(true)
+
+	// init redis
+	redis.Init()
+	err := redis.LoadUserFromDBToRedis(context.Background())
+	if err != nil {
+		panic(err)
+	}
 
 	// init jwt
 	jwt.Init()
@@ -40,9 +51,6 @@ func main() {
 
 	// init snowflake id generator
 	snowflake.Init()
-
-	// init log
-	log.InitHLogger()
 
 	// init server
 	v := conf.Init()

@@ -6,6 +6,8 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/comment"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
@@ -18,6 +20,13 @@ type CommentServiceImpl struct{}
 
 // CommentAction implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
+	// check user
+	_, err = pack.QueryUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	// do action
 	q := query.Use(mysql.DB)
 	err = q.Transaction(func(tx *query.Query) error {
 		switch req.ActionType {
@@ -48,7 +57,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
-				res, err := convert.CommentConverterORM(ctx, q, c, nil) // 不允许自己关注自己
+				res, err := convert.CommentConverterORM(ctx, q, c, redis.InvalidUserId) // 不允许自己关注自己
 				if err != nil {
 					return err
 				}
@@ -94,6 +103,12 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 
 // CommentList implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
+	// check user
+	_, err = pack.QueryUser(ctx, req.UserViewId)
+	if err != nil {
+		return nil, err
+	}
+
 	q := query.Use(mysql.DB)
 	err = q.Transaction(func(tx *query.Query) error {
 		comments, err := tx.Comment.WithContext(ctx).
@@ -104,14 +119,9 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 		}
 
-		view, err := tx.User.WithContext(ctx).Where(tx.User.ID.Eq(req.UserViewId)).Take()
-		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
-		}
-
 		list := make([]*rpcmodel.Comment, len(comments))
 		for i, c := range comments {
-			list[i], err = convert.CommentConverterORM(ctx, q, c, view)
+			list[i], err = convert.CommentConverterORM(ctx, q, c, req.UserViewId)
 			if err != nil {
 				return err
 			}

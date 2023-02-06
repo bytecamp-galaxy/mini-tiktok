@@ -21,7 +21,7 @@ const (
 	// ErrRedis - 500: Redis error.
 	ErrRedis
 
-	// ErrPasswordInvalid - 401: Password invalid.
+	// ErrPasswordInvalid - 400: Password invalid.
 	ErrPasswordInvalid
 
 	// ErrPasswordIncorrect - 401: Password incorrect.
@@ -44,4 +44,7 @@ const (
 
 	// ErrOpenFormFile - 500: Open request's form file error.
 	ErrOpenFormFile
+
+	// ErrInvalidUser - 400: User does not exist.
+	ErrInvalidUser
 )

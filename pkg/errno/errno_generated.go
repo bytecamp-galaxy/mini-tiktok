@@ -14,7 +14,7 @@ func Init() {
 	register(ErrBindAndValidation, 400, "Error occurred while binding the request body to the struct or validation failed")
 	register(ErrDatabase, 500, "Database error")
 	register(ErrRedis, 500, "Redis error")
-	register(ErrPasswordInvalid, 401, "Password invalid")
+	register(ErrPasswordInvalid, 400, "Password invalid")
 	register(ErrPasswordIncorrect, 401, "Password incorrect")
 	register(ErrPasswordHash, 500, "Error occurred while hashing password")
 	register(ErrClientRPCInit, 500, "RPC client initialization error")
@@ -22,4 +22,5 @@ func Init() {
 	register(ErrEncodingFailed, 500, "Encoding failed")
 	register(ErrMinio, 500, "Minio error")
 	register(ErrOpenFormFile, 500, "Open request's form file error")
+	register(ErrInvalidUser, 400, "User does not exist")
 }

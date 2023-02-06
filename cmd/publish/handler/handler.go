@@ -6,6 +6,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -21,11 +22,15 @@ type PublishServiceImpl struct{}
 
 // PublishVideo implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.PublishRequest) (resp *publish.PublishResponse, err error) {
+	// check user
+	_, err = pack.QueryUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
 	videoData := req.Data
 	authorId := req.UserId
 	videoTitle := req.Title
-	// // 获取后缀
-	// filetype := http.DetectContentType(videoData)
 
 	// byte[] -> reader
 	reader := bytes.NewReader(videoData)
@@ -98,15 +103,18 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 
 // PublishList implements the PublishServiceImpl interface.
 func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
+	// check user
+	_, err = pack.QueryUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	_, err = pack.QueryUser(ctx, req.UserViewId)
+	if err != nil {
+		return nil, err
+	}
+
 	// query videos in db
 	v := query.Video
-	u := query.User
-
-	// find user view
-	view, err := u.WithContext(ctx).Where(u.ID.Eq(req.UserViewId)).Take()
-	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
-	}
 
 	videos, err := v.WithContext(ctx).Preload(v.Author).Order(v.CreatedAt.Desc()).Where(v.AuthorID.Eq(req.UserId)).Find()
 	if err != nil {
@@ -115,7 +123,7 @@ func (s *PublishServiceImpl) PublishList(ctx context.Context, req *publish.Publi
 
 	respVideos := make([]*rpcmodel.Video, len(videos))
 	for i, video := range videos {
-		respVideos[i], err = convert.VideoConverterORM(ctx, query.Q, video, view)
+		respVideos[i], err = convert.VideoConverterORM(ctx, query.Q, video, req.UserViewId)
 		if err != nil {
 			return nil, err
 		}
