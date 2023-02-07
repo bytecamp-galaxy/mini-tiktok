@@ -14,7 +14,7 @@ build_func() {
   fi
 }
 
-servers=('api' 'user' 'comment' 'publish' 'feed')
+servers=('api' 'user' 'comment' 'publish' 'feed' 'relation')
 
 for server in ${servers[*]}
 do

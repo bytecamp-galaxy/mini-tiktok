@@ -1,7 +1,6 @@
-FROM ubuntu AS build
-RUN apt-get update && \
-    apt-get install -y ffmpeg
-
+#FROM ubuntu AS build
+#RUN apt-get update && \
+#    apt-get install -y ffmpeg
 FROM golang:1.19
 
 ENV CGO_ENABLED 0
@@ -18,15 +17,14 @@ COPY kitex_gen kitex_gen
 COPY configs configs
 COPY pkg pkg
 COPY internal internal
-COPY --from=build /usr/bin/ffmpeg /usr/bin/ffmpeg
-
-RUN cd configs \
-    && rm global.yaml \
-    && mv docker.yaml global.yaml
 
 WORKDIR /root/cmd/publish
-RUN chmod +x build.sh
-RUN ./build.sh
+RUN chmod +x build.sh \
+    && ./build.sh \
+    && sed -i "s@http://\(deb\|security\).debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list  \
+    && apt update \
+    && apt install -y netcat \
+    && apt install -y ffmpeg
 
 WORKDIR /root
 ENTRYPOINT ["/root/cmd/publish/output/publish"]
