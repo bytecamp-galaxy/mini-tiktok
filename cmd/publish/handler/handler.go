@@ -17,6 +17,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/google/uuid"
+	"net/http"
 )
 
 // PublishServiceImpl implements the last service interface defined in the IDL.
@@ -36,6 +37,12 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 
 	// byte[] -> reader
 	reader := bytes.NewReader(videoData)
+	// check video type
+	filetype := http.DetectContentType(videoData)
+	if filetype != "video/mp4" {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrInvalidVideoType), err.Error())
+	}
+
 	videoUid := uuid.New()
 	fileName := videoUid.String() + "." + "mp4"
 

@@ -50,4 +50,7 @@ const (
 
 	// ErrInvalidVideo - 400: Video does not exist.
 	ErrInvalidVideo
+
+	// ErrInvalidVideoType - 400: Uploaded video type unsupported. (.mp4 only)
+	ErrInvalidVideoType
 )

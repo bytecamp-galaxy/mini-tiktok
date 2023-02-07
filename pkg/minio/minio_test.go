@@ -3,6 +3,7 @@ package minio
 import (
 	"github.com/stretchr/testify/assert"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -11,6 +12,13 @@ import (
 const (
 	TestBucketName = "tiktoktest"
 )
+
+func TestVideoType(t *testing.T) {
+	f, err := os.ReadFile("../../assets/test.mp4")
+	assert.NoError(t, err)
+	filetype := http.DetectContentType(f)
+	log.Println(filetype)
+}
 
 // MinioServerUrl 不能包含 '/' 等特殊字符
 // bucket name 只能用小写字母

@@ -37,4 +37,5 @@ mini-tiktok 系统支持的错误码列表如下：
 | ErrOpenFormFile | 100014 | 500 | Open request's form file error |
 | ErrInvalidUser | 100015 | 400 | User does not exist |
 | ErrInvalidVideo | 100016 | 400 | Video does not exist |
+| ErrInvalidVideoType | 100017 | 400 | Uploaded video type unsupported. ( |
 
