@@ -10,7 +10,7 @@ import (
 
 // IsFollow user (view) follow user
 func IsFollow(ctx context.Context, q *query.Query, userViewId int64, userId int64) (bool, error) {
-	existed, err := redis.FollowKeyExist(ctx, userViewId)
+	existed, err := redis.FollowKeyExists(ctx, userViewId)
 	if err != nil {
 		return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}
@@ -28,12 +28,9 @@ func IsFollow(ctx context.Context, q *query.Query, userViewId int64, userId int6
 		}
 
 		// load to redis
-		count, err := redis.FollowKeyAdd(ctx, userViewId, ids...)
+		err = redis.FollowKeyAdd(ctx, userViewId, ids...)
 		if err != nil {
 			return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-		}
-		if count != int64(len(rs)+1) {
-			return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis sadd error")
 		}
 	}
 
@@ -47,7 +44,7 @@ func IsFollow(ctx context.Context, q *query.Query, userViewId int64, userId int6
 
 // IsFavorite user (view) favorite video
 func IsFavorite(ctx context.Context, q *query.Query, userViewId int64, videoId int64) (bool, error) {
-	existed, err := redis.FavouriteKeyExist(ctx, userViewId)
+	existed, err := redis.FavouriteKeyExists(ctx, userViewId)
 	if err != nil {
 		return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}
@@ -65,12 +62,9 @@ func IsFavorite(ctx context.Context, q *query.Query, userViewId int64, videoId i
 		}
 
 		// load to redis
-		count, err := redis.FavouriteKeyAdd(ctx, userViewId, ids...)
+		err = redis.FavouriteKeyAdd(ctx, userViewId, ids...)
 		if err != nil {
 			return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-		}
-		if count != int64(len(rs)+1) {
-			return false, kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis sadd error")
 		}
 	}
 

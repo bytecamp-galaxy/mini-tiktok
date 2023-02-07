@@ -41,6 +41,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = redis.LoadVideoFromDBToRedis(context.Background())
+	if err != nil {
+		panic(err)
+	}
 
 	// init jwt
 	jwt.Init()

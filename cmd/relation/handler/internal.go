@@ -5,7 +5,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
-	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
@@ -45,29 +44,36 @@ func doFollow(ctx context.Context, fromId int64, toId int64) error {
 		}
 
 		// update redis follow info if exists
-		exist, err := redis.FollowKeyExist(ctx, fromId)
+		exist, err := redis.FollowKeyExists(ctx, fromId)
 		if err != nil {
 			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 		if exist {
-			count, err := redis.FollowKeyAdd(ctx, fromId, toId)
+			err := redis.FollowKeyAdd(ctx, fromId, toId)
 			if err != nil {
 				return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 			}
-			if count != 1 {
-				return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis sadd error")
-			}
 		}
 
-		// delete redis user info if exists
-		err = pack.DeleteUserFromRedisIfExist(ctx, fromId)
+		// update redis user info, guarantee existence
+		user, err := redis.UserInfoGet(ctx, fromId)
 		if err != nil {
-			return err
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+		}
+		user.FollowingCount += 1
+		err = redis.UserInfoSet(ctx, user)
+		if err != nil {
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 
-		err = pack.DeleteUserFromRedisIfExist(ctx, toId)
+		user, err = redis.UserInfoGet(ctx, toId)
 		if err != nil {
-			return err
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+		}
+		user.FollowerCount += 1
+		err = redis.UserInfoSet(ctx, user)
+		if err != nil {
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 
 		return nil
@@ -108,29 +114,36 @@ func doUnFollow(ctx context.Context, fromId int64, toId int64) error {
 		}
 
 		// update redis follow info if exists
-		exist, err := redis.FollowKeyExist(ctx, fromId)
+		exist, err := redis.FollowKeyExists(ctx, fromId)
 		if err != nil {
 			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 		if exist {
-			count, err := redis.FollowKeyRem(ctx, fromId, toId)
+			err := redis.FollowKeyRem(ctx, fromId, toId)
 			if err != nil {
 				return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 			}
-			if count != 1 {
-				return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis srem error")
-			}
 		}
 
-		// delete redis user info if exists
-		err = pack.DeleteUserFromRedisIfExist(ctx, fromId)
+		// update redis user info, guarantee existence
+		user, err := redis.UserInfoGet(ctx, fromId)
 		if err != nil {
-			return err
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+		}
+		user.FollowingCount -= 1
+		err = redis.UserInfoSet(ctx, user)
+		if err != nil {
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 
-		err = pack.DeleteUserFromRedisIfExist(ctx, toId)
+		user, err = redis.UserInfoGet(ctx, toId)
 		if err != nil {
-			return err
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+		}
+		user.FollowerCount -= 1
+		err = redis.UserInfoSet(ctx, user)
+		if err != nil {
+			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 
 		return nil

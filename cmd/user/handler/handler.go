@@ -6,6 +6,7 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
@@ -35,6 +36,16 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
+	// load to redis bloom filter
+	err = redis.UserIdAddBF(ctx, id)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+	}
+	err = redis.UserNameAddBF(ctx, req.Username)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+	}
+
 	// response to user server
 	resp = &user.UserRegisterResponse{
 		UserId: id,
@@ -44,6 +55,15 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 
 // UserLogin implements the UserServiceImpl interface.
 func (s *UserServiceImpl) UserLogin(ctx context.Context, req *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
+	// query username in redis bloom filter
+	exist, err := redis.UserNameExistBF(ctx, req.Username)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+	}
+	if !exist {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrInvalidUser), "")
+	}
+
 	// query user in db
 	u := query.User
 	data, err := query.User.WithContext(ctx).Where(u.Username.Eq(req.Username)).Take()

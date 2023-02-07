@@ -7,11 +7,13 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/minio"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/google/uuid"
@@ -74,17 +76,11 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
-	// 获取 author
-	u := query.User
-	author, err := query.User.WithContext(ctx).Where(u.ID.Eq(req.UserId)).Take()
-	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
-	}
-
 	// 封装 video
+	vid := snowflake.Generate()
 	video := &model.Video{
+		ID:       vid,
 		AuthorID: authorId,
-		Author:   *author,
 		PlayUrl:  playUrl.String(),
 		CoverUrl: coverUrl.String(),
 		Title:    videoTitle,
@@ -94,6 +90,12 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	err = query.Video.WithContext(ctx).Create(video)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+
+	// load to redis bloom filter
+	err = redis.VideoIdAddBF(ctx, vid)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}
 
 	// response to publish server

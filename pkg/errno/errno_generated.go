@@ -23,4 +23,5 @@ func Init() {
 	register(ErrMinio, 500, "Minio error")
 	register(ErrOpenFormFile, 500, "Open request's form file error")
 	register(ErrInvalidUser, 400, "User does not exist")
+	register(ErrInvalidVideo, 400, "Video does not exist")
 }

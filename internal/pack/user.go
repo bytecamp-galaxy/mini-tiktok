@@ -11,14 +11,24 @@ import (
 
 // QueryUser can only be called by rpc servers
 func QueryUser(ctx context.Context, uid int64) (*model.User, error) {
-	var u *model.User
-	exist, err := redis.UserKeyExist(ctx, uid)
+	// query user id in redis bloom filter
+	exist, err := redis.UserIdExistBF(ctx, uid)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+	}
+	if !exist {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrInvalidUser), "")
+	}
+
+	// query user info in redis
+	exist, err = redis.UserInfoExists(ctx, uid)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}
 
+	var u *model.User
 	if exist {
-		u, err = redis.UserKeyGet(ctx, uid)
+		u, err = redis.UserInfoGet(ctx, uid)
 		if err != nil {
 			return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
@@ -30,27 +40,10 @@ func QueryUser(ctx context.Context, uid int64) (*model.User, error) {
 		}
 
 		// load to redis
-		err := redis.UserKeySet(ctx, u)
+		err := redis.UserInfoSet(ctx, u)
 		if err != nil {
 			return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 	}
 	return u, nil
-}
-
-func DeleteUserFromRedisIfExist(ctx context.Context, uid int64) error {
-	existed, err := redis.UserKeyExist(ctx, uid)
-	if err != nil {
-		return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-	}
-	if existed {
-		count, err := redis.UserKeyDel(ctx, uid)
-		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-		}
-		if count != 1 {
-			return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis del error")
-		}
-	}
-	return nil
 }

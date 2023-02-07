@@ -39,17 +39,14 @@ func doFavorite(ctx context.Context, uid int64, vid int64) error {
 		}
 
 		// update redis favourite info if exists
-		existed, err := redis.FavouriteKeyExist(ctx, uid)
+		existed, err := redis.FavouriteKeyExists(ctx, uid)
 		if err != nil {
 			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 		if existed {
-			count, err := redis.FavouriteKeyAdd(ctx, uid, vid)
+			err := redis.FavouriteKeyAdd(ctx, uid, vid)
 			if err != nil {
 				return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-			}
-			if count != 1 {
-				return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis sadd error")
 			}
 		}
 
@@ -84,17 +81,14 @@ func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
 		}
 
 		// update redis favourite info if exists
-		existed, err := redis.FavouriteKeyExist(ctx, uid)
+		existed, err := redis.FavouriteKeyExists(ctx, uid)
 		if err != nil {
 			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 		}
 		if existed {
-			count, err := redis.FavouriteKeyRem(ctx, uid, vid)
+			err := redis.FavouriteKeyRem(ctx, uid, vid)
 			if err != nil {
 				return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-			}
-			if count != 1 {
-				return kerrors.NewBizStatusError(int32(errno.ErrRedis), "redis srem error")
 			}
 		}
 

@@ -22,6 +22,13 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 		return nil, err
 	}
 
+	// check video
+	_, err = pack.QueryVideo(ctx, req.VideoId)
+	if err != nil {
+		return nil, err
+	}
+
+	// do action
 	resp = &favorite.FavoriteActionResponse{}
 	switch req.ActionType {
 	case 1:

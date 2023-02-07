@@ -26,6 +26,12 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 		return nil, err
 	}
 
+	// check video
+	_, err = pack.QueryVideo(ctx, req.VideoId)
+	if err != nil {
+		return nil, err
+	}
+
 	// do action
 	q := query.Use(mysql.DB)
 	err = q.Transaction(func(tx *query.Query) error {
@@ -109,6 +115,13 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 		return nil, err
 	}
 
+	// check video
+	_, err = pack.QueryVideo(ctx, req.VideoId)
+	if err != nil {
+		return nil, err
+	}
+
+	// do action
 	q := query.Use(mysql.DB)
 	err = q.Transaction(func(tx *query.Query) error {
 		comments, err := tx.Comment.WithContext(ctx).

@@ -47,4 +47,7 @@ const (
 
 	// ErrInvalidUser - 400: User does not exist.
 	ErrInvalidUser
+
+	// ErrInvalidVideo - 400: Video does not exist.
+	ErrInvalidVideo
 )

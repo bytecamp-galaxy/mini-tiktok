@@ -3,7 +3,7 @@ package log
 import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/kitex/pkg/klog"
-	hertzzap "github.com/hertz-contrib/logger/zap"
+	hertzzap "github.com/hertz-contrib/obs-opentelemetry/logging/zap"
 	kitexzap "github.com/kitex-contrib/obs-opentelemetry/logging/zap"
 	gormlogger "gorm.io/gorm/logger"
 	"moul.io/zapgorm2"

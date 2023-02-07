@@ -36,4 +36,5 @@ mini-tiktok 系统支持的错误码列表如下：
 | ErrMinio | 100013 | 500 | Minio error |
 | ErrOpenFormFile | 100014 | 500 | Open request's form file error |
 | ErrInvalidUser | 100015 | 400 | User does not exist |
+| ErrInvalidVideo | 100016 | 400 | Video does not exist |
 

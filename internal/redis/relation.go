@@ -5,38 +5,38 @@ import (
 )
 
 var (
-	followKeyFormat    = "follow-%v"
-	favouriteKeyFormat = "favourite-%v"
+	followKeyFormat    = "ufo-%v"
+	favouriteKeyFormat = "ufa-%v"
 )
 
-func FollowKeyExist(ctx context.Context, uid int64) (bool, error) {
-	return Exist(followKeyFormat, ctx, uid)
+func FollowKeyExists(ctx context.Context, uid int64) (bool, error) {
+	return Exists(ctx, followKeyFormat, uid)
 }
 
-func FollowKeyAdd(ctx context.Context, uid int64, id ...interface{}) (int64, error) {
-	return SetAdd(followKeyFormat, ctx, uid, id...)
+func FollowKeyAdd(ctx context.Context, uid int64, id ...interface{}) error {
+	return SetAdd(ctx, followKeyFormat, uid, id...)
 }
 
-func FollowKeyRem(ctx context.Context, uid int64, id ...interface{}) (int64, error) {
-	return SetRem(followKeyFormat, ctx, uid, id...)
+func FollowKeyRem(ctx context.Context, uid int64, id ...interface{}) error {
+	return SetRem(ctx, followKeyFormat, uid, id...)
 }
 
 func FollowKeyContains(ctx context.Context, uid int64, id int64) (bool, error) {
-	return SetContains(followKeyFormat, ctx, uid, id)
+	return SetContains(ctx, followKeyFormat, uid, id)
 }
 
-func FavouriteKeyExist(ctx context.Context, uid int64) (bool, error) {
-	return Exist(favouriteKeyFormat, ctx, uid)
+func FavouriteKeyExists(ctx context.Context, uid int64) (bool, error) {
+	return Exists(ctx, favouriteKeyFormat, uid)
 }
 
-func FavouriteKeyAdd(ctx context.Context, uid int64, id ...interface{}) (int64, error) {
-	return SetAdd(favouriteKeyFormat, ctx, uid, id...)
+func FavouriteKeyAdd(ctx context.Context, uid int64, id ...interface{}) error {
+	return SetAdd(ctx, favouriteKeyFormat, uid, id...)
 }
 
-func FavouriteKeyRem(ctx context.Context, uid int64, id ...interface{}) (int64, error) {
-	return SetRem(favouriteKeyFormat, ctx, uid, id...)
+func FavouriteKeyRem(ctx context.Context, uid int64, id ...interface{}) error {
+	return SetRem(ctx, favouriteKeyFormat, uid, id...)
 }
 
 func FavouriteKeyContains(ctx context.Context, uid int64, id int64) (bool, error) {
-	return SetContains(favouriteKeyFormat, ctx, uid, id)
+	return SetContains(ctx, favouriteKeyFormat, uid, id)
 }
