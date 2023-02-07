@@ -31,9 +31,14 @@ func TestPerformance(t *testing.T) {
 	RunSpecs(t, "performance test")
 }
 
+// TODO(vgalaxy): use gomega expect for http status code
 var _ = Describe("performance test", Ordered, func() {
 	It("ping", func() {
-		e.GET("/ping").Expect().Status(http.StatusOK).JSON().Object().Value("message").Equal("pong")
+		resp := e.GET("/ping").
+			Expect().
+			Status(http.StatusOK).
+			JSON().Object()
+		Expect(resp.Value("message").String().Raw()).To(Equal("pong"))
 	})
 
 	It("user register", func() {
