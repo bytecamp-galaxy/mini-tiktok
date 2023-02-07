@@ -25,12 +25,12 @@ var (
 
 const (
 	indentation = 2
-	flag        = "*"
+	star        = "*"
 )
 
 func describe(text string, fn func()) {
 	for i := 0; i < depth; i++ {
-		fmt.Print(flag)
+		fmt.Print(star)
 	}
 	fmt.Printf(" %s\n", text)
 	depth += indentation

@@ -1,7 +1,7 @@
 package main
 
 import (
-	model2 "github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"gorm.io/gen"
 )
@@ -18,6 +18,6 @@ func main() {
 	// Generate struct `User` based on table `users`
 	// g.GenerateModel("users")
 
-	g.ApplyBasic(model2.User{}, model2.Video{}, model2.Comment{}, model2.FollowRelation{}, model2.FavoriteRelation{})
+	g.ApplyBasic(model.User{}, model.Video{}, model.Comment{}, model.FollowRelation{}, model.FavoriteRelation{})
 	g.Execute()
 }

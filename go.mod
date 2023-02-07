@@ -76,6 +76,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/pprof v0.0.0-20220608213341-c488b8fa1db3 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
@@ -102,7 +103,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
 	github.com/oleiade/lane v1.0.1 // indirect
-	github.com/onsi/gomega v1.25.0 // indirect
+	github.com/onsi/ginkgo/v2 v2.8.0 // indirect
+	github.com/onsi/gomega v1.26.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.4.0 // indirect
