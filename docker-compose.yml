@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.9"
 
 services:
   api-server:
@@ -7,11 +7,8 @@ services:
     volumes:
       - ./logs:/root/logs
     depends_on:
-      - mysql
-      - otel-collector
-      - minio
-      - etcd
-      - redis
+      mysql:
+        condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/api/output/api
   user-server:
     image: vgalaxy/server:latest
@@ -19,11 +16,8 @@ services:
     volumes:
       - ./logs:/root/logs
     depends_on:
-      - mysql
-      - otel-collector
-      - minio
-      - etcd
-      - redis
+      mysql:
+        condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/user/output/user
   comment-server:
     image: vgalaxy/server:latest
@@ -31,11 +25,8 @@ services:
     volumes:
       - ./logs:/root/logs
     depends_on:
-      - mysql
-      - otel-collector
-      - minio
-      - etcd
-      - redis
+      mysql:
+        condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/comment/output/comment
   feed-server:
     image: vgalaxy/server:latest
@@ -43,11 +34,8 @@ services:
     volumes:
       - ./logs:/root/logs
     depends_on:
-      - mysql
-      - otel-collector
-      - minio
-      - etcd
-      - redis
+      mysql:
+        condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/feed/output/feed
   publish-server:
     image: vgalaxy/server:latest
@@ -55,23 +43,26 @@ services:
     volumes:
       - ./logs:/root/logs
     depends_on:
-      - mysql
-      - otel-collector
-      - minio
-      - etcd
-      - redis
+      mysql:
+        condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/publish/output/publish
+  favorite-server:
+    image: vgalaxy/server:latest
+    network_mode: host
+    volumes:
+      - ./logs:/root/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/favorite/output/favorite
   relation-server:
     image: vgalaxy/server:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
     depends_on:
-      - mysql
-      - otel-collector
-      - minio
-      - etcd
-      - redis
+      mysql:
+       condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/relation/output/relation
 
   redis:
@@ -87,6 +78,11 @@ services:
       - MYSQL_USER=gorm
       - MYSQL_PASSWORD=gorm
       - MYSQL_RANDOM_ROOT_PASSWORD="yes"  # https://dev.mysql.com/doc/refman/5.7/en/docker-mysql-more-topics.html#docker_var_mysql_random_root_password
+    healthcheck:
+      test: mysqladmin ping -h127.0.0.1 -ugorm -pgorm
+      timeout: 20s
+      retries: 10
+      interval: 1s
 
   etcd:
     image: bitnami/etcd:latest

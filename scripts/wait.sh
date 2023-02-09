@@ -13,6 +13,6 @@ do
     break
   else
 #    wget -qO- https://ghproxy.com/https://raw.githubusercontent.com/eficode/wait-for/v2.2.3/wait-for | sh -s -- 127.0.0.1:${!i} -- echo success
-    bash /root/wait-for 127.0.0.1:${!i} -- echo success
+    bash /root/wait-for -t 600 127.0.0.1:${!i} -- echo 'wait '${!i}' success'
   fi
 done
