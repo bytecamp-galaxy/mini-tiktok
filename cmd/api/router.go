@@ -4,11 +4,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/handler/message"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/pprof"
+	"github.com/hertz-contrib/swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 // customizeRegister registers customize routers.
@@ -24,4 +28,10 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ws", func(c context.Context, ctx *app.RequestContext) {
 		message.ServeWs(ctx, hub)
 	})
+
+	// swagger
+	v := conf.Init()
+	url := fmt.Sprintf("http://localhost:%d/swagger/doc.json", // use localhost here, use the same port to avoid CORS
+		v.GetInt("api-server.port")) // The url pointing to API definition
+	r.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler, swagger.URL(url)))
 }

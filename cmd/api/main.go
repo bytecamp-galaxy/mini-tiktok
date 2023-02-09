@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/api/biz/jwt"
+	_ "github.com/bytecamp-galaxy/mini-tiktok/cmd/api/docs"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
@@ -28,6 +29,19 @@ import (
 	"time"
 )
 
+// @title mini tiktok
+// @version 1.0
+// @description 第五届字节跳动青训营后端专场结营项目 - 极简版抖音
+
+// @contact.name bytecamp-galaxy
+// @contact.url https://github.com/bytecamp-galaxy/
+
+// @license.name MIT License
+// @license.url https://mit-license.org/
+
+// @host localhost:8080
+// @BasePath /douyin/
+// @schemes http
 func main() {
 	v := conf.Init()
 	// init log

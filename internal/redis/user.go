@@ -23,14 +23,9 @@ const (
 // LoadUserFromDBToRedis only called by api service
 func LoadUserFromDBToRedis(ctx context.Context) error {
 	// init bloom filter
-	err := UserIdInitBF(ctx)
-	if err != nil {
-		return err
-	}
-	err = UserNameInitBF(ctx)
-	if err != nil {
-		return err
-	}
+	// ignore recreate error
+	_ = UserIdInitBF(ctx)
+	_ = UserNameInitBF(ctx)
 	// query db
 	us, err := query.User.WithContext(ctx).Find()
 	if err != nil {

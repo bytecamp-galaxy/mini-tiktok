@@ -22,6 +22,10 @@ import (
 
 // RelationAction .
 // @router /douyin/relation/action/ [POST]
+// @description 关注操作
+// @produce application/json
+// @param q query api.RelationActionRequest true "relation action request"
+// @success 200 {object} api.RelationActionResponse
 func RelationAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.RelationActionRequest
@@ -82,6 +86,10 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 
 // RelationFollowList .
 // @router /douyin/relation/follow/list/ [GET]
+// @description 粉丝列表
+// @produce application/json
+// @param q query api.RelationFollowListRequest true "relation follow list request"
+// @success 200 {object} api.RelationFollowListResponse
 func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.RelationFollowListRequest
@@ -139,6 +147,10 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 
 // RelationFollowerList .
 // @router /douyin/relation/follower/list/ [GET]
+// @description 关注列表
+// @produce application/json
+// @param q query api.RelationFollowerListRequest true "relation follower list request"
+// @success 200 {object} api.RelationFollowerListResponse
 func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.RelationFollowerListRequest
