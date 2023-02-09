@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
@@ -44,41 +45,41 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	}
 
 	videoUid := uuid.New()
-	fileName := videoUid.String() + "." + "mp4"
+	videoName := fmt.Sprintf("%s.mp4", videoUid.String())
 
 	v := conf.Init()
 	videoBucketName := v.GetString("minio.video-bucket-name")
 	coverBucketName := v.GetString("minio.cover-bucket-name")
 
 	// 上传视频
-	err = minio.UploadFile(videoBucketName, fileName, reader, int64(len(videoData)))
+	err = minio.UploadFile(videoBucketName, videoName, reader, int64(len(videoData)))
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取视频链接
-	playUrl, err := minio.GetFileUrl(videoBucketName, fileName, 0)
+	playUrl, err := minio.GetFileUrl(videoBucketName, videoName, 0)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取封面
 	coverUid := uuid.New()
-	coverPath := coverUid.String() + "." + "jpg"
-	coverData, err := utils.ReadFrameAsJpeg(playUrl.String())
+	coverName := fmt.Sprintf("%s.jpg", coverUid.String())
+	coverData, err := utils.GetThumbnail(reader)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrEncodingFailed), err.Error())
 	}
 
 	// 上传封面
 	coverReader := bytes.NewReader(coverData)
-	err = minio.UploadFile(coverBucketName, coverPath, coverReader, int64(len(coverData)))
+	err = minio.UploadFile(coverBucketName, coverName, coverReader, int64(len(coverData)))
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}
 
 	// 获取封面链接
-	coverUrl, err := minio.GetFileUrl(coverBucketName, coverPath, 0)
+	coverUrl, err := minio.GetFileUrl(coverBucketName, coverName, 0)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
 	}

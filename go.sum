@@ -72,6 +72,8 @@ github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmV
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
 github.com/aws/aws-sdk-go v1.38.20 h1:QbzNx/tdfATbdKfubBpkt84OM6oBkxQZRw6+bW2GyeA=
 github.com/aws/aws-sdk-go v1.38.20/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
+github.com/bakape/thumbnailer/v2 v2.7.1 h1:dtlbmzup5PhUVsnOB2uF82FKJaphLY41kOXTP3Hb1+Q=
+github.com/bakape/thumbnailer/v2 v2.7.1/go.mod h1:+yOYrfZmQ3VO7uqVHxTr3p5J74WRjP5MeQQXaU6GBjY=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -130,7 +132,6 @@ github.com/cloudwego/fastpb v0.0.3 h1:GZE0WzlnjQFE3+vkYFZd964PGT9AXOuvir+JGzuBSP
 github.com/cloudwego/fastpb v0.0.3/go.mod h1:/V13XFTq2TUkxj2qWReV8MwfPC4NnPcy6FsrojnsSG0=
 github.com/cloudwego/frugal v0.1.3 h1:tw3+hh4YMmtHFHRue3OGYjAnkxnZRHqeAyG18+7z5aI=
 github.com/cloudwego/frugal v0.1.3/go.mod h1:b981ViPYdhI56aFYsoMjl9kv6yeqYSO+iEz2jrhkCgI=
-github.com/cloudwego/hertz v0.0.1/go.mod h1:prTyExvsH/UmDkvfU3dp3EHsZFQISfT8R7BirvpTKdo=
 github.com/cloudwego/hertz v0.2.1/go.mod h1:prTyExvsH/UmDkvfU3dp3EHsZFQISfT8R7BirvpTKdo=
 github.com/cloudwego/hertz v0.2.2-0.20220809100505-e428c8fd938b/go.mod h1:GWWYlAVkq1gDu6vJd/XNciWsP6q0d4TrEKk5fpJYF04=
 github.com/cloudwego/hertz v0.3.0/go.mod h1:GWWYlAVkq1gDu6vJd/XNciWsP6q0d4TrEKk5fpJYF04=
@@ -399,8 +400,6 @@ github.com/henrylee2cn/ameda v1.4.10 h1:JdvI2Ekq7tapdPsuhrc4CaFiqw6QXFvZIULWJgQy
 github.com/henrylee2cn/ameda v1.4.10/go.mod h1:liZulR8DgHxdK+MEwvZIylGnmcjzQ6N6f2PlWe7nEO4=
 github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 h1:yE9ULgp02BhYIrO6sdV/FPe0xQM6fNHkVQW2IAymfM0=
 github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8/go.mod h1:Nhe/DM3671a5udlv2AdV2ni/MZzgfv2qrPL5nIi3EGQ=
-github.com/hertz-contrib/cors v0.0.0-20220601061225-50f4e582beaf h1:ZAxm2v6m6uhdlRZkmfcdFJm9P3FG7VQIQxC5Hkx8Li0=
-github.com/hertz-contrib/cors v0.0.0-20220601061225-50f4e582beaf/go.mod h1:45j0uowS7Wuijes/UKkxrszUM7Hs6E49TY0M27Fu560=
 github.com/hertz-contrib/gzip v0.0.1 h1:fPCnSZIDT4Gd8ZTuoCCJXek0opUsN89T2djdEW7Awr4=
 github.com/hertz-contrib/gzip v0.0.1/go.mod h1:Fom/vnPMLA3UJ/P8fsZO8izjWG82m53BGO48lW1U1l8=
 github.com/hertz-contrib/obs-opentelemetry/logging/zap v0.0.0-20230206061618-0fc86f9ff95d h1:jelNzBsuGtgx7cGfL0R2xi25KRW7fXPlnJvLPO/9wIs=
@@ -603,6 +602,8 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLA
 github.com/nishanths/predeclared v0.0.0-20200524104333-86fad755b4d3/go.mod h1:nt3d53pc1VYcphSCIaYAJtnPYnr3Zyn8fMq2wvPGPso=
 github.com/novalagung/gubrak v1.0.0 h1:+iDvzUcSHUoa3bwP/ig40K2h9X+5cX2w5qcBb3izAwo=
 github.com/novalagung/gubrak v1.0.0/go.mod h1:lahTbjdK/OLI9Y4alRlf003XEwbiOj7ERkmDHFFbzLk=
+github.com/nwaples/rardecode v1.1.0 h1:vSxaY8vQhOcVr4mm5e8XllHWTiM4JF507A0Katqw7MQ=
+github.com/nwaples/rardecode v1.1.0/go.mod h1:5DzqNKiOdpKKBH87u8VlvAnPZMXcGRhxWkRpHbbfGS0=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=
