@@ -15,7 +15,7 @@ COPY configs configs
 COPY pkg pkg
 COPY internal internal
 
-WORKDIR /root/cmd/user
+WORKDIR /root/cmd/favorite
 RUN chmod +x build.sh \
     && ./build.sh \
     && sed -i "s@http://\(deb\|security\).debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list  \
@@ -23,4 +23,4 @@ RUN chmod +x build.sh \
     && apt install -y netcat
 
 WORKDIR /root
-ENTRYPOINT ["/root/cmd/user/output/user"]
+ENTRYPOINT ["/root/cmd/favorite/output/favorite"]
