@@ -1,0 +1,430 @@
+basePath: /douyin/
+definitions:
+  api.Comment:
+    properties:
+      content:
+        type: string
+      create_date:
+        type: string
+      id:
+        type: integer
+      user:
+        $ref: '#/definitions/api.User'
+    type: object
+  api.CommentActionResponse:
+    properties:
+      comment:
+        $ref: '#/definitions/api.Comment'
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  api.CommentListResponse:
+    properties:
+      comment_list:
+        items:
+          $ref: '#/definitions/api.Comment'
+        type: array
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  api.FavoriteActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  api.FavoriteListResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      video_list:
+        items:
+          $ref: '#/definitions/api.Video'
+        type: array
+    type: object
+  api.FeedResponse:
+    properties:
+      next_time:
+        type: integer
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      video_list:
+        items:
+          $ref: '#/definitions/api.Video'
+        type: array
+    type: object
+  api.PublishActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  api.PublishListResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      video_list:
+        items:
+          $ref: '#/definitions/api.Video'
+        type: array
+    type: object
+  api.RelationActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  api.RelationFollowListResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user_list:
+        items:
+          $ref: '#/definitions/api.User'
+        type: array
+    type: object
+  api.RelationFollowerListResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user_list:
+        items:
+          $ref: '#/definitions/api.User'
+        type: array
+    type: object
+  api.User:
+    properties:
+      follow_count:
+        type: integer
+      follower_count:
+        type: integer
+      id:
+        type: integer
+      is_follow:
+        type: boolean
+      name:
+        type: string
+    type: object
+  api.UserLoginResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      token:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  api.UserQueryResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user:
+        $ref: '#/definitions/api.User'
+    type: object
+  api.UserRegisterResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      token:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  api.Video:
+    properties:
+      author:
+        $ref: '#/definitions/api.User'
+      comment_count:
+        type: integer
+      cover_url:
+        type: string
+      favorite_count:
+        type: integer
+      id:
+        type: integer
+      is_favorite:
+        type: boolean
+      play_url:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: bytecamp-galaxy
+    url: https://github.com/bytecamp-galaxy/
+  description: 第五届字节跳动青训营后端专场结营项目 - 极简版抖音
+  license:
+    name: MIT License
+    url: https://mit-license.org/
+  title: mini tiktok
+  version: "1.0"
+paths:
+  /douyin/comment/action/:
+    post:
+      description: 评论操作：登录用户对视频进行评论
+      parameters:
+      - in: query
+        name: ActionType
+        type: integer
+      - in: query
+        name: CommentId
+        type: integer
+      - in: query
+        name: CommentText
+        type: string
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: VideoId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.CommentActionResponse'
+  /douyin/comment/list:
+    get:
+      description: 评论列表：查看视频的所有评论，按发布时间倒序
+      parameters:
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: VideoId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.CommentListResponse'
+  /douyin/favorite/action/:
+    post:
+      description: 赞操作：登录用户对视频的点赞和取消点赞操作
+      parameters:
+      - in: query
+        name: ActionType
+        type: integer
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: VideoId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.FavoriteActionResponse'
+  /douyin/favorite/list/:
+    get:
+      description: 喜欢列表：用户的所有点赞视频
+      parameters:
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: UserId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.FavoriteListResponse'
+  /douyin/feed/:
+    get:
+      description: 视频流接口：不限制登录状态，返回按投稿时间倒序的视频列表，视频数由服务端控制，单次最多 30 个
+      parameters:
+      - in: query
+        name: LatestTime
+        type: integer
+      - in: query
+        name: Token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.FeedResponse'
+  /douyin/publish/action/:
+    post:
+      description: 发布列表：用户的视频发布列表，直接列出用户所有投稿过的视频
+      parameters:
+      - in: formData
+        items:
+          type: integer
+        name: Data
+        type: array
+      - in: formData
+        name: Title
+        type: string
+      - in: formData
+        name: Token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.PublishActionResponse'
+  /douyin/publish/list/:
+    get:
+      description: 发布列表：用户的视频发布列表，直接列出用户所有投稿过的视频
+      parameters:
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: UserId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.PublishListResponse'
+  /douyin/relation/action/:
+    post:
+      description: 关注操作
+      parameters:
+      - in: query
+        name: ActionType
+        type: integer
+      - in: query
+        name: ToUserId
+        type: integer
+      - in: query
+        name: Token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.RelationActionResponse'
+  /douyin/relation/follow/list/:
+    get:
+      description: 粉丝列表
+      parameters:
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: UserId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.RelationFollowListResponse'
+  /douyin/relation/follower/list/:
+    get:
+      description: 关注列表
+      parameters:
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: UserId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.RelationFollowerListResponse'
+  /douyin/user/:
+    get:
+      description: 用户信息：获取用户的 id、昵称，如果实现社交部分的功能，还会返回关注数和粉丝数
+      parameters:
+      - in: query
+        name: Token
+        type: string
+      - in: query
+        name: UserId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserQueryResponse'
+  /douyin/user/login/:
+    post:
+      description: 用户登录：通过用户名和密码进行登录，登录成功后返回用户 id 和权限 token
+      parameters:
+      - in: query
+        name: Password
+        type: string
+      - in: query
+        name: Username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserLoginResponse'
+  /douyin/user/register/:
+    post:
+      description: 用户注册：新用户注册时提供用户名，密码，昵称即可，用户名需要保证唯一，创建成功后返回用户 id 和权限 token
+      parameters:
+      - in: query
+        name: Password
+        type: string
+      - in: query
+        name: Username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserRegisterResponse'
+schemes:
+- http
+swagger: "2.0"

@@ -16,7 +16,7 @@ minio:
 
 api-server:
   name: "tiktok.api.service"
-  host: "0.0.0.0"
+  host: "0.0.0.0" # https://stackoverflow.com/a/20778887/6229548
   port: 8080
   exit-wait-time: 5
 

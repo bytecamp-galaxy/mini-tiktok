@@ -22,6 +22,10 @@ import (
 
 // GetFeed .
 // @router /douyin/feed/ [GET]
+// @description 视频流接口：不限制登录状态，返回按投稿时间倒序的视频列表，视频数由服务端控制，单次最多 30 个
+// @produce application/json
+// @param q query api.FeedRequest true "feed request"
+// @success 200 {object} api.FeedResponse
 func GetFeed(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.FeedRequest

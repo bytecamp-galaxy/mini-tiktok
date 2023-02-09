@@ -13,10 +13,8 @@ const (
 // LoadVideoFromDBToRedis only called by api service
 func LoadVideoFromDBToRedis(ctx context.Context) error {
 	// init bloom filter
-	err := VideoIdInitBF(ctx)
-	if err != nil {
-		return err
-	}
+	// ignore recreate error
+	_ = VideoIdInitBF(ctx)
 	// query db
 	vs, err := query.Video.WithContext(ctx).Find()
 	if err != nil {

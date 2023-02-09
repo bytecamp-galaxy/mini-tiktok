@@ -21,6 +21,10 @@ import (
 
 // FavoriteAction .
 // @router /douyin/favorite/action/ [POST]
+// @description 赞操作：登录用户对视频的点赞和取消点赞操作
+// @produce application/json
+// @param q query api.FavoriteActionRequest true "favorite action request"
+// @success 200 {object} api.FavoriteActionResponse
 func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.FavoriteActionRequest
@@ -70,6 +74,10 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 
 // FavoriteList .
 // @router /douyin/favorite/list/ [GET]
+// @description 喜欢列表：用户的所有点赞视频
+// @produce application/json
+// @param q query api.FavoriteListRequest true "favorite list request"
+// @success 200 {object} api.FavoriteListResponse
 func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.FavoriteListRequest

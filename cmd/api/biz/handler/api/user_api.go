@@ -21,6 +21,10 @@ import (
 
 // UserRegister .
 // @router /douyin/user/register/ [POST]
+// @description 用户注册：新用户注册时提供用户名，密码，昵称即可，用户名需要保证唯一，创建成功后返回用户 id 和权限 token
+// @produce application/json
+// @param q query api.UserRegisterRequest true "user register request"
+// @success 200 {object} api.UserRegisterResponse
 func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserRegisterRequest
@@ -82,6 +86,10 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 
 // UserLogin .
 // @router /douyin/user/login/ [POST]
+// @description 用户登录：通过用户名和密码进行登录，登录成功后返回用户 id 和权限 token
+// @produce application/json
+// @param q query api.UserLoginRequest true "user login request"
+// @success 200 {object} api.UserLoginResponse
 func UserLogin(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserLoginRequest
@@ -136,6 +144,10 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 
 // UserQuery .
 // @router /douyin/user/ [GET]
+// @description 用户信息：获取用户的 id、昵称，如果实现社交部分的功能，还会返回关注数和粉丝数
+// @produce application/json
+// @param q query api.UserQueryRequest true "user query request"
+// @success 200 {object} api.UserQueryResponse
 func UserQuery(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.UserQueryRequest

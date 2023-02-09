@@ -23,6 +23,10 @@ import (
 
 // PublishAction .
 // @router /douyin/publish/action/ [POST]
+// @description 投稿接口：登录用户选择视频上传
+// @produce application/json
+// @param f formData api.PublishActionRequest true "publish action request"
+// @success 200 {object} api.PublishActionResponse
 func PublishAction(ctx context.Context, c *app.RequestContext) {
 	// NOTE: DO NOT USE `BindAndValidate`
 	fileHeader, err := c.Request.FormFile("data")
@@ -88,6 +92,10 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 
 // PublishList .
 // @router /douyin/publish/list/ [GET]
+// @description 发布列表：用户的视频发布列表，直接列出用户所有投稿过的视频
+// @produce application/json
+// @param q query api.PublishListRequest true "publish list request"
+// @success 200 {object} api.PublishListResponse
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.PublishListRequest

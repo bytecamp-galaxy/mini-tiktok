@@ -21,6 +21,10 @@ import (
 
 // CommentAction .
 // @router /douyin/comment/action/ [POST]
+// @description 评论操作：登录用户对视频进行评论
+// @produce application/json
+// @param q query api.CommentActionRequest true "comment action request"
+// @success 200 {object} api.CommentActionResponse
 func CommentAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CommentActionRequest
@@ -77,6 +81,10 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 
 // CommentList .
 // @router /douyin/comment/list [GET]
+// @description 评论列表：查看视频的所有评论，按发布时间倒序
+// @produce application/json
+// @param q query api.CommentListRequest true "comment list request"
+// @success 200 {object} api.CommentListResponse
 func CommentList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CommentListRequest
