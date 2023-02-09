@@ -22,7 +22,9 @@ import (
 )
 
 func main() {
+	v := conf.Init()
 	// init log
+	log.SetOutput(v.GetString("user-server.log-path"))
 	log.InitKLogger()
 
 	// init db
@@ -35,7 +37,6 @@ func main() {
 	snowflake.Init()
 
 	// init server
-	v := conf.Init()
 
 	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
 	r, err := etcd.NewEtcdRegistry([]string{etcdAddr})

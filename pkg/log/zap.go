@@ -3,7 +3,6 @@ package log
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
 )
 
 func getEncoder() zapcore.Encoder {
@@ -29,7 +28,7 @@ func getAtomicLevel() zap.AtomicLevel {
 }
 
 func getLogWriter() zapcore.WriteSyncer {
-	return zapcore.AddSync(os.Stdout)
+	return zapcore.AddSync(Writer)
 }
 
 func getDBLogger() *zap.Logger {
