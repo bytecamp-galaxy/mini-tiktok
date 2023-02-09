@@ -14,13 +14,10 @@ COPY kitex_gen kitex_gen
 COPY configs configs
 COPY pkg pkg
 COPY internal internal
+COPY scripts/wait.sh wait.sh
+COPY scripts/build_all.sh build_all.sh
 
-WORKDIR /root/cmd/feed
-RUN chmod +x build.sh \
-    && ./build.sh \
+RUN bash ./build_all.sh \
     && sed -i "s@http://\(deb\|security\).debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list  \
     && apt update \
     && apt install -y netcat
-
-WORKDIR /root
-ENTRYPOINT ["/root/cmd/feed/output/feed"]

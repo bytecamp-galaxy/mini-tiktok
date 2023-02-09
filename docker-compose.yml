@@ -2,59 +2,65 @@ version: "3.7"
 
 services:
   api-server:
-    image: vgalaxy/api-server:latest
+    image: vgalaxy/server:latest
     network_mode: host
     depends_on:
       - mysql
       - otel-collector
       - minio
       - etcd
-    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 -- /root/cmd/api/output/api
+      - redis
+    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 redis:6379 -- /root/cmd/api/output/api
   user-server:
-    image: vgalaxy/user-server:latest
+    image: vgalaxy/server:latest
     network_mode: host
     depends_on:
       - mysql
       - otel-collector
       - minio
       - etcd
-    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 -- /root/cmd/user/output/user
+      - redis
+    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 redis:6379 -- /root/cmd/user/output/user
   comment-server:
-    image: vgalaxy/comment-server:latest
+    image: vgalaxy/server:latest
     network_mode: host
     depends_on:
       - mysql
       - otel-collector
       - minio
       - etcd
-    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 -- /root/cmd/comment/output/comment
+      - redis
+    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 redis:6379 -- /root/cmd/comment/output/comment
   feed-server:
-    image: vgalaxy/feed-server:latest
+    image: vgalaxy/server:latest
     network_mode: host
     depends_on:
       - mysql
       - otel-collector
       - minio
       - etcd
-    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 -- /root/cmd/feed/output/feed
+      - redis
+    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 redis:6379 -- /root/cmd/feed/output/feed
   publish-server:
-    image: vgalaxy/publish-server:latest
+    image: vgalaxy/server:latest
     network_mode: host
     depends_on:
       - mysql
       - otel-collector
       - minio
       - etcd
-    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 -- /root/cmd/publish/output/publish
+      - redis
+    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 redis:6379 -- /root/cmd/publish/output/publish
   relation-server:
-    image: vgalaxy/relation-server:latest
+    image: vgalaxy/server:latest
     network_mode: host
     depends_on:
       - mysql
       - otel-collector
       - minio
       - etcd
-    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 -- /root/cmd/relation/output/relation
+      - redis
+    command: bash /root/wait.sh mysql:3306 etcd:2379 otel-collector:4317 minio:9000 redis:6379 -- /root/cmd/relation/output/relation
   redis:
     image: redis/redis-stack-server:latest
     ports:
