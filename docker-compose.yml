@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   api-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
@@ -11,7 +11,7 @@ services:
         condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/api/output/api
   user-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
@@ -20,7 +20,7 @@ services:
         condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/user/output/user
   comment-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
@@ -29,7 +29,7 @@ services:
         condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/comment/output/comment
   feed-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
@@ -38,7 +38,7 @@ services:
         condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/feed/output/feed
   publish-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
@@ -47,7 +47,7 @@ services:
         condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/publish/output/publish
   favorite-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs
@@ -56,7 +56,7 @@ services:
         condition: service_healthy
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/favorite/output/favorite
   relation-server:
-    image: vgalaxy/server:latest
+    image: heiyan2020/mini-tiktok:latest
     network_mode: host
     volumes:
       - ./logs:/root/logs

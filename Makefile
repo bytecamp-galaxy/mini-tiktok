@@ -1,6 +1,7 @@
 .PHONY: run test kill
 
 run:
+	mkdir -p logs
 	go run ./cmd/api &
 	go run ./cmd/comment &
 	go run ./cmd/feed &
@@ -20,4 +21,8 @@ service:
 	docker compose up mysql redis etcd otel-collector jaeger-all-in-one victoriametrics grafana minio -d
 
 docker:
+	mkdir -p logs
 	docker compose up
+
+image:
+	docker build -f Dockerfile -t mini-tiktok .
