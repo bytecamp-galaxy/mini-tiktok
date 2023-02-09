@@ -73,6 +73,7 @@ services:
       - etcd
       - redis
     command: bash /root/wait.sh 3306 2379 4317 9000 6379 -- /root/cmd/relation/output/relation
+
   redis:
     image: redis/redis-stack-server:latest
     ports:

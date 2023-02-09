@@ -48,7 +48,7 @@ func main() {
 		panic(err)
 	}
 
-	serverAddr := fmt.Sprintf("%s:%d", v.GetString("publish-server.host"), v.GetInt("publish-server.port"))
+	serverAddr := fmt.Sprintf("%s:%d", v.GetString("publish-server.host"), 0)
 	addr, err := net.ResolveTCPAddr("tcp", serverAddr)
 	if err != nil {
 		panic(err)

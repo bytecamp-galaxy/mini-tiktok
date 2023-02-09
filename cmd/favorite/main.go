@@ -44,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	serverAddr := fmt.Sprintf("%s:%d", v.GetString("favorite-server.host"), v.GetInt("favorite-server.port"))
+	serverAddr := fmt.Sprintf("%s:%d", v.GetString("favorite-server.host"), 0)
 	addr, err := net.ResolveTCPAddr("tcp", serverAddr)
 	if err != nil {
 		panic(err)
