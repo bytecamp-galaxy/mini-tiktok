@@ -14,56 +14,6 @@ minio:
   video-bucket-name: "video"
   cover-bucket-name: "cover"
 
-api-server:
-  name: "tiktok.api.service"
-  host: "0.0.0.0" # https://stackoverflow.com/a/20778887/6229548
-  port: 8080
-  exit-wait-time: 5
-  log-path: "logs/api.log"
-
-user-server:
-  name: "tiktok.user.service"
-  host: "127.0.0.1"
-  port: 8899
-  log-path: "logs/user.log"
-
-feed-server:
-  name: "tiktok.feed.service"
-  host: "127.0.0.1"
-  port: 8881
-  default-limit: 30
-  log-path: "logs/feed.log"
-
-comment-server:
-  name: "tiktok.comment.service"
-  host: "127.0.0.1"
-  port: 8882
-  log-path: "logs/comment.log"
-
-favorite-server:
-  name: "tiktok.favorite.service"
-  host: "127.0.0.1"
-  port: 8883
-  log-path: "logs/favorite.log"
-
-publish-server:
-  name: "tiktok.publish.service"
-  host: "127.0.0.1"
-  port: 8884
-  log-path: "logs/publish.log"
-
-relation-server:
-  name: "tiktok.relation.service"
-  host: "127.0.0.1"
-  port: 8885
-  log-path: "logs/relation.log"
-
-message-server:
-  name: "tiktok.message.service"
-  host: "127.0.0.1"
-  port: 8886
-  log-path: "logs/message.log"
-
 mysql:
   host: "127.0.0.1"
   port: 3306
@@ -80,3 +30,46 @@ redis:
   password: ""
   db: 0
   pool-size: 100
+
+api-server:
+  name: "tiktok.api.service"
+  host: "0.0.0.0" # https://stackoverflow.com/a/20778887/6229548
+  port: 8080
+  exit-wait-time: 5
+  log-path: "logs/api.log"
+
+user-server:
+  name: "tiktok.user.service"
+  host: "127.0.0.1"
+  log-path: "logs/user.log"
+
+feed-server:
+  name: "tiktok.feed.service"
+  host: "127.0.0.1"
+  default-limit: 30
+  log-path: "logs/feed.log"
+
+comment-server:
+  name: "tiktok.comment.service"
+  host: "127.0.0.1"
+  log-path: "logs/comment.log"
+
+favorite-server:
+  name: "tiktok.favorite.service"
+  host: "127.0.0.1"
+  log-path: "logs/favorite.log"
+
+publish-server:
+  name: "tiktok.publish.service"
+  host: "127.0.0.1"
+  log-path: "logs/publish.log"
+
+relation-server:
+  name: "tiktok.relation.service"
+  host: "127.0.0.1"
+  log-path: "logs/relation.log"
+
+message-server:
+  name: "tiktok.message.service"
+  host: "127.0.0.1"
+  log-path: "logs/message.log"
