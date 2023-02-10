@@ -104,9 +104,10 @@ services:
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib-dev:latest
-    command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
     volumes:
       - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./logs:/var/log/mini-tiktok
     ports:
       - "1888:1888"   # pprof extension
       - "8888"        # Prometheus metrics exposed by the collector

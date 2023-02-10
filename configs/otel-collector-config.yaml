@@ -2,12 +2,15 @@ receivers:
   otlp:
     protocols:
       grpc:
+  filelog:
+    include: [ /var/log/mini-tiktok/*.log ]
 
 exporters:
   prometheusremotewrite:
     endpoint: "http://victoriametrics:8428/api/v1/write"
 
   logging:
+    loglevel: debug
 
   jaeger:
     endpoint: jaeger-all-in-one:14250
@@ -30,8 +33,12 @@ service:
     traces:
       receivers: [ otlp ]
       processors: [ batch ]
-      exporters: [ logging, jaeger ]
+      exporters: [ jaeger ]
     metrics:
       receivers: [ otlp ]
       processors: [ batch ]
-      exporters: [ logging, prometheusremotewrite ]
+      exporters: [ prometheusremotewrite ]
+    logs:
+      receivers: [ filelog ]
+      processors: [ batch ]
+      exporters: [ logging ]

@@ -12,22 +12,21 @@ import (
 )
 
 var (
-	Writer io.Writer = os.Stdout
+	writer io.Writer = os.Stdout
 )
 
 func SetOutput(path string) {
 	switch path {
 	case "stdout":
-		Writer = os.Stdout
+		writer = os.Stdout
 	case "stderr":
-		Writer = os.Stderr
+		writer = os.Stderr
 	default:
-		path = "./" + path
 		f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			panic(err)
 		}
-		Writer = f
+		writer = f
 	}
 }
 
@@ -36,9 +35,7 @@ func InitHLogger() {
 		hertzzap.WithCoreWs(getLogWriter()),
 		hertzzap.WithCoreLevel(getAtomicLevel()),
 		hertzzap.WithZapOptions(getZapOptions()...)))
-
-	hlog.SetOutput(Writer)
-
+	hlog.SetOutput(writer)
 }
 
 func InitKLogger() {
@@ -46,8 +43,7 @@ func InitKLogger() {
 		kitexzap.WithCoreWs(getLogWriter()),
 		kitexzap.WithCoreLevel(getAtomicLevel()),
 		kitexzap.WithZapOptions(getZapOptions()...)))
-
-	klog.SetOutput(Writer)
+	klog.SetOutput(writer)
 }
 
 func GetDBLogger() gormlogger.Interface {

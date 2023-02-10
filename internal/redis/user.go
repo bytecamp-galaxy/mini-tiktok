@@ -49,7 +49,8 @@ func LoadUserFromDBToRedis(ctx context.Context) error {
 			return err
 		}
 	}
-	hlog.CtxInfof(ctx, "load %v user(s) from db to redis successfully", len(us))
+	// do not use `CtxInfof`
+	hlog.Infof("load %v user(s) from db to redis successfully", len(us))
 	return nil
 }
 

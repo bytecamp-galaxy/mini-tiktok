@@ -10,7 +10,7 @@ func getEncoder() zapcore.Encoder {
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	encoderConfig.EncodeCaller = zapcore.FullCallerEncoder
-	return zapcore.NewConsoleEncoder(encoderConfig)
+	return zapcore.NewJSONEncoder(encoderConfig)
 }
 
 func getZapOptions() []zap.Option {
@@ -28,10 +28,10 @@ func getAtomicLevel() zap.AtomicLevel {
 }
 
 func getLogWriter() zapcore.WriteSyncer {
-	return zapcore.AddSync(Writer)
+	return zapcore.AddSync(writer)
 }
 
 func getDBLogger() *zap.Logger {
 	core := zapcore.NewCore(getEncoder(), getLogWriter(), getLevel())
-	return zap.New(core) // TODO(vgalaxy): add caller
+	return zap.New(core, zap.AddCaller(), zap.AddCallerSkip(-1)) // TODO(vgalaxy): inconsistent caller skip
 }

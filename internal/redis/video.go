@@ -28,7 +28,7 @@ func LoadVideoFromDBToRedis(ctx context.Context) error {
 			return err
 		}
 	}
-	hlog.CtxInfof(ctx, "load %v video(s) from db to redis successfully", len(vs))
+	hlog.Infof("load %v video(s) from db to redis successfully", len(vs))
 	return nil
 }
 

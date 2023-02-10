@@ -26,7 +26,7 @@ func CreateBucket(bucketName string) error {
 			klog.Debugf("bucket %s already exists", bucketName)
 			return nil
 		} else {
-			klog.Debugf("%s", errBucketExists)
+			klog.Debugf("%s", errBucketExists.Error())
 			return err
 		}
 	} else {
