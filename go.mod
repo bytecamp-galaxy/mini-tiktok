@@ -14,7 +14,6 @@ require (
 	github.com/go-redis/redis/extra/redisotel/v8 v8.11.5
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.3.0
-	github.com/hertz-contrib/cors v0.0.0-20220601061225-50f4e582beaf
 	github.com/hertz-contrib/gzip v0.0.1
 	github.com/hertz-contrib/obs-opentelemetry/logging/zap v0.0.0-20230206061618-0fc86f9ff95d
 	github.com/hertz-contrib/obs-opentelemetry/provider v0.0.0-20221123024949-68d0df9511cf

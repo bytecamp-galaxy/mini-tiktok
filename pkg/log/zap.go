@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -18,6 +19,9 @@ func getZapOptions() []zap.Option {
 }
 
 func getLevel() zapcore.Level {
+	if conf.IsProd() {
+		return zapcore.InfoLevel
+	}
 	return zapcore.DebugLevel
 }
 

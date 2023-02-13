@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/kitex/pkg/klog"
 	hertzzap "github.com/hertz-contrib/obs-opentelemetry/logging/zap"
@@ -48,5 +49,8 @@ func InitKLogger() {
 
 func GetDBLogger() gormlogger.Interface {
 	logger := zapgorm2.New(getDBLogger())
+	if conf.IsProd() {
+		return logger
+	}
 	return logger.LogMode(gormlogger.Info)
 }

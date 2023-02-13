@@ -37,6 +37,7 @@ api-server:
   port: 8080
   exit-wait-time: 5
   log-path: "logs/api.log"
+  max-request-body-size: 104857600 # 100 MB
 
 user-server:
   name: "tiktok.user.service"

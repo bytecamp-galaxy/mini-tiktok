@@ -99,6 +99,7 @@ func main() {
 		server.WithStreamBody(true),
 		server.WithTransport(standard.NewTransporter),
 		server.WithExitWaitTime(time.Duration(v.GetInt("api-server.exit-wait-time"))*time.Second),
+		server.WithMaxRequestBodySize(v.GetInt("api-server.max-request-body-size")),
 		server.WithRegistry(r, &registry.Info{
 			ServiceName: v.GetString("api-server.name"),
 			Addr:        addr,
