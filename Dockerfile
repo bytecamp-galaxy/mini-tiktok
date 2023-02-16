@@ -32,7 +32,6 @@ WORKDIR /root
 COPY --from=build /root .
 COPY --from=script /root/wait.sh ./wait.sh
 COPY --from=script /root/configs ./configs
-COPY logs logs
 COPY scripts/wait.sh wait.sh
 RUN sed -i "s@http://\(deb\|security\).debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list \
     && apt update \
