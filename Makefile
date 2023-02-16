@@ -1,5 +1,8 @@
 .PHONY: logs run test kill service docker image clean
 
+REPLICA_CONFIG = ./configs/replica.config
+include ${REPLICA_CONFIG}
+
 logs:
 	mkdir -p logs
 
@@ -23,7 +26,12 @@ service:
 	docker compose up mysql redis etcd otel-collector jaeger-all-in-one victoriametrics grafana minio
 
 docker: logs
-	docker compose up
+	docker compose up -d --scale user-server=${USER_SERVER} \
+			--scale feed-server=${FEED_SERVER} \
+			--scale publish-server=${PUBLISH_SERVER} \
+			--scale relation-server=${RELATION_SERVER} \
+			--scale favorite-server=${FAVORITE_SERVER} \
+			--scale comment-server=${COMMENT_SERVER}
 
 image:
 	docker build -f Dockerfile -t mini-tiktok .

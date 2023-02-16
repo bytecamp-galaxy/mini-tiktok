@@ -36,41 +36,41 @@ api-server:
   host: "0.0.0.0" # https://stackoverflow.com/a/20778887/6229548
   port: 8080
   exit-wait-time: 5
-  log-path: "logs/api.log"
+  log-path: "stderr"
   max-request-body-size: 104857600 # 100 MB
 
 user-server:
   name: "tiktok.user.service"
   host: "127.0.0.1"
-  log-path: "logs/user.log"
+  log-path: "stderr"
 
 feed-server:
   name: "tiktok.feed.service"
   host: "127.0.0.1"
   default-limit: 30
-  log-path: "logs/feed.log"
+  log-path: "stderr"
 
 comment-server:
   name: "tiktok.comment.service"
   host: "127.0.0.1"
-  log-path: "logs/comment.log"
+  log-path: "stderr"
 
 favorite-server:
   name: "tiktok.favorite.service"
   host: "127.0.0.1"
-  log-path: "logs/favorite.log"
+  log-path: "stderr"
 
 publish-server:
   name: "tiktok.publish.service"
   host: "127.0.0.1"
-  log-path: "logs/publish.log"
+  log-path: "stderr"
 
 relation-server:
   name: "tiktok.relation.service"
   host: "127.0.0.1"
-  log-path: "logs/relation.log"
+  log-path: "stderr"
 
 message-server:
   name: "tiktok.message.service"
   host: "127.0.0.1"
-  log-path: "logs/message.log"
+  log-path: "stderr"
