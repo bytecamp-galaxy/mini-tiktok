@@ -1,5 +1,8 @@
 .PHONY: run test kill
 
+REPLICA_CONFIG = ./configs/replica.config
+include ${REPLICA_CONFIG}
+
 run:
 	mkdir -p logs
 	go run ./cmd/api &
@@ -22,7 +25,12 @@ service:
 
 docker:
 	mkdir -p logs
-	docker compose up
+	docker compose up -d --scale user-server=${USER_SERVER} \
+			--scale feed-server=${FEED_SERVER} \
+			--scale publish-server=${PUBLISH_SERVER} \
+			--scale relation-server=${RELATION_SERVER} \
+			--scale favorite-server=${FAVORITE_SERVER} \
+			--scale comment-server=${COMMENT_SERVER}
 
 image:
 	docker build -f Dockerfile -t mini-tiktok .

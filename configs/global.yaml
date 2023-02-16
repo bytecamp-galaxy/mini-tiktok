@@ -19,50 +19,50 @@ api-server:
   host: "0.0.0.0" # https://stackoverflow.com/a/20778887/6229548
   port: 8080
   exit-wait-time: 5
-  log-path: "logs/api.log"
+  log-path: "stderr"
 
 user-server:
   name: "tiktok.user.service"
   host: "127.0.0.1"
   port: 8899
-  log-path: "logs/user.log"
+  log-path: "stderr"
 
 feed-server:
   name: "tiktok.feed.service"
   host: "127.0.0.1"
   port: 8881
   default-limit: 30
-  log-path: "logs/feed.log"
+  log-path: "stderr"
 
 comment-server:
   name: "tiktok.comment.service"
   host: "127.0.0.1"
   port: 8882
-  log-path: "logs/comment.log"
+  log-path: "stderr"
 
 favorite-server:
   name: "tiktok.favorite.service"
   host: "127.0.0.1"
   port: 8883
-  log-path: "logs/favorite.log"
+  log-path: "stderr"
 
 publish-server:
   name: "tiktok.publish.service"
   host: "127.0.0.1"
   port: 8884
-  log-path: "logs/publish.log"
+  log-path: "stderr"
 
 relation-server:
   name: "tiktok.relation.service"
   host: "127.0.0.1"
   port: 8885
-  log-path: "logs/relation.log"
+  log-path: "stderr"
 
 message-server:
   name: "tiktok.message.service"
   host: "127.0.0.1"
   port: 8886
-  log-path: "logs/message.log"
+  log-path: "stderr"
 
 mysql:
   host: "127.0.0.1"

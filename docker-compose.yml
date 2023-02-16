@@ -67,8 +67,22 @@ services:
 
   redis:
     image: redis/redis-stack-server:latest
+    labels:
+      co.elastic.logs/enable: false
     ports:
       - "6379:6379"
+
+#  filebeat:
+#    image: docker.elastic.co/beats/filebeat:7.3.1
+#    labels:
+#      co.elastic.logs/enable: false
+#    user: root
+#    command: filebeat -e -strict.perms=false
+#    volumes:
+#      - ./configs/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   mysql:
     image: mysql:latest
     ports:
@@ -80,12 +94,16 @@ services:
       - MYSQL_RANDOM_ROOT_PASSWORD="yes"  # https://dev.mysql.com/doc/refman/5.7/en/docker-mysql-more-topics.html#docker_var_mysql_random_root_password
     healthcheck:
       test: mysqladmin ping -h127.0.0.1 -ugorm -pgorm
-      timeout: 20s
-      retries: 10
+      timeout: 100s
+      retries: 100
       interval: 1s
+    labels:
+      co.elastic.logs/enable: false
 
   etcd:
     image: bitnami/etcd:latest
+    labels:
+      co.elastic.logs/enable: false
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
@@ -95,6 +113,8 @@ services:
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib-dev:latest
+    labels:
+      co.elastic.logs/enable: false
     command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
     volumes:
       - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
@@ -110,6 +130,8 @@ services:
 
   jaeger-all-in-one:
     image: jaegertracing/all-in-one:latest
+    labels:
+      co.elastic.logs/enable: false
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     ports:
@@ -120,6 +142,8 @@ services:
 
   victoriametrics:
     container_name: victoriametrics
+    labels:
+      co.elastic.logs/enable: false
     image: victoriametrics/victoria-metrics
     ports:
       - "8428:8428"
@@ -137,6 +161,8 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    labels:
+      co.elastic.logs/enable: false
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -148,6 +174,8 @@ services:
     # default admin name: minioadmin
     # default admin pwd: minioadmin
     image: quay.io/minio/minio
+    labels:
+      co.elastic.logs/enable: false
     command: server /data --console-address ":9001" -address ":9000"
     ports:
       - "9001:9001" # client
