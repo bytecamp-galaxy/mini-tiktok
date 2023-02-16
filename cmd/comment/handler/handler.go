@@ -63,6 +63,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
 
+				// TODO(vgalaxy): move out tx scope
 				res, err := convert.CommentConverterORM(ctx, q, c, redis.InvalidUserId) // 不允许自己关注自己
 				if err != nil {
 					return err
@@ -123,30 +124,37 @@ func (s *CommentServiceImpl) CommentList(ctx context.Context, req *comment.Comme
 
 	// do action
 	q := query.Use(mysql.DB)
+	var comments []*model.Comment
 	err = q.Transaction(func(tx *query.Query) error {
-		comments, err := tx.Comment.WithContext(ctx).
+		comments, err = tx.Comment.WithContext(ctx).
 			Preload(tx.Comment.User).
 			Where(tx.Comment.VideoID.Eq(req.VideoId)).
 			Find()
 		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+			return err
 		}
 
-		list := make([]*rpcmodel.Comment, len(comments))
-		for i, c := range comments {
-			list[i], err = convert.CommentConverterORM(ctx, q, c, req.UserViewId)
-			if err != nil {
-				return err
-			}
-		}
-		resp = &comment.CommentListResponse{
-			CommentList: list,
-		}
 		return nil
 	})
 
 	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+
+	list := make([]*rpcmodel.Comment, len(comments))
+	for i, c := range comments {
+		list[i], err = convert.CommentConverterORM(ctx, q, c, req.UserViewId)
+		if err != nil {
+			return nil, err
+		}
+	}
+	resp = &comment.CommentListResponse{
+		CommentList: list,
+	}
+
+	if err != nil {
 		return nil, err
 	}
+
 	return resp, nil
 }

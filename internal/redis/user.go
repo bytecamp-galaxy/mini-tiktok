@@ -22,6 +22,8 @@ const (
 
 // LoadUserFromDBToRedis only called by api service
 func LoadUserFromDBToRedis(ctx context.Context) error {
+	// TODO: pipelined
+
 	// init bloom filter
 	// ignore recreate error
 	_ = UserIdInitBF(ctx)
@@ -111,15 +113,7 @@ func UserInfoSet(ctx context.Context, user *model.User) error {
 }
 
 func UserInfoDel(ctx context.Context, uid int64) error {
-	k := fmt.Sprintf(userInfoKeyFormat, uid)
-	res, err := r.Del(ctx, k).Result()
-	if err != nil {
-		return err
-	}
-	if res != 1 {
-		return errors.New("redis del error")
-	}
-	return nil
+	return Del(ctx, userInfoKeyFormat, uid)
 }
 
 func UserInfoGet(ctx context.Context, uid int64) (*model.User, error) {

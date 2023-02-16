@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
@@ -24,7 +25,7 @@ func doFavorite(ctx context.Context, uid int64, vid int64) error {
 			VideoID: vid,
 		})
 		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+			return err
 		}
 
 		// 改变 video 表中的 FavoriteCount
@@ -32,26 +33,38 @@ func doFavorite(ctx context.Context, uid int64, vid int64) error {
 			Where(tx.Video.ID.Eq(vid)).
 			Update(tx.Video.FavoriteCount, tx.Video.FavoriteCount.Add(1))
 		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+			return err
 		}
 		if result.RowsAffected != 1 {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
-		}
-
-		// update redis favourite info if exists
-		existed, err := redis.FavouriteKeyExists(ctx, uid)
-		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-		}
-		if existed {
-			err := redis.FavouriteKeyAdd(ctx, uid, vid)
-			if err != nil {
-				return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-			}
+			return errors.New("database update error")
 		}
 
 		return nil
 	})
+
+	if err != nil {
+		return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+
+	err = func() error {
+		// update redis favourite info if exists
+		existed, err := redis.FavouriteKeyExists(ctx, uid)
+		if err != nil {
+			return err
+		}
+		if existed {
+			err := redis.FavouriteKeyAdd(ctx, uid, vid)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}()
+
+	if err != nil {
+		return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+	}
 
 	return err
 }
@@ -63,10 +76,10 @@ func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
 		r := tx.FavoriteRelation
 		result, err := r.WithContext(ctx).Where(r.UserID.Eq(uid), r.VideoID.Eq(vid)).Delete()
 		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+			return err
 		}
 		if result.RowsAffected == 0 {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "nonexistent relation")
+			return errors.New("nonexistent relation")
 		}
 
 		// 改变 video 表中的 FavoriteCount
@@ -74,26 +87,38 @@ func doUnfavorite(ctx context.Context, uid int64, vid int64) error {
 			Where(tx.Video.ID.Eq(vid)).
 			Update(tx.Video.FavoriteCount, tx.Video.FavoriteCount.Sub(1))
 		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+			return err
 		}
 		if result.RowsAffected != 1 {
-			return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
-		}
-
-		// update redis favourite info if exists
-		existed, err := redis.FavouriteKeyExists(ctx, uid)
-		if err != nil {
-			return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-		}
-		if existed {
-			err := redis.FavouriteKeyRem(ctx, uid, vid)
-			if err != nil {
-				return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
-			}
+			return errors.New("database update error")
 		}
 
 		return nil
 	})
+
+	if err != nil {
+		return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
+	}
+
+	err = func() error {
+		// update redis favourite info if exists
+		existed, err := redis.FavouriteKeyExists(ctx, uid)
+		if err != nil {
+			return err
+		}
+		if existed {
+			err := redis.FavouriteKeyRem(ctx, uid, vid)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}()
+
+	if err != nil {
+		return kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
+	}
 
 	return err
 }

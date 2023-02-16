@@ -1,7 +1,9 @@
-.PHONY: run test kill
+.PHONY: logs run test kill service docker image clean
 
-run:
+logs:
 	mkdir -p logs
+
+run: logs
 	go run ./cmd/api &
 	go run ./cmd/comment &
 	go run ./cmd/feed &
@@ -18,11 +20,14 @@ kill:
 	ps -ef | grep -E "(go run ./cmd)|(/tmp/go-build)" | grep -v "grep" | awk '{print $$2}' | xargs kill -9
 
 service:
-	docker compose up mysql redis etcd otel-collector jaeger-all-in-one victoriametrics grafana minio -d
+	docker compose up mysql redis etcd otel-collector jaeger-all-in-one victoriametrics grafana minio
 
-docker:
-	mkdir -p logs
+docker: logs
 	docker compose up
 
 image:
 	docker build -f Dockerfile -t mini-tiktok .
+
+clean:
+	rm -rf logs
+	docker rm $$(docker ps -a -q)

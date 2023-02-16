@@ -16,6 +16,15 @@ func Exists(ctx context.Context, format string, uid int64) (bool, error) {
 	return existed == 1, err
 }
 
+func Del(ctx context.Context, format string, uid int64) error {
+	key := fmt.Sprintf(format, uid)
+	_, err := r.Del(ctx, key).Result() // skip checking result equals one
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 /*==================================================================
                              Set
 ====================================================================*/

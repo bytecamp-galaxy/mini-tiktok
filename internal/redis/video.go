@@ -12,6 +12,8 @@ const (
 
 // LoadVideoFromDBToRedis only called by api service
 func LoadVideoFromDBToRedis(ctx context.Context) error {
+	// TODO: pipelined
+
 	// init bloom filter
 	// ignore recreate error
 	_ = VideoIdInitBF(ctx)
