@@ -35,7 +35,7 @@ docker: logs
 			--scale comment-server=${COMMENT_SERVER}
 
 image:
-	docker build -f Dockerfile -t mini-tiktok .
+	docker build -f Dockerfile -t vgalaxy/mini-tiktok .
 
 clean:
 	rm -rf logs
