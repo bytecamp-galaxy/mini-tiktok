@@ -39,8 +39,8 @@ const (
 	// ErrEncodingFailed - 500: Encoding failed.
 	ErrEncodingFailed
 
-	// ErrMinio - 500: Minio error.
-	ErrMinio
+	// ErrOss - 500: Oss error.
+	ErrOss
 
 	// ErrOpenFormFile - 500: Open request's form file error.
 	ErrOpenFormFile
@@ -51,6 +51,6 @@ const (
 	// ErrInvalidVideo - 400: Video does not exist.
 	ErrInvalidVideo
 
-	// ErrInvalidVideoType - 400: Uploaded video type unsupported. (.mp4 only)
+	// ErrInvalidVideoType - 400: Uploaded video type unsupported.
 	ErrInvalidVideoType
 )

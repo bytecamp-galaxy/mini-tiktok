@@ -4,7 +4,9 @@ REPLICA_CONFIG = ./configs/replica.config
 include ${REPLICA_CONFIG}
 
 logs:
-	mkdir -p logs
+	rm -rf logs
+	# if `mkdir -p logs`, logs belong to root
+	mkdir logs
 
 run: logs
 	go run ./cmd/api &

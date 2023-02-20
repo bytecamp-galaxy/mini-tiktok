@@ -4,8 +4,8 @@ namespace go api
                         User Service
 ====================================================================*/
 struct UserRegisterRequest {
-    1: required string Username (api.query="username", api.vd="(len($) > 8 && len($) < 32)");
-    2: required string Password (api.query="password", api.vd="(len($) > 8 && len($) < 32)");
+    1: required string Username (api.query="username", api.vd="(len($) > 6 && len($) < 32)");
+    2: required string Password (api.query="password", api.vd="(len($) > 6 && len($) < 32)");
 }
 
 struct UserRegisterResponse {
@@ -16,8 +16,8 @@ struct UserRegisterResponse {
 }
 
 struct UserLoginRequest {
-    1: required string Username (api.query="username", api.vd="(len($) > 8 && len($) < 32)");
-    2: required string Password (api.query="password", api.vd="(len($) > 8 && len($) < 32)");
+    1: required string Username (api.query="username", api.vd="(len($) > 6 && len($) < 32)");
+    2: required string Password (api.query="password", api.vd="(len($) > 6 && len($) < 32)");
 }
 
 struct UserLoginResponse {
@@ -44,6 +44,12 @@ struct User {
     3: optional i64 FollowCount (api.body="follow_count");
     4: optional i64 FollowerCount (api.body="follower_count");
     5: required bool IsFollow (api.body="is_follow");
+    6: optional string Avatar (api.body="avatar");
+    7: optional string BackgroundImage (api.body="background_image");
+    8: optional string Signature (api.body="signature");
+    9: optional i64 TotalFavorited (api.body="total_favorited");
+    10: optional i64 WorkCount (api.body="work_count");
+    11: optional i64 FavoriteCount (api.body="favorite_count");
 }
 
 service UserApi {

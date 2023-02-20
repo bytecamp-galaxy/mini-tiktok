@@ -6,13 +6,16 @@ otlp-receiver:
   host: "127.0.0.1"
   port: 4317
 
-minio:
+oss:
+  type: "minio"
   host: "127.0.0.1"
   port: 9000
+  endpoint: oss-cn-nanjing.aliyuncs.com
   ak: "minioadmin"
   sk: "minioadmin"
-  video-bucket-name: "video"
-  cover-bucket-name: "cover"
+  video-bucket-name: "mini-tiktok-video"
+  cover-bucket-name: "mini-tiktok-cover"
+  init-bucket: true
 
 mysql:
   host: "127.0.0.1"
@@ -36,41 +39,41 @@ api-server:
   host: "0.0.0.0" # https://stackoverflow.com/a/20778887/6229548
   port: 8080
   exit-wait-time: 5
-  log-path: "stderr"
+  log-path: "logs/api-server"
   max-request-body-size: 104857600 # 100 MB
 
 user-server:
   name: "tiktok.user.service"
   host: "127.0.0.1"
-  log-path: "stderr"
+  log-path: "logs/user-server"
 
 feed-server:
   name: "tiktok.feed.service"
   host: "127.0.0.1"
   default-limit: 30
-  log-path: "stderr"
+  log-path: "logs/feed-server"
 
 comment-server:
   name: "tiktok.comment.service"
   host: "127.0.0.1"
-  log-path: "stderr"
+  log-path: "logs/comment-server"
 
 favorite-server:
   name: "tiktok.favorite.service"
   host: "127.0.0.1"
-  log-path: "stderr"
+  log-path: "logs/favorite-server"
 
 publish-server:
   name: "tiktok.publish.service"
   host: "127.0.0.1"
-  log-path: "stderr"
+  log-path: "logs/publish-server"
 
 relation-server:
   name: "tiktok.relation.service"
   host: "127.0.0.1"
-  log-path: "stderr"
+  log-path: "logs/relation-server"
 
 message-server:
   name: "tiktok.message.service"
   host: "127.0.0.1"
-  log-path: "stderr"
+  log-path: "logs/message-server"

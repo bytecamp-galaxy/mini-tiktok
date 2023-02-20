@@ -3,16 +3,18 @@ package handler
 import (
 	"bytes"
 	"context"
+	"errors"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/minio"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
@@ -36,7 +38,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	videoTitle := req.Title
 
 	// byte[] -> reader
-	reader := bytes.NewReader(videoData)
+	videoReader := bytes.NewReader(videoData)
 	// check video type
 	filetype := http.DetectContentType(videoData)
 	if filetype != "video/mp4" {
@@ -44,43 +46,43 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	}
 
 	videoUid := uuid.New()
-	fileName := videoUid.String() + "." + "mp4"
+	videoName := videoUid.String() + "." + "mp4"
 
 	v := conf.Init()
-	videoBucketName := v.GetString("minio.video-bucket-name")
-	coverBucketName := v.GetString("minio.cover-bucket-name")
+	videoBucketName := v.GetString("oss.video-bucket-name")
+	coverBucketName := v.GetString("oss.cover-bucket-name")
 
 	// 上传视频
-	err = minio.UploadFile(videoBucketName, fileName, reader, int64(len(videoData)))
+	err = oss.Upload(videoBucketName, videoName, videoReader, int64(len(videoData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
 	}
 
 	// 获取视频链接
-	playUrl, err := minio.GetFileUrl(videoBucketName, fileName, 0)
+	playUrl, err := oss.GetUrl(videoBucketName, videoName)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
 	}
 
 	// 获取封面
 	coverUid := uuid.New()
-	coverPath := coverUid.String() + "." + "jpg"
-	coverData, err := utils.ReadFrameAsJpeg(playUrl.String())
+	coverName := coverUid.String() + "." + "jpg"
+	coverData, err := utils.ReadFrameAsJpeg(playUrl)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrEncodingFailed), err.Error())
 	}
 
 	// 上传封面
 	coverReader := bytes.NewReader(coverData)
-	err = minio.UploadFile(coverBucketName, coverPath, coverReader, int64(len(coverData)))
+	err = oss.Upload(coverBucketName, coverName, coverReader, int64(len(coverData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
 	}
 
 	// 获取封面链接
-	coverUrl, err := minio.GetFileUrl(coverBucketName, coverPath, 0)
+	coverUrl, err := oss.GetUrl(coverBucketName, coverName)
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
 	}
 
 	// 封装 video
@@ -88,19 +90,65 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	video := &model.Video{
 		ID:       vid,
 		AuthorID: authorId,
-		PlayUrl:  playUrl.String(),
-		CoverUrl: coverUrl.String(),
+		PlayUrl:  playUrl,
+		CoverUrl: coverUrl,
 		Title:    videoTitle,
 	}
 
-	// 保存
-	err = query.Video.WithContext(ctx).Create(video)
+	// db transaction
+	q := query.Use(mysql.DB)
+	err = q.Transaction(func(tx *query.Query) error {
+		// create video
+		err = query.Video.WithContext(ctx).Create(video)
+		if err != nil {
+			return err
+		}
+
+		// update user info
+		result, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(authorId)).
+			Update(query.User.WorkCount, query.User.WorkCount.Add(1))
+		if err != nil {
+			return err
+		}
+		if result.RowsAffected != 1 {
+			return errors.New("database update error")
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
-	// load to redis bloom filter
-	err = redis.VideoIdAddBF(ctx, vid)
+	// redis transaction
+	err = func() error {
+		// load vid to redis bloom filter
+		err = redis.VideoIdAddBF(ctx, vid)
+		if err != nil {
+			return err
+		}
+
+		// update redis user info if exists
+		exist, err := redis.UserInfoExists(ctx, authorId)
+		if err != nil {
+			return err
+		}
+		if exist {
+			user, err := redis.UserInfoGet(ctx, authorId)
+			if err != nil {
+				return err
+			}
+			user.WorkCount += 1
+			err = redis.UserInfoSet(ctx, user)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}()
+
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}

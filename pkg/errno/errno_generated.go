@@ -20,9 +20,9 @@ func Init() {
 	register(ErrClientRPCInit, 500, "RPC client initialization error")
 	register(ErrRPCLink, 500, "RPC service link error")
 	register(ErrEncodingFailed, 500, "Encoding failed")
-	register(ErrMinio, 500, "Minio error")
+	register(ErrOss, 500, "Oss error")
 	register(ErrOpenFormFile, 500, "Open request's form file error")
 	register(ErrInvalidUser, 400, "User does not exist")
 	register(ErrInvalidVideo, 400, "Video does not exist")
-	register(ErrInvalidVideoType, 400, "Uploaded video type unsupported. (")
+	register(ErrInvalidVideoType, 400, "Uploaded video type unsupported")
 }

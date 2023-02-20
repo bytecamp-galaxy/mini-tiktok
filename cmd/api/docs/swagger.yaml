@@ -111,6 +111,12 @@ definitions:
     type: object
   api.User:
     properties:
+      avatar:
+        type: string
+      background_image:
+        type: string
+      favorite_count:
+        type: integer
       follow_count:
         type: integer
       follower_count:
@@ -121,6 +127,12 @@ definitions:
         type: boolean
       name:
         type: string
+      signature:
+        type: string
+      total_favorited:
+        type: integer
+      work_count:
+        type: integer
     type: object
   api.UserLoginResponse:
     properties:
@@ -283,7 +295,7 @@ paths:
             $ref: '#/definitions/api.FeedResponse'
   /douyin/publish/action/:
     post:
-      description: 发布列表：用户的视频发布列表，直接列出用户所有投稿过的视频
+      description: 投稿接口：登录用户选择视频上传
       parameters:
       - in: formData
         items:

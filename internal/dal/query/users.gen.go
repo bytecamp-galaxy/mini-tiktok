@@ -32,6 +32,9 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Password = field.NewString(tableName, "password")
 	_user.FollowingCount = field.NewInt64(tableName, "following_count")
 	_user.FollowerCount = field.NewInt64(tableName, "follower_count")
+	_user.TotalFavorited = field.NewInt64(tableName, "total_favorited")
+	_user.WorkCount = field.NewInt64(tableName, "work_count")
+	_user.FavoriteCount = field.NewInt64(tableName, "favorite_count")
 
 	_user.fillFieldMap()
 
@@ -47,6 +50,9 @@ type user struct {
 	Password       field.String
 	FollowingCount field.Int64
 	FollowerCount  field.Int64
+	TotalFavorited field.Int64
+	WorkCount      field.Int64
+	FavoriteCount  field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -68,6 +74,9 @@ func (u *user) updateTableName(table string) *user {
 	u.Password = field.NewString(table, "password")
 	u.FollowingCount = field.NewInt64(table, "following_count")
 	u.FollowerCount = field.NewInt64(table, "follower_count")
+	u.TotalFavorited = field.NewInt64(table, "total_favorited")
+	u.WorkCount = field.NewInt64(table, "work_count")
+	u.FavoriteCount = field.NewInt64(table, "favorite_count")
 
 	u.fillFieldMap()
 
@@ -84,12 +93,15 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 5)
+	u.fieldMap = make(map[string]field.Expr, 8)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["username"] = u.Username
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["following_count"] = u.FollowingCount
 	u.fieldMap["follower_count"] = u.FollowerCount
+	u.fieldMap["total_favorited"] = u.TotalFavorited
+	u.fieldMap["work_count"] = u.WorkCount
+	u.fieldMap["favorite_count"] = u.FavoriteCount
 }
 
 func (u user) clone(db *gorm.DB) user {

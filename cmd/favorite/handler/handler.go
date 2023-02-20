@@ -23,7 +23,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 	}
 
 	// check video
-	_, err = pack.QueryVideo(ctx, req.VideoId)
+	v, err := pack.QueryVideo(ctx, req.VideoId)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 	switch req.ActionType {
 	case 1:
 		{
-			e := doFavorite(ctx, req.UserId, req.VideoId)
+			e := doFavorite(ctx, req.UserId, req.VideoId, v.AuthorID)
 			if e != nil {
 				return nil, e
 			}
@@ -41,7 +41,7 @@ func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, req *favorite.
 		}
 	case 2:
 		{
-			e := doUnfavorite(ctx, req.UserId, req.VideoId)
+			e := doUnfavorite(ctx, req.UserId, req.VideoId, v.AuthorID)
 			if e != nil {
 				return nil, e
 			}

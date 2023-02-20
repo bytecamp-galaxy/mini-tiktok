@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	writer io.Writer = os.Stdout
+	writer io.Writer = os.Stderr
 )
 
 func SetOutput(path string) {

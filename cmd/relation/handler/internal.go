@@ -59,12 +59,11 @@ func doFollow(ctx context.Context, fromId int64, toId int64) error {
 		if err != nil {
 			return err
 		}
-		if !exist {
-			return nil
-		}
-		err = redis.FollowKeyAdd(ctx, fromId, toId)
-		if err != nil {
-			return err
+		if exist {
+			err = redis.FollowKeyAdd(ctx, fromId, toId)
+			if err != nil {
+				return err
+			}
 		}
 
 		// update redis user info if exists
@@ -72,34 +71,32 @@ func doFollow(ctx context.Context, fromId int64, toId int64) error {
 		if err != nil {
 			return err
 		}
-		if !exist {
-			return nil
-		}
-		user, err := redis.UserInfoGet(ctx, fromId)
-		if err != nil {
-			return err
-		}
-		user.FollowingCount += 1
-		err = redis.UserInfoSet(ctx, user)
-		if err != nil {
-			return err
+		if exist {
+			user, err := redis.UserInfoGet(ctx, fromId)
+			if err != nil {
+				return err
+			}
+			user.FollowingCount += 1
+			err = redis.UserInfoSet(ctx, user)
+			if err != nil {
+				return err
+			}
 		}
 
 		exist, err = redis.UserInfoExists(ctx, toId)
 		if err != nil {
 			return err
 		}
-		if !exist {
-			return nil
-		}
-		user, err = redis.UserInfoGet(ctx, toId)
-		if err != nil {
-			return err
-		}
-		user.FollowerCount += 1
-		err = redis.UserInfoSet(ctx, user)
-		if err != nil {
-			return err
+		if exist {
+			user, err := redis.UserInfoGet(ctx, toId)
+			if err != nil {
+				return err
+			}
+			user.FollowerCount += 1
+			err = redis.UserInfoSet(ctx, user)
+			if err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -157,12 +154,11 @@ func doUnFollow(ctx context.Context, fromId int64, toId int64) error {
 		if err != nil {
 			return err
 		}
-		if !exist {
-			return nil
-		}
-		err = redis.FollowKeyRem(ctx, fromId, toId)
-		if err != nil {
-			return err
+		if exist {
+			err = redis.FollowKeyRem(ctx, fromId, toId)
+			if err != nil {
+				return err
+			}
 		}
 
 		// update redis user info if exists
@@ -170,34 +166,32 @@ func doUnFollow(ctx context.Context, fromId int64, toId int64) error {
 		if err != nil {
 			return err
 		}
-		if !exist {
-			return nil
-		}
-		user, err := redis.UserInfoGet(ctx, fromId)
-		if err != nil {
-			return err
-		}
-		user.FollowingCount -= 1
-		err = redis.UserInfoSet(ctx, user)
-		if err != nil {
-			return err
+		if exist {
+			user, err := redis.UserInfoGet(ctx, fromId)
+			if err != nil {
+				return err
+			}
+			user.FollowingCount -= 1
+			err = redis.UserInfoSet(ctx, user)
+			if err != nil {
+				return err
+			}
 		}
 
 		exist, err = redis.UserInfoExists(ctx, toId)
 		if err != nil {
 			return err
 		}
-		if !exist {
-			return nil
-		}
-		user, err = redis.UserInfoGet(ctx, toId)
-		if err != nil {
-			return err
-		}
-		user.FollowerCount -= 1
-		err = redis.UserInfoSet(ctx, user)
-		if err != nil {
-			return err
+		if exist {
+			user, err := redis.UserInfoGet(ctx, toId)
+			if err != nil {
+				return err
+			}
+			user.FollowerCount -= 1
+			err = redis.UserInfoSet(ctx, user)
+			if err != nil {
+				return err
+			}
 		}
 
 		return nil

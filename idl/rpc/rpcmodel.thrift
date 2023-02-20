@@ -6,6 +6,12 @@ struct User {
     3: required i64 FollowCount;
     4: required i64 FollowerCount;
     5: required bool IsFollow;
+    6: required string Avatar;
+    7: required string BackgroundImage;
+    8: required string Signature;
+    9: required i64 TotalFavorited;
+    10: required i64 WorkCount;
+    11: required i64 FavoriteCount;
 }
 
 struct Comment {
