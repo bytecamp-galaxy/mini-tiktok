@@ -29,7 +29,7 @@ service:
 	docker compose up -d mysql redis etcd otel-collector jaeger-all-in-one victoriametrics grafana minio
 
 docker: logs
-	docker-compose up -d --scale user-server=${USER_SERVER} \
+	docker compose up -d --scale user-server=${USER_SERVER} \
 			--scale feed-server=${FEED_SERVER} \
 			--scale publish-server=${PUBLISH_SERVER} \
 			--scale relation-server=${RELATION_SERVER} \
