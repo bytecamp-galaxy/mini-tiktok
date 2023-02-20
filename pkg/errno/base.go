@@ -39,11 +39,8 @@ const (
 	// ErrEncodingFailed - 500: Encoding failed.
 	ErrEncodingFailed
 
-	// ErrMinio - 500: Minio error.
-	ErrMinio
-
-	// ErrOSS - 500: OSS error.
-	ErrOSS
+	// ErrOss - 500: Oss error.
+	ErrOss
 
 	// ErrOpenFormFile - 500: Open request's form file error.
 	ErrOpenFormFile

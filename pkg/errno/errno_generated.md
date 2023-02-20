@@ -33,10 +33,9 @@ mini-tiktok 系统支持的错误码列表如下：
 | ErrClientRPCInit | 100010 | 500 | RPC client initialization error |
 | ErrRPCLink | 100011 | 500 | RPC service link error |
 | ErrEncodingFailed | 100012 | 500 | Encoding failed |
-| ErrMinio | 100013 | 500 | Minio error |
-| ErrOSS | 100014 | 500 | OSS error |
-| ErrOpenFormFile | 100015 | 500 | Open request's form file error |
-| ErrInvalidUser | 100016 | 400 | User does not exist |
-| ErrInvalidVideo | 100017 | 400 | Video does not exist |
-| ErrInvalidVideoType | 100018 | 400 | Uploaded video type unsupported |
+| ErrOss | 100013 | 500 | Oss error |
+| ErrOpenFormFile | 100014 | 500 | Open request's form file error |
+| ErrInvalidUser | 100015 | 400 | User does not exist |
+| ErrInvalidVideo | 100016 | 400 | Video does not exist |
+| ErrInvalidVideoType | 100017 | 400 | Uploaded video type unsupported |
 

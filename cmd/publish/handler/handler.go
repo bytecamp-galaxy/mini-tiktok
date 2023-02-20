@@ -6,14 +6,15 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/google/uuid"
 	"net/http"
@@ -35,7 +36,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	videoTitle := req.Title
 
 	// byte[] -> reader
-	reader := bytes.NewReader(videoData)
+	videoReader := bytes.NewReader(videoData)
 	// check video type
 	filetype := http.DetectContentType(videoData)
 	if filetype != "video/mp4" {
@@ -43,53 +44,44 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	}
 
 	videoUid := uuid.New()
-	fileName := videoUid.String() + "." + "mp4"
+	videoName := videoUid.String() + "." + "mp4"
 
 	v := conf.Init()
-	videoBucketName := v.GetString("minio.video-bucket-name")
-	//coverBucketName := v.GetString("minio.cover-bucket-name")
+	videoBucketName := v.GetString("oss.video-bucket-name")
+	coverBucketName := v.GetString("oss.cover-bucket-name")
 
 	// 上传视频
-	//err = minio.UploadFile(videoBucketName, fileName, reader, int64(len(videoData)))
-	//if err != nil {
-	//	return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
-	//}
-
-	err = oss.UploadFile(videoBucketName, fileName, reader)
+	err = oss.Upload(videoBucketName, videoName, videoReader, int64(len(videoData)))
 	if err != nil {
-		return nil, kerrors.NewBizStatusError(int32(errno.ErrOSS), err.Error())
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
 	}
 
 	// 获取视频链接
-	//playUrl, err := minio.GetFileUrl(videoBucketName, fileName, 0)
-	//if err != nil {
-	//	return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
-	//}
-
-	playUrl := oss.GetFileUrl(videoBucketName, fileName)
+	playUrl, err := oss.GetUrl(videoBucketName, videoName)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
+	}
 
 	// 获取封面
-	//coverUid := uuid.New()
-	//coverPath := coverUid.String() + "." + "jpg"
-	//coverData, err := utils.ReadFrameAsJpeg(playUrl.String())
-	//if err != nil {
-	//	return nil, kerrors.NewBizStatusError(int32(errno.ErrEncodingFailed), err.Error())
-	//}
+	coverUid := uuid.New()
+	coverName := coverUid.String() + "." + "jpg"
+	coverData, err := utils.ReadFrameAsJpeg(playUrl)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrEncodingFailed), err.Error())
+	}
 
 	// 上传封面
-	//coverReader := bytes.NewReader(coverData)
-	//err = minio.UploadFile(coverBucketName, coverPath, coverReader, int64(len(coverData)))
-	//if err != nil {
-	//	return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
-	//}
+	coverReader := bytes.NewReader(coverData)
+	err = oss.Upload(coverBucketName, coverName, coverReader, int64(len(coverData)))
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
+	}
 
 	// 获取封面链接
-	//coverUrl, err := minio.GetFileUrl(coverBucketName, coverPath, 0)
-	//if err != nil {
-	//	return nil, kerrors.NewBizStatusError(int32(errno.ErrMinio), err.Error())
-	//}
-
-	coverUrl := oss.VideoSnapshot(playUrl)
+	coverUrl, err := oss.GetUrl(coverBucketName, coverName)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(int32(errno.ErrOss), err.Error())
+	}
 
 	// 封装 video
 	vid := snowflake.Generate()

@@ -37,7 +37,6 @@ func main() {
 	snowflake.Init()
 
 	// init server
-
 	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
 	r, err := etcd.NewEtcdRegistry([]string{etcdAddr})
 	if err != nil {

@@ -25,7 +25,7 @@ func IsDev() bool {
 }
 
 func IsProd() bool {
-	return Init().GetString("prod") == prod
+	return Init().GetString("envKey") == prod
 }
 
 func Init() *viper.Viper {

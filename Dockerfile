@@ -32,6 +32,7 @@ COPY --from=build /root .
 COPY --from=script /root/wait.sh ./wait.sh
 COPY scripts/wait.sh wait.sh
 RUN apt update \
+    && apt install -y ffmpeg \
     && apt install -y netcat \
     && apt install -y wget \
     && wget https://ghproxy.com/https://raw.githubusercontent.com/eficode/wait-for/v2.2.3/wait-for

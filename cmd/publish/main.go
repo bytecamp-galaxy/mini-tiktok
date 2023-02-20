@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"github.com/bytecamp-galaxy/mini-tiktok/cmd/publish/handler"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish/publishservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -29,7 +29,11 @@ func main() {
 	log.InitKLogger()
 
 	// init oss
-	oss.Init()
+	if conf.IsProd() {
+		oss.Init(v.GetString(oss.AliyunInstance))
+	} else {
+		oss.Init(v.GetString("oss.type"))
+	}
 
 	// init db
 	dal.Init(false)
@@ -41,7 +45,6 @@ func main() {
 	snowflake.Init()
 
 	// init server
-
 	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))
 	r, err := etcd.NewEtcdRegistry([]string{etcdAddr})
 	if err != nil {
