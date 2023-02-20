@@ -7,15 +7,15 @@ otlp-receiver:
   port: 4317
 
 oss:
-  type: "aliyun"
+  type: "minio"
   host: "127.0.0.1"
   port: 9000
   endpoint: oss-cn-nanjing.aliyuncs.com
-  ak: LTAI5tA1qexCsVqqnoDUxFjB
-  sk: jl110U6w6SFHQCm5258BC8fnrKZ6Ub
+  ak: "minioadmin"
+  sk: "minioadmin"
   video-bucket-name: "mini-tiktok-video"
   cover-bucket-name: "mini-tiktok-cover"
-  init-bucket: false
+  init-bucket: true
 
 mysql:
   host: "127.0.0.1"

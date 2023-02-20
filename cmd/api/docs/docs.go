@@ -184,7 +184,7 @@ const docTemplate = `{
         },
         "/douyin/publish/action/": {
             "post": {
-                "description": "发布列表：用户的视频发布列表，直接列出用户所有投稿过的视频",
+                "description": "投稿接口：登录用户选择视频上传",
                 "produces": [
                     "application/json"
                 ],
@@ -593,6 +593,15 @@ const docTemplate = `{
         "api.User": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "background_image": {
+                    "type": "string"
+                },
+                "favorite_count": {
+                    "type": "integer"
+                },
                 "follow_count": {
                     "type": "integer"
                 },
@@ -607,6 +616,15 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "signature": {
+                    "type": "string"
+                },
+                "total_favorited": {
+                    "type": "integer"
+                },
+                "work_count": {
+                    "type": "integer"
                 }
             }
         },

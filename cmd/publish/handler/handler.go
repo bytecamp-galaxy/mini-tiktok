@@ -3,8 +3,10 @@ package handler
 import (
 	"bytes"
 	"context"
+	"errors"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/convert"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/model"
+	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/mysql"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/pack"
@@ -93,14 +95,60 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 		Title:    videoTitle,
 	}
 
-	// 保存
-	err = query.Video.WithContext(ctx).Create(video)
+	// db transaction
+	q := query.Use(mysql.DB)
+	err = q.Transaction(func(tx *query.Query) error {
+		// create video
+		err = query.Video.WithContext(ctx).Create(video)
+		if err != nil {
+			return err
+		}
+
+		// update user info
+		result, err := query.User.WithContext(ctx).Where(query.User.ID.Eq(authorId)).
+			Update(query.User.WorkCount, query.User.WorkCount.Add(1))
+		if err != nil {
+			return err
+		}
+		if result.RowsAffected != 1 {
+			return errors.New("database update error")
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
-	// load to redis bloom filter
-	err = redis.VideoIdAddBF(ctx, vid)
+	// redis transaction
+	err = func() error {
+		// load vid to redis bloom filter
+		err = redis.VideoIdAddBF(ctx, vid)
+		if err != nil {
+			return err
+		}
+
+		// update redis user info if exists
+		exist, err := redis.UserInfoExists(ctx, authorId)
+		if err != nil {
+			return err
+		}
+		if exist {
+			user, err := redis.UserInfoGet(ctx, authorId)
+			if err != nil {
+				return err
+			}
+			user.WorkCount += 1
+			err = redis.UserInfoSet(ctx, user)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}()
+
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}

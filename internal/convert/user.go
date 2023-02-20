@@ -16,11 +16,17 @@ func UserConverterAPI(user *rpcmodel.User) *api.User {
 		return nil
 	}
 	return &api.User{
-		Id:            user.Id,
-		Name:          user.Name,
-		FollowCount:   &user.FollowCount,
-		FollowerCount: &user.FollowerCount,
-		IsFollow:      user.IsFollow,
+		Id:              user.Id,
+		Name:            user.Name,
+		FollowCount:     &user.FollowCount,
+		FollowerCount:   &user.FollowerCount,
+		IsFollow:        user.IsFollow,
+		Avatar:          &user.Avatar,
+		BackgroundImage: &user.BackgroundImage,
+		Signature:       &user.Signature,
+		TotalFavorited:  &user.TotalFavorited,
+		WorkCount:       &user.WorkCount,
+		FavoriteCount:   &user.FavoriteCount,
 	}
 }
 
@@ -37,10 +43,16 @@ func UserConverterORM(ctx context.Context, q *query.Query, user *model.User, use
 		}
 	}
 	return &rpcmodel.User{
-		Id:            user.ID,
-		Name:          user.Username,
-		FollowCount:   user.FollowingCount,
-		FollowerCount: user.FollowerCount,
-		IsFollow:      relFollow,
+		Id:              user.ID,
+		Name:            user.Username,
+		FollowCount:     user.FollowingCount,
+		FollowerCount:   user.FollowerCount,
+		IsFollow:        relFollow,
+		Avatar:          "https://pixiv.cat/71001144.png",
+		BackgroundImage: "https://pixiv.cat/105250474.png",
+		Signature:       "Nothing but more and more nothingness.",
+		TotalFavorited:  user.TotalFavorited,
+		WorkCount:       user.WorkCount,
+		FavoriteCount:   user.FavoriteCount,
 	}, nil
 }
