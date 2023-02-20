@@ -9,8 +9,8 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/publish/publishservice"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/minio"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
+	"github.com/bytecamp-galaxy/mini-tiktok/pkg/oss"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -28,8 +28,8 @@ func main() {
 	log.SetOutput(v.GetString("publish-server.log-path"))
 	log.InitKLogger()
 
-	// init minio
-	minio.Init()
+	// init oss
+	oss.Init()
 
 	// init db
 	dal.Init(false)

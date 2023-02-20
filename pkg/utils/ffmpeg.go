@@ -2,11 +2,15 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"gopkg.in/vansante/go-ffprobe.v2"
 	"image"
 	"image/jpeg"
 	"os"
+
+	"io"
 )
 
 // ReadFrameAsJpeg
@@ -30,4 +34,16 @@ func ReadFrameAsJpeg(filePath string) ([]byte, error) {
 	jpeg.Encode(buf, img, nil)
 
 	return buf.Bytes(), err
+}
+
+func ParseVideoResolution(ctx context.Context, reader io.Reader) (weight int, height int, err error) {
+	var data *ffprobe.ProbeData
+	data, err = ffprobe.ProbeReader(ctx, reader)
+	if err != nil {
+		return
+	}
+
+	weight = data.Streams[0].Width
+	height = data.Streams[0].Height
+	return
 }

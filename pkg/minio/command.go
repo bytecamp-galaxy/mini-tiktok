@@ -2,6 +2,7 @@ package minio
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/url"
 	"time"
@@ -32,6 +33,14 @@ func CreateBucket(bucketName string) error {
 	} else {
 		klog.Infof("bucket %s create successfully", bucketName)
 	}
+
+	policy := fmt.Sprintf(`{"Version": "2012-10-17","Statement": [{"Action": ["s3:GetObject"],"Effect": "Allow","Principal": {"AWS": ["*"]},"Resource": ["arn:aws:s3:::%s/*"],"Sid": ""}]}`, bucketName)
+	err = minioClient.SetBucketPolicy(context.Background(), bucketName, policy)
+	if err != nil {
+		klog.Debugf("%s", err.Error())
+		return err
+	}
+
 	return nil
 }
 

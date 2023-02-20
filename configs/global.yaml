@@ -14,6 +14,13 @@ minio:
   video-bucket-name: "video"
   cover-bucket-name: "cover"
 
+aliyun-oss:
+  endpoint: oss-cn-nanjing.aliyuncs.com
+  ak: xxx
+  sk: xxx
+  video-bucket-name: "mini-tiktok-video"
+  cover-bucket-name: "mini-tiktok-cover"
+
 mysql:
   host: "127.0.0.1"
   port: 3306

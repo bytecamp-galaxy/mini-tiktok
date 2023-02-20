@@ -42,6 +42,9 @@ const (
 	// ErrMinio - 500: Minio error.
 	ErrMinio
 
+	// ErrOSS - 500: OSS error.
+	ErrOSS
+
 	// ErrOpenFormFile - 500: Open request's form file error.
 	ErrOpenFormFile
 
@@ -51,6 +54,6 @@ const (
 	// ErrInvalidVideo - 400: Video does not exist.
 	ErrInvalidVideo
 
-	// ErrInvalidVideoType - 400: Uploaded video type unsupported. (.mp4 only)
+	// ErrInvalidVideoType - 400: Uploaded video type unsupported.
 	ErrInvalidVideoType
 )
