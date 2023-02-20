@@ -35,6 +35,6 @@ func CommentConverterORM(ctx context.Context, q *query.Query, comment *model.Com
 		Id:         comment.ID,
 		User:       user,
 		Content:    comment.Content,
-		CreateDate: time.Unix(comment.CreatedAt, 0).String(),
+		CreateDate: time.Unix(comment.CreatedAt, 0).Format("01-02"),
 	}, nil
 }
