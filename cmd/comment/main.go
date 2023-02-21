@@ -62,7 +62,7 @@ func main() {
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
 		server.WithRegistryInfo(info),
-		server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 100}),
+		server.WithLimit(&limit.Option{MaxConnections: 100000, MaxQPS: 10000}),
 		server.WithMiddleware(mw.CommonMiddleware),
 		server.WithMiddleware(mw.ServerMiddleware),
 		server.WithMuxTransport(),
