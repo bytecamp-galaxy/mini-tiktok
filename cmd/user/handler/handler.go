@@ -9,7 +9,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/user"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 )
@@ -26,18 +25,17 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 	}
 
 	// create user in db
-	id := snowflake.Generate()
-	err = query.User.WithContext(ctx).Create(&model.User{
-		ID:       id,
+	data := &model.User{
 		Username: req.Username,
 		Password: hash,
-	})
+	}
+	err = query.User.WithContext(ctx).Create(data)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 	}
 
 	// load to redis bloom filter
-	err = redis.UserIdAddBF(ctx, id)
+	err = redis.UserIdAddBF(ctx, data.ID)
 	if err != nil {
 		return nil, kerrors.NewBizStatusError(int32(errno.ErrRedis), err.Error())
 	}
@@ -48,7 +46,7 @@ func (s *UserServiceImpl) UserRegister(ctx context.Context, req *user.UserRegist
 
 	// response to user server
 	resp = &user.UserRegisterResponse{
-		UserId: id,
+		UserId: data.ID,
 	}
 	return resp, nil
 }

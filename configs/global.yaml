@@ -11,8 +11,8 @@ oss:
   host: "127.0.0.1"
   port: 9000
   endpoint: oss-cn-nanjing.aliyuncs.com
-  ak: "3qDMG9UgoSUcHrnB"
-  sk: "wBIlWi47C0R5AP5oWVrDNt3jbTA0Upbq"
+  ak: "minioadmin"
+  sk: "minioadmin"
   video-bucket-name: "mini-tiktok-video"
   cover-bucket-name: "mini-tiktok-cover"
   init-bucket: true

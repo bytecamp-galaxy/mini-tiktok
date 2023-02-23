@@ -2,16 +2,16 @@ package snowflake
 
 import "github.com/bwmarrin/snowflake"
 
-var node *snowflake.Node
+var generator *snowflake.Node
 
-func Init() {
-	n, err := snowflake.NewNode(1)
+func Init(node int64) {
+	n, err := snowflake.NewNode(node)
 	if err != nil {
 		panic(err)
 	}
-	node = n
+	generator = n
 }
 
 func Generate() int64 {
-	return node.Generate().Int64()
+	return generator.Generate().Int64()
 }

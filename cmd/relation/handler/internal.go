@@ -8,7 +8,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 )
 
@@ -17,12 +16,11 @@ func doFollow(ctx context.Context, fromId int64, toId int64) error {
 	q := query.Use(mysql.DB)
 	err := q.Transaction(func(tx *query.Query) error {
 		// 添加关注数据
-		id := snowflake.Generate()
-		err := tx.FollowRelation.WithContext(ctx).Create(&model.FollowRelation{
-			ID:       id,
+		data := &model.FollowRelation{
 			UserID:   fromId,
 			ToUserID: toId,
-		})
+		}
+		err := tx.FollowRelation.WithContext(ctx).Create(data)
 		if err != nil {
 			return err
 		}

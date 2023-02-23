@@ -10,7 +10,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/log"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/mw"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/registry"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -31,9 +30,6 @@ func main() {
 
 	// init redis
 	redis.Init()
-
-	// init snowflake id generator
-	snowflake.Init()
 
 	// init server
 	etcdAddr := fmt.Sprintf("%s:%d", v.GetString("etcd.host"), v.GetInt("etcd.port"))

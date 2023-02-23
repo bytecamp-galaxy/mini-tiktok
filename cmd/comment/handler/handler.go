@@ -11,7 +11,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/comment"
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 )
 
@@ -38,13 +37,12 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 		switch req.ActionType {
 		case 1:
 			{
-				id := snowflake.Generate()
-				err = tx.Comment.WithContext(ctx).Create(&model.Comment{
-					ID:      id,
+				data := &model.Comment{
 					VideoID: req.VideoId,
 					UserID:  req.UserId,
 					Content: *req.CommentText,
-				})
+				}
+				err = tx.Comment.WithContext(ctx).Create(data)
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}
@@ -58,7 +56,7 @@ func (s *CommentServiceImpl) CommentAction(ctx context.Context, req *comment.Com
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), "database update error")
 				}
 
-				c, err := tx.Comment.Preload(tx.Comment.User).WithContext(ctx).Where(tx.Comment.ID.Eq(id)).Take()
+				c, err := tx.Comment.Preload(tx.Comment.User).WithContext(ctx).Where(tx.Comment.ID.Eq(data.ID)).Take()
 				if err != nil {
 					return kerrors.NewBizStatusError(int32(errno.ErrDatabase), err.Error())
 				}

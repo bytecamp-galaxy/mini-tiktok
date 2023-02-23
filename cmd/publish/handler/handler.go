@@ -15,7 +15,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/kitex_gen/rpcmodel"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/conf"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/google/uuid"
@@ -86,9 +85,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	}
 
 	// 封装 video
-	vid := snowflake.Generate()
 	video := &model.Video{
-		ID:       vid,
 		AuthorID: authorId,
 		PlayUrl:  playUrl,
 		CoverUrl: coverUrl,
@@ -124,7 +121,7 @@ func (s *PublishServiceImpl) PublishVideo(ctx context.Context, req *publish.Publ
 	// redis transaction
 	err = func() error {
 		// load vid to redis bloom filter
-		err = redis.VideoIdAddBF(ctx, vid)
+		err = redis.VideoIdAddBF(ctx, video.ID)
 		if err != nil {
 			return err
 		}

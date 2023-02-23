@@ -8,7 +8,6 @@ import (
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/dal/query"
 	"github.com/bytecamp-galaxy/mini-tiktok/internal/redis"
 	"github.com/bytecamp-galaxy/mini-tiktok/pkg/errno"
-	"github.com/bytecamp-galaxy/mini-tiktok/pkg/snowflake"
 	"github.com/cloudwego/kitex/pkg/kerrors"
 )
 
@@ -20,12 +19,11 @@ func doFavorite(ctx context.Context, uid int64, vid int64, auid int64) error {
 	q := query.Use(mysql.DB)
 	err := q.Transaction(func(tx *query.Query) error {
 		// 添加点赞数据
-		id := snowflake.Generate()
-		err := tx.FavoriteRelation.WithContext(ctx).Create(&model.FavoriteRelation{
-			ID:      id,
+		data := &model.FavoriteRelation{
 			UserID:  uid,
 			VideoID: vid,
-		})
+		}
+		err := tx.FavoriteRelation.WithContext(ctx).Create(data)
 		if err != nil {
 			return err
 		}
